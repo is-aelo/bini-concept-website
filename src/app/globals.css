@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* BINI Brand Colors */
+    --bini-teal: #00A99D;
+    --bini-pink: #EF426F;
+    --bini-sky: #F8FBFF;
+    --bini-yellow: #FFD100;
+  }
+
+  body {
+    /* Using standard CSS instead of @apply for base body styles */
+    color: #0f172a; /* Equivalent to slate-900 */
+    min-height: 100vh;
+    margin: 0;
+    
+    /* Static Tropical Gradient */
+    background: linear-gradient(
+      135deg, 
+      #F8FBFF 0%, 
+      #F2F8FF 40%, 
+      #FFF5F8 100%
+    );
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* Editorial Glassmorphism */
+  .bini-glass {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  }
+
+  /* Smooth Glow Interaction */
+  .bini-glow-hover {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .bini-glow-hover:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 169, 157, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .rounded-bini-lg {
+    border-radius: 2.5rem;
+  }
+}
+
+@theme {
+  /* Registering custom variables into Tailwind theme for v4 */
+  --color-bini-teal: var(--bini-teal);
+  --color-bini-pink: var(--bini-pink);
+  --color-bini-sky: var(--bini-sky);
+  --color-bini-yellow: var(--bini-yellow);
+  
+  --font-heading: var(--font-sora);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Custom Animation Utility */
+@utility animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
