@@ -1,27 +1,34 @@
 import type { Metadata } from "next";
-import { Sora, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Bebas_Neue, Playfair_Display, Space_Mono, DM_Sans } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 
-const sora = Sora({ 
-  subsets: ["latin"], 
-  variable: "--font-sora",
-  weight: ["400", "600", "700", "800"]
+// 1. FONT CONFIGURATION (High-End Editorial Mix)
+const displayFont = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--f-display",
 });
 
-const jakarta = Plus_Jakarta_Sans({ 
-  subsets: ["latin"], 
-  variable: "--font-jakarta" 
+const serifFont = Playfair_Display({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--f-serif",
 });
 
-const geistMono = Geist_Mono({ 
-  subsets: ["latin"], 
-  variable: "--font-geist-mono" 
+const monoFont = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--f-mono",
+});
+
+const bodyFont = DM_Sans({
+  subsets: ["latin"],
+  variable: "--f-body",
 });
 
 export const metadata: Metadata = {
-  title: "BINI Digital Flagship",
-  description: "Official BINI Concept Experience | Developed by Eloisa Jane Talingting",
+  title: "BINI — Nation's Girl Group | Portfolio Concept",
+  description: "A high-fidelity creative concept for BINI. Experience the first P-Pop group to perform at Coachella.",
 };
 
 export default function RootLayout({
@@ -30,27 +37,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sora.variable} ${jakarta.variable} ${geistMono.variable} scroll-smooth`}>
-      <body className="antialiased font-jakarta">
-        {/* Fixed Header */}
-        <Header />
-        
-        {/* Main Content Area */}
-        <div className="relative pt-20 min-h-screen">
-          {children}
-        </div>
+    <html lang="en" className="scroll-smooth">
+      <body
+        className={`
+          ${displayFont.variable} 
+          ${serifFont.variable} 
+          ${monoFont.variable} 
+          ${bodyFont.variable} 
+          antialiased selection:bg-[var(--c-teal)] selection:text-[var(--c-ink)]
+        `}
+      >
+        {/* 2. GLOBAL NOISE FILTER (Required for the grain effect in globals.css) */}
+        <svg className="pointer-events-none fixed isolate z-[9999] opacity-0">
+          <filter id="noiseFilter">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.65"
+              numOctaves="3"
+              stitchTiles="stitch"
+            />
+          </filter>
+        </svg>
 
-        {/* Minimal Editorial Footer */}
-        <footer className="py-12 px-8 border-t border-black/5">
-          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-[10px] tracking-[0.2em] uppercase text-slate-400">
-              BINI Concept Archive // 2026
-            </p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-slate-400">
-              Designed & Built by <span className="text-slate-900 font-bold">Eloisa Jane</span>
-            </p>
-          </div>
-        </footer>
+        {/* 3. MAIN WRAPPER */}
+        <main className="relative min-h-screen">
+          {children}
+        </main>
       </body>
     </html>
   );

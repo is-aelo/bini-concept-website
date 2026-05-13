@@ -32,7 +32,7 @@ const seedData = async () => {
       type: 'EP',
       releaseDate: '2026-03-14',
       tracklist: ['Blush', 'Keep It Real', 'Signals', 'Honey Honey', 'Unang Kilig', 'Echo'],
-      spotifyLink: 'https://open.spotify.com/album/4'
+      spotifyLink: 'https://open.spotify.com/album/7EKQ3Mw77tsyP4Ymaa5hlM?si=xJ83ZbYuRIKEaEzwCkZFHg'
     },
     {
       _type: 'album',
@@ -40,7 +40,7 @@ const seedData = async () => {
       type: 'Album',
       releaseDate: '2025-11-20',
       tracklist: ['Bikini', 'Slow Burn', 'Reign', 'Skyline', 'Focus', 'Afterglow', 'Wildfire', 'Golden'],
-      spotifyLink: 'https://open.spotify.com/album/5'
+      spotifyLink: 'https://open.spotify.com/album/42s2X3WQppxdHafUT2dfmF?si=y2a3vNU3QQGJrIyow-xZOA'
     },
     {
       _type: 'album',
@@ -48,7 +48,7 @@ const seedData = async () => {
       type: 'EP',
       releaseDate: '2024-03-08',
       tracklist: ['Karera', 'Pantayo', 'Salamin, Salamin', 'Ang Huling Cha Cha', 'Na Na Nandito Lang', 'Diyan Ka Lang'],
-      spotifyLink: 'https://open.spotify.com/album/6'
+      spotifyLink: 'https://open.spotify.com/album/2eT1XApzS0GmkJLMlCBdVv?si=APgmc9_hQA69UkOulpWRZw'
     },
     {
       _type: 'album',
@@ -56,7 +56,7 @@ const seedData = async () => {
       type: 'Album',
       releaseDate: '2022-09-29',
       tracklist: ['Lagi', 'Huwag Muna Tayong Umuwi', 'I Feel Good', 'No Fear', 'Strings', 'Brighter Tomorrow', 'Say It With Me', 'Kinikilig'],
-      spotifyLink: 'https://open.spotify.com/album/7'
+      spotifyLink: 'https://open.spotify.com/album/7H64wogfyQUcRqFZFbMV9S?si=7VFdG4ZRTQa-CaSw7DBJig'
     },
     {
       _type: 'album',
@@ -64,7 +64,7 @@ const seedData = async () => {
       type: 'Album',
       releaseDate: '2021-10-14',
       tracklist: ['Born to Win', 'Golden Arrow', 'Na Na Na', 'Huwat Muna Tayong Umuwi', '8', 'Yesterday, Today, Tomorrow'],
-      spotifyLink: 'https://open.spotify.com/album/9'
+      spotifyLink: 'https://open.spotify.com/album/28rgW6IXDsrk4YtTcFtGGK?si=CbnJ3l8FTz-kGYKvvqfXUg'
     },
     {
       _type: 'album',
@@ -72,15 +72,15 @@ const seedData = async () => {
       type: 'Single',
       releaseDate: '2026-01-30',
       tracklist: ['Unang Kilig', 'Honey Honey'],
-      spotifyLink: 'https://open.spotify.com/album/8'
+      spotifyLink: 'https://open.spotify.com/album/3KDnE33OQ0tkI2qtvoVA0r?si=EgjchvdZS9SZUpxW9cynWw'
     },
     {
       _type: 'album',
-      title: 'Cherry On Top',
+      title: 'BINIverse',
       type: 'Single',
       releaseDate: '2024-07-11',
-      tracklist: ['Cherry On Top'],
-      spotifyLink: 'https://open.spotify.com/track/10'
+      tracklist: ['Blink Twice', 'Zero Pressure', 'Secrets','Out Of My Head', 'Cherry On Top'],
+      spotifyLink: 'https://open.spotify.com/album/0N41GI4E4w6irltx8mJhY5?si=P6XfUUFjQtaZjGc-74woKQ'
     }
   ];
 

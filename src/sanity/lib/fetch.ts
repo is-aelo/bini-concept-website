@@ -5,13 +5,13 @@ const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // Set to false if you need statically generated pages to update instantly
+  useCdn: false,
 });
 
 export async function sanityFetch<QueryResponse>({
   query,
   params = {},
-  revalidate = 3600, // Revalidate every hour by default
+  revalidate = 0,
   tags = [],
 }: {
   query: string;
@@ -21,8 +21,8 @@ export async function sanityFetch<QueryResponse>({
 }) {
   return client.fetch<QueryResponse>(query, params, {
     next: {
-      revalidate: revalidate,
-      tags: tags,
+      revalidate,
+      tags,
     },
   });
 }

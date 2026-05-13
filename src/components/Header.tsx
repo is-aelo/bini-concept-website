@@ -1,81 +1,111 @@
-// src/components/Header.tsx
+"use client";
 
-import Link from "next/link";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { List, Infinity } from '@phosphor-icons/react';
+import MobileMenu from './MobileMenu';
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
-import MobileMenu from "./MobileMenu";
 
-export default async function Header() {
-  const settings = await sanityFetch<any>({
-    query: SITE_SETTINGS_QUERY,
-  });
+const Header = () => {
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await sanityFetch<any>({
+          query: SITE_SETTINGS_QUERY,
+        });
+        setSettings(data);
+      } catch (error) {
+        console.error("Error loading header settings:", error);
+      }
+    };
+    fetchSettings();
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
-    { name: "Artists", href: "/members" },
-    { name: "Gallery", href: "/gallery" },
-    { name: "Discography", href: "/discography" },
-    { name: "Tour", href: "/tours" },
+    { name: 'Profile', href: '#profile' },
+    { name: 'Gallery', href: '#gallery' },
+    { name: 'Discography', href: '#disco' },
+    { name: 'Tour', href: '#tour' },
   ];
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full px-3 pt-3 md:px-5">
-      <nav className="bini-glass mx-auto w-full max-w-[1440px] rounded-[2rem]">
-        <div className="flex h-16 items-center justify-between px-5 md:h-[74px] md:px-8">
-          
-          {/* LEFT */}
-          <div className="flex min-w-0 flex-1 items-center">
-            <Link
-              href="/"
-              className="group flex items-center transition-opacity duration-300 hover:opacity-90"
-            >
-              {settings?.logoUrl ? (
-                <img
-                  src={settings.logoUrl}
-                  alt="Logo"
-                  className="h-8 w-auto object-contain md:h-9"
-                />
-              ) : (
-                <span className="font-heading text-[1.1rem] font-bold tracking-[-0.04em] text-bini-teal">
-                  {settings?.title || "BINI"}
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* CENTER */}
-          <div className="hidden flex-1 items-center justify-center md:flex">
-            <div className="flex items-center gap-1 rounded-full border border-white/40 bg-white/35 px-2 py-2 backdrop-blur-md">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="rounded-full px-4 py-2 font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 transition-all duration-300 hover:bg-white/70 hover:text-bini-pink"
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex flex-1 items-center justify-end gap-3">
-            <Link
-              href="/community"
-              className="hidden h-10 items-center justify-center rounded-full bg-bini-teal px-6 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-[#00958b] md:flex"
-            >
-              Community
-            </Link>
-
-            <div className="md:hidden">
-              <MobileMenu
-                logo={settings?.logoUrl}
-                siteTitle={settings?.title || "BINI"}
-                links={[...navLinks, { name: "Community", href: "/community" }]}
+    <>
+      <header 
+        className={`fixed top-0 w-full z-[60] transition-all duration-500 px-6 md:px-10 ${
+          scrolled 
+            ? 'py-4 bg-[var(--c-surface)]/80 backdrop-blur-lg border-b border-[var(--c-surface-3)]' 
+            : 'py-8 bg-transparent'
+        }`}
+      >
+        <div className="max-w-[1800px] mx-auto flex justify-between items-center">
+          <a href="#" className="group relative flex items-center">
+            {settings?.logoUrl ? (
+              <img 
+                src={settings.logoUrl} 
+                alt={settings?.title || "Logo"} 
+                className="h-8 w-auto md:h-10 object-contain"
               />
-            </div>
-          </div>
+            ) : (
+              <span className="text-2xl font-bold tracking-tighter uppercase text-[var(--c-ink)]">
+                {settings?.title || "BINI"}
+              </span>
+            )}
+            <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[var(--c-teal)] transition-all duration-300 group-hover:w-full"></span>
+          </a>
+
+          <nav className="hidden md:flex items-center gap-10">
+            <ul className="flex gap-10">
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  <a 
+                    href={link.href}
+                    className="text-label-mono text-[var(--c-ink)] hover:text-[var(--c-teal)] transition-colors relative group"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <button className="btn-community text-[10px] whitespace-nowrap gap-2">
+              <Infinity size={20} weight="bold" />
+              COMMUNITY
+            </button>
+          </nav>
+
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="md:hidden p-2 text-[var(--c-ink)]"
+            aria-label="Open Menu"
+          >
+            <List size={32} weight="light" />
+          </button>
         </div>
-      </nav>
-    </header>
+      </header>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <MobileMenu 
+            isOpen={isMobileMenuOpen} 
+            onClose={() => setIsMobileMenuOpen(false)} 
+            navLinks={navLinks} 
+            logoUrl={settings?.logoUrl}
+            siteTitle={settings?.title}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
-}
+};
+
+export default Header;
