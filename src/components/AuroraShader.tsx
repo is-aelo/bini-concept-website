@@ -56,33 +56,35 @@ const fragmentShader = `
 
   void main() {
     vec2 uv = vUv;
-    float t = uTime * 0.1;
-    vec2 p = uv;
+    
+    float t1 = uTime * 0.05;
+    float t2 = uTime * 0.03;
 
-    float n1 = snoise(p * 1.6 + t);
-    float n2 = snoise(p * 2.2 - t * 0.8);
-    p += vec2(n1, n2) * 0.2;
+    float n1 = snoise(uv * 1.2 + vec2(t1, t2));
+    float n2 = snoise(uv * 1.6 - vec2(t2 * 1.2, t1));
+    
+    vec2 distortedUv = uv + vec2(n1, n2) * 0.35;
 
-    float field = snoise(p * 1.8 + vec2(t, -t * 0.6));
+    float field1 = snoise(distortedUv * 1.0 + vec2(t1 * 0.5, -t1 * 0.3));
+    float field2 = snoise(distortedUv * 1.4 - vec2(-t2, t1 * 0.7));
 
-    float topLeft  = (1.0 - uv.x) * (1.0 - uv.y);
-    float botRight = uv.x * uv.y;
-    float spread   = topLeft + botRight;
+    vec3 baseColor   = vec3(0.961, 0.953, 0.933); 
+    vec3 colorTeal   = vec3(0.388, 0.796, 0.839); 
+    vec3 colorDeepPink = vec3(1.000, 0.000, 0.431); 
+    vec3 colorAmber  = vec3(1.000, 0.745, 0.043); 
+    vec3 colorPurple = vec3(0.514, 0.220, 0.925); 
 
-    /* base: --c-surface #F5F3EE */
-    vec3 base    = vec3(0.961, 0.953, 0.933);
-    /* --c-teal #63CBD6 */
-    vec3 cTeal   = vec3(0.388, 0.796, 0.839);
-    /* --c-stacey #EC7FA3 */
-    vec3 cPink   = vec3(0.925, 0.498, 0.639);
+    vec3 gradientA = mix(colorTeal, colorDeepPink, smoothstep(-0.4, 0.4, field1));
+    vec3 gradientB = mix(colorAmber, colorPurple, smoothstep(-0.5, 0.5, field2));
+    
+    vec3 activeAurora = mix(gradientA, gradientB, smoothstep(-0.2, 0.2, field1 + field2));
 
-    vec3 accent  = mix(cTeal, cPink, smoothstep(-0.4, 0.4, field));
-    vec3 color   = mix(base, accent, spread * 0.13 + 0.04 * smoothstep(-0.5, 0.5, field));
+    float patternIntensity = smoothstep(-0.5, 0.5, field1 * 0.5 + field2 * 0.5);
+    
+    vec3 finalColor = mix(baseColor, activeAurora, 0.18 + 0.15 * patternIntensity);
+    float finalAlpha = clamp(0.45 + 0.25 * patternIntensity, 0.35, 0.75);
 
-    float alpha  = 0.55 + 0.3 * smoothstep(-0.5, 0.5, field) * spread;
-    alpha        = clamp(alpha, 0.4, 0.85);
-
-    gl_FragColor = vec4(color, alpha);
+    gl_FragColor = vec4(finalColor, finalAlpha);
   }
 `;
 
@@ -99,11 +101,11 @@ function Scene() {
   );
 
   useFrame((state) => {
-    const { clock, mouse: m } = state;
     if (!materialRef.current) return;
-    materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
-    mouse.set(m.x, m.y);
-    materialRef.current.uniforms.uMouse.value.lerp(mouse, 0.05);
+
+    materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    mouse.set(state.mouse.x, state.mouse.y);
+    materialRef.current.uniforms.uMouse.value.lerp(mouse, 0.03);
   });
 
   return (
@@ -115,6 +117,8 @@ function Scene() {
         fragmentShader={fragmentShader}
         uniforms={uniforms}
         transparent={true}
+        depthWrite={false}
+        depthTest={false}
       />
     </mesh>
   );
@@ -126,7 +130,14 @@ export default function AuroraShader() {
       className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
       style={{ background: "var(--c-surface)" }}
     >
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas 
+        camera={{ position: [0, 0, 1] }}
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: "high-performance" 
+        }}
+      >
         <Scene />
       </Canvas>
     </div>

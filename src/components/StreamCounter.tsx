@@ -1,36 +1,38 @@
+// src/components/StreamCounter.tsx
 "use client";
 
-import { motion, useMotionValue, useSpring, useInView } from "framer-motion";
+import { useMotionValue, useInView, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
 
-export default function StreamCounter({
-  value,
-}: {
+interface StreamCounterProps {
   value: number;
-}) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  className?: string;
+}
 
-  const motionValue = useMotionValue(0);
-
-  const spring = useSpring(motionValue, {
-    stiffness: 60,
-    damping: 20,
-  });
+export default function StreamCounter({ value, className }: StreamCounterProps) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const count = useMotionValue(128);
 
   useEffect(() => {
-    if (isInView) {
-      motionValue.set(value);
-    }
-  }, [isInView, value, motionValue]);
+    if (!isInView) return;
 
-  const formatted = useMotionValue(0);
+    const controls = animate(count, value, {
+      duration: 3.5,
+      ease: "easeOut",
+      onUpdate: (latest) => {
+        if (ref.current) {
+          ref.current.textContent = `${Math.floor(latest).toLocaleString()}+`;
+        }
+      },
+    });
 
-  spring.on("change", (latest) => {
-    if (ref.current) {
-      ref.current.textContent = `${Math.floor(latest).toLocaleString()}+`;
-    }
-  });
+    return () => controls.stop();
+  }, [isInView, value, count]);
 
-  return <span ref={ref}>0</span>;
+  return (
+    <span ref={ref} className={className}>
+      128+
+    </span>
+  );
 }

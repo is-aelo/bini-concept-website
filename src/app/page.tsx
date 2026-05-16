@@ -7,7 +7,7 @@ export default function BiniPage() {
     { stageName: 'Aiah', fullName: 'Maraiah Queen Arceta', symbol: '♒', color: 'var(--c-aiah)' },
     { stageName: 'Colet', fullName: 'Ma. Nicolette Vergara', symbol: '♍', color: 'var(--c-colet)' },
     { stageName: 'Maloi', fullName: 'Mary Loi Yves Ricalde', symbol: '♊', color: 'var(--c-maloi)' },
-    { stageName: 'Gwen', fullName: 'Gweneth L. Apuli', symbol: '♊', color: 'var(--c-gwen)' },
+    { stageName: 'Gwen', fullName: 'Gweneth L. APULI', symbol: '♊', color: 'var(--c-gwen)' },
     { stageName: 'Stacey', fullName: 'Stacey Aubrey Sevilleja', symbol: '♋', color: 'var(--c-stacey)' },
     { stageName: 'Mikha', fullName: 'Mikhaela Janna Lim', symbol: '♏', color: 'var(--c-mikha)' },
     { stageName: 'Jhoanna', fullName: 'Jhoanna Robles', symbol: '♐', color: 'var(--c-jhoanna)' },
@@ -76,8 +76,8 @@ export default function BiniPage() {
           <h2 className="text-display-xl !text-6xl text-[var(--c-surface)] mb-20">Discography</h2>
           <div className="flex flex-wrap justify-center gap-16 cd-stack-container">
             {albums.map((album) => (
-              <div key={album.title} className="group">
-                <div className="cd-case flex flex-col items-center justify-center p-8 text-center text-[var(--c-surface)]">
+              <div key={album.title} className="group relative">
+                <div className="cd-case relative flex flex-col items-center justify-center p-8 text-center text-[var(--c-surface)]">
                   <div className="absolute top-4 right-4 text-label-mono opacity-40">{album.type}</div>
                   <div className="w-12 h-12 rounded-full border border-white/20 mb-4 flex items-center justify-center">
                     <div className="w-4 h-4 rounded-full bg-white/10"></div>
