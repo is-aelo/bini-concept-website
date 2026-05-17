@@ -58,12 +58,12 @@ export default async function Hero() {
     <section className="relative min-h-screen bg-[var(--c-surface)] overflow-hidden flex flex-col border-b border-[var(--c-border)]">
       <AuroraShader />
 
-      <div className="relative z-10 flex flex-col flex-1 w-full max-w-[1400px] mx-auto px-6 md:px-16 pt-28 md:pt-24 pb-0">
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 pt-24 sm:pt-28 md:pt-24 pb-0">
         <div className="flex-1 flex items-center justify-center w-full">
           <HeroCarousel images={displayData} />
         </div>
 
-        <div className="flex flex-col items-center text-center gap-3 pb-10 pt-6">
+        <div className="flex flex-col items-center text-center gap-2 sm:gap-3 pb-8 sm:pb-10 pt-4 sm:pt-6">
           <div className="flex items-center gap-2">
             <Asterisk
               size={11}
@@ -72,7 +72,7 @@ export default async function Hero() {
             />
             <span
               style={{ fontFamily: "var(--f-mono)" }}
-              className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 text-[var(--c-ink)]"
+              className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 text-[var(--c-ink)]"
             >
               Mabuhay! we are
             </span>
@@ -81,7 +81,7 @@ export default async function Hero() {
           <h1
             style={{
               fontFamily: "var(--f-display)",
-              fontSize: "clamp(72px, 10vw, 140px)",
+              fontSize: "clamp(56px, 10vw, 140px)",
               lineHeight: 0.88,
               letterSpacing: "-0.03em",
               color: "var(--c-ink)",
@@ -90,23 +90,26 @@ export default async function Hero() {
             BINI
           </h1>
 
-<p
-  className="text-[var(--c-ink)] opacity-70 max-w-[420px] leading-relaxed font-regular"
-  style={{
-    fontFamily: "var(--f-body)",
-    fontSize: "0.95rem",
-  }}
->
-  An 8-member Filipino girl group redefining P-pop and bringing modern
-  Filipino talent to the global stage.
-</p>
+          <p
+            className="text-[var(--c-ink)] opacity-70 max-w-[320px] sm:max-w-[420px] leading-relaxed font-regular"
+            style={{
+              fontFamily: "var(--f-body)",
+              fontSize: "clamp(0.8rem, 2.5vw, 0.95rem)",
+            }}
+          >
+            An 8-member Filipino girl group redefining P-pop and bringing modern
+            Filipino talent to the global stage.
+          </p>
         </div>
       </div>
 
       <div
-        className="relative z-20 w-full flex items-center gap-5 px-6 md:px-16"
+        className="relative z-20 w-full flex items-center gap-2 sm:gap-4 md:gap-5 px-3 sm:px-6 md:px-16"
         style={{
-          height: 72,
+          minHeight: 64,
+          height: "auto",
+          paddingTop: 10,
+          paddingBottom: 10,
           background: "rgba(245, 243, 238, 0.8)",
           backdropFilter: "blur(20px) saturate(1.4)",
           WebkitBackdropFilter: "blur(20px) saturate(1.4)",
@@ -116,13 +119,13 @@ export default async function Hero() {
         {latestAlbum?.coverUrl && (
           <div
             className="relative flex-shrink-0 rounded-lg overflow-hidden"
-            style={{ width: 46, height: 46, boxShadow: "0 4px 12px rgba(0,0,0,0.10)" }}
+            style={{ width: 38, height: 38, boxShadow: "0 4px 12px rgba(0,0,0,0.10)" }}
           >
             <Image
               src={latestAlbum.coverUrl}
               alt={latestAlbum.title || "Latest Album"}
               fill
-              sizes="46px"
+              sizes="38px"
               className="object-cover"
               priority
               unoptimized
@@ -130,16 +133,19 @@ export default async function Hero() {
           </div>
         )}
 
-        <div className="flex flex-col gap-0.5 flex-shrink-0">
+        <div className="flex flex-col gap-0.5 flex-shrink-0 min-w-0">
           <span
             style={{ fontFamily: "var(--f-mono)" }}
-            className="text-[9px] font-bold uppercase tracking-[0.14em] opacity-40 text-[var(--c-ink)]"
+            className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.14em] opacity-40 text-[var(--c-ink)]"
           >
             Latest Release
           </span>
           <span
-            className="text-[21px] font-black leading-none tracking-wide"
-            style={{ fontFamily: "var(--f-display)" }}
+            className="font-black leading-none tracking-wide"
+            style={{
+              fontFamily: "var(--f-display)",
+              fontSize: "clamp(14px, 4vw, 21px)",
+            }}
           >
             {(latestAlbum?.title || "SIGNALS").split("").map((letter, i) => (
               <span key={i} style={{ color: MEMBER_COLORS[i % MEMBER_COLORS.length] }}>
@@ -150,12 +156,12 @@ export default async function Hero() {
         </div>
 
         <div
-          className="flex-shrink-0"
-          style={{ width: 1, height: 32, background: "rgba(12,12,10,0.10)" }}
+          className="flex-shrink-0 hidden xs:block"
+          style={{ width: 1, height: 28, background: "rgba(12,12,10,0.10)" }}
         />
 
-        <div className="hidden sm:flex flex-col gap-0.5 flex-shrink-0">
-          <StreamCounter value={20000000} className="text-[18px] font-bold tracking-tight text-[var(--c-ink)]" />
+        <div className="hidden md:flex flex-col gap-0.5 flex-shrink-0">
+          <StreamCounter value={20000000} className="text-[16px] sm:text-[18px] font-bold tracking-tight text-[var(--c-ink)]" />
           <span
             style={{ fontFamily: "var(--f-mono)" }}
             className="text-[8px] font-bold uppercase tracking-[0.12em] opacity-40 text-[var(--c-ink)]"
@@ -170,19 +176,19 @@ export default async function Hero() {
           <Link
             href={latestAlbum.spotifyLink}
             target="_blank"
-            className="flex-shrink-0 inline-flex items-center gap-2 font-bold text-black transition-all duration-200 hover:-translate-y-px active:scale-[0.98]"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 sm:gap-2 font-bold text-black transition-all duration-200 hover:-translate-y-px active:scale-[0.98] whitespace-nowrap"
             style={{
-              height: 38,
-              padding: "0 18px",
+              height: 36,
+              padding: "0 12px",
               borderRadius: 9999,
               background: "var(--c-teal)",
-              fontSize: 13,
+              fontSize: "clamp(11px, 2.5vw, 13px)",
               letterSpacing: "0.02em",
               boxShadow: "0 4px 16px rgba(30,215,96,0.22)",
               fontFamily: "var(--f-body)",
             }}
           >
-            <SpotifyLogo size={15} weight="fill" />
+            <SpotifyLogo size={14} weight="fill" className="flex-shrink-0" />
             Stream Now
           </Link>
         )}

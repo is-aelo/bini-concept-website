@@ -26,7 +26,13 @@ export const memberType = {
     },
     {
       name: 'profileImage',
-      title: 'Profile Image',
+      title: 'Profile Image (Primary Portrait)',
+      type: 'image',
+      options: { hotspot: true },
+    },
+    {
+      name: 'galleryImage',
+      title: 'Gallery Image (Secondary/Action Shot)',
       type: 'image',
       options: { hotspot: true },
     },

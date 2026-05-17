@@ -1,5 +1,3 @@
-// src/sanity/lib/queries.ts
-
 import { groq } from "next-sanity";
 
 export const SITE_SETTINGS_QUERY = groq`
@@ -18,6 +16,8 @@ export const ALL_MEMBERS_QUERY = groq`
     "slug": slug.current,
     "profileImage": profileImage.asset->url,
     "hotspot": profileImage.hotspot,
+    "galleryImage": galleryImage.asset->url,
+    "galleryHotspot": galleryImage.hotspot,
     birthday,
     zodiac,
     roles,
@@ -44,6 +44,18 @@ export const HERO_GALLERY_QUERY = groq`
     _id,
     title,
     featured,
+    "imageUrl": image.asset->url,
+    "lqip": image.asset->metadata.lqip
+  }
+`;
+export const COACHELLA_GALLERY_QUERY = groq`
+  *[
+    _type == "gallery" &&
+    title match "BINICHELLA-*"
+  ] | order(title asc) {
+    _id,
+    title,
+    "filename": image.asset->originalFilename,
     "imageUrl": image.asset->url,
     "lqip": image.asset->metadata.lqip
   }
@@ -78,6 +90,7 @@ export const MEMBER_BY_SLUG_QUERY = groq`
     stageName,
     fullName,
     "profileImage": profileImage.asset->url,
+    "galleryImage": galleryImage.asset->url,
     birthday,
     zodiac,
     roles,

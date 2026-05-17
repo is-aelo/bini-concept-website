@@ -9,22 +9,33 @@ interface HeroImage {
   imageUrl: string | null;
 }
 
-const CARD_W = 260;
-const CARD_H = 380;
 const SWIPE_THRESHOLD = 80;
 const VELOCITY_THRESHOLD = 400;
 
-const INITIAL_SLOT_OFFSETS = {
-  left:   { x: 0, y: 15, rotate: -6, zIndex: 1 },
-  center: { x: 0, y: 0,  rotate: 0,  zIndex: 3 },
-  right:  { x: 0, y: 10, rotate: 6,  zIndex: 2 },
-};
+function getCardDimensions() {
+  if (typeof window === "undefined") return { w: 220, h: 320 };
+  const vw = window.innerWidth;
+  if (vw < 400) return { w: 160, h: 240 };
+  if (vw < 640) return { w: 190, h: 280 };
+  if (vw < 768) return { w: 220, h: 320 };
+  return { w: 260, h: 380 };
+}
 
-const ACTIVE_SLOT_OFFSETS = {
-  left:   { x: -320, y: 0, rotate: -7, zIndex: 1 },
-  center: { x: 0,    y: 0, rotate: 0,  zIndex: 3 },
-  right:  { x: 320,  y: 0, rotate: 7,  zIndex: 1 },
-};
+function getSlotOffsets(w: number) {
+  const spread = Math.round(w * 1.24);
+  return {
+    initial: {
+      left:   { x: 0, y: 15, rotate: -6, zIndex: 1 },
+      center: { x: 0, y: 0,  rotate: 0,  zIndex: 3 },
+      right:  { x: 0, y: 10, rotate: 6,  zIndex: 2 },
+    },
+    active: {
+      left:   { x: -spread, y: 0, rotate: -7, zIndex: 1 },
+      center: { x: 0,       y: 0, rotate: 0,  zIndex: 3 },
+      right:  { x: spread,  y: 0, rotate: 7,  zIndex: 1 },
+    },
+  };
+}
 
 function ShineLayer() {
   return (
@@ -57,7 +68,7 @@ function HolographicLayer() {
 
 function RibbonUnboxing({ onComplete }: { onComplete: () => void }) {
   return (
-    <div style={{ position: "absolute", width: CARD_W, height: CARD_H, zIndex: 30, pointerEvents: "none", overflow: "hidden", borderRadius: 28 }}>
+    <div style={{ position: "absolute", width: "100%", height: "100%", zIndex: 30, pointerEvents: "none", overflow: "hidden", borderRadius: 28 }}>
       <motion.div
         initial="wrapped"
         animate="unboxed"
@@ -67,7 +78,7 @@ function RibbonUnboxing({ onComplete }: { onComplete: () => void }) {
         <motion.div
           variants={{
             wrapped: { y: 0, opacity: 1 },
-            unboxed: { y: -CARD_H, opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
+            unboxed: { y: "-100%", opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
           }}
           style={{
             position: "absolute", left: "calc(50% - 24px)", top: 0, width: 48, height: "100%",
@@ -78,7 +89,7 @@ function RibbonUnboxing({ onComplete }: { onComplete: () => void }) {
         <motion.div
           variants={{
             wrapped: { x: 0, opacity: 1 },
-            unboxed: { x: -CARD_W, opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
+            unboxed: { x: "-100%", opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
           }}
           style={{
             position: "absolute", top: "calc(50% - 24px)", left: 0, width: "100%", height: 48,
@@ -123,6 +134,17 @@ interface CardSlot {
 export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   const safeImages = useMemo(() => images.filter(i => i.imageUrl).slice(0, 8), [images]);
 
+  const [cardDims, setCardDims] = useState({ w: 220, h: 320 });
+
+  useEffect(() => {
+    function update() {
+      setCardDims(getCardDimensions());
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   const [slots, setSlots] = useState<CardSlot[]>(() => {
     if (safeImages.length === 0) return [];
     return [
@@ -152,9 +174,7 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   );
 
   const handleSwiped = useCallback((direction: "left" | "right") => {
-    if (isInitial) {
-      setIsInitial(false);
-    }
+    if (isInitial) setIsInitial(false);
 
     setDeck(prev => {
       const next = [...prev];
@@ -180,12 +200,13 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   if (safeImages.length === 0) return null;
 
   const centerSlot = slots.find(s => s.slot === "center");
+  const slotOffsets = getSlotOffsets(cardDims.w);
 
   return (
     <div style={{
       position: "relative",
       width: "100%",
-      height: CARD_H + 60,
+      height: cardDims.h + 60,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -193,7 +214,15 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
       userSelect: "none",
     }}>
       {isUnboxingActive && centerSlot && (
-        <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 40 }}>
+        <div style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 40,
+          width: cardDims.w,
+          height: cardDims.h,
+        }}>
           <RibbonUnboxing onComplete={handleUnboxingComplete} />
         </div>
       )}
@@ -202,7 +231,7 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
         const img = imageMap[id];
         if (!img?.imageUrl) return null;
         const isCenter = slot === "center";
-        const slotData = isInitial ? INITIAL_SLOT_OFFSETS[slot] : ACTIVE_SLOT_OFFSETS[slot];
+        const slotData = isInitial ? slotOffsets.initial[slot] : slotOffsets.active[slot];
 
         return (
           <CardItem
@@ -210,8 +239,8 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
             img={img}
             slot={slot}
             slotData={slotData}
-            w={CARD_W}
-            h={CARD_H}
+            w={cardDims.w}
+            h={cardDims.h}
             isCenter={isCenter}
             isLocked={isUnboxingActive}
             onSwiped={handleSwiped}
@@ -259,7 +288,7 @@ function CardItem({
       isCommitted.current = true;
       const dir = info.offset.x > 0 ? "right" : "left";
       const flyX = dir === "right" ? 500 : -500;
-      
+
       animate(dragX, flyX, {
         duration: 0.18,
         ease: "easeOut",
@@ -269,6 +298,8 @@ function CardItem({
       animate(dragX, 0, { type: "tween", duration: 0.18, ease: "easeOut" });
     }
   }
+
+  const borderRadius = Math.round(w * 0.092);
 
   return (
     <motion.div
@@ -302,7 +333,7 @@ function CardItem({
       <div style={{
         width: "100%",
         height: "100%",
-        borderRadius: 24,
+        borderRadius,
         overflow: "hidden",
         position: "relative",
         boxShadow: isCenter
@@ -322,12 +353,12 @@ function CardItem({
         {isCenter && <HolographicLayer />}
         {isCenter && <ShineLayer />}
         <div style={{
-          position: "absolute", inset: 0, borderRadius: 24,
+          position: "absolute", inset: 0, borderRadius,
           background: "linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.18) 100%)",
           pointerEvents: "none", zIndex: 8,
         }} />
         <div style={{
-          position: "absolute", inset: 0, borderRadius: 24,
+          position: "absolute", inset: 0, borderRadius,
           border: "1px solid rgba(255,255,255,0.18)",
           pointerEvents: "none", zIndex: 11,
         }} />
