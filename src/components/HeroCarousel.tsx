@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { motion, useMotionValue, useTransform, animate, PanInfo } from "framer-motion";
+import { motion, useMotionValue, animate, PanInfo } from "framer-motion";
 
 interface HeroImage {
   _id: string;
@@ -66,64 +66,6 @@ function HolographicLayer() {
   );
 }
 
-function RibbonUnboxing({ onComplete }: { onComplete: () => void }) {
-  return (
-    <div style={{ position: "absolute", width: "100%", height: "100%", zIndex: 30, pointerEvents: "none", overflow: "hidden", borderRadius: 28 }}>
-      <motion.div
-        initial="wrapped"
-        animate="unboxed"
-        onAnimationComplete={onComplete}
-        style={{ position: "absolute", inset: 0 }}
-      >
-        <motion.div
-          variants={{
-            wrapped: { y: 0, opacity: 1 },
-            unboxed: { y: "-100%", opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
-          }}
-          style={{
-            position: "absolute", left: "calc(50% - 24px)", top: 0, width: 48, height: "100%",
-            background: "linear-gradient(90deg, #d4145a 0%, #ff5e62 100%)",
-            boxShadow: "0 0 12px rgba(0,0,0,0.3)", zIndex: 32
-          }}
-        />
-        <motion.div
-          variants={{
-            wrapped: { x: 0, opacity: 1 },
-            unboxed: { x: "-100%", opacity: 0, transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99], delay: 1.2 } }
-          }}
-          style={{
-            position: "absolute", top: "calc(50% - 24px)", left: 0, width: "100%", height: 48,
-            background: "linear-gradient(180deg, #d4145a 0%, #ff5e62 100%)",
-            boxShadow: "0 0 12px rgba(0,0,0,0.3)", zIndex: 31
-          }}
-        />
-        <motion.div
-          variants={{
-            wrapped: { scale: 0, opacity: 0 },
-            unboxed: {
-              scale: [0, 1.2, 0],
-              opacity: [0, 1, 0],
-              rotate: [0, 45, 90],
-              transition: { times: [0, 0.4, 1], duration: 1.4, ease: "easeInOut", delay: 0.2 }
-            }
-          }}
-          style={{
-            position: "absolute", top: "calc(50% - 40px)", left: "calc(50% - 40px)",
-            width: 80, height: 80, zIndex: 33, display: "flex", alignItems: "center", justifyContent: "center"
-          }}
-        >
-          <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 50 C30 20, 10 30, 35 50 C10 70, 30 80, 50 50 Z" fill="#ff7b90" stroke="#d4145a" strokeWidth="3" />
-            <path d="M50 50 C70 20, 90 30, 65 50 C90 70, 70 80, 50 50 Z" fill="#ff7b90" stroke="#d4145a" strokeWidth="3" />
-            <circle cx="50" cy="50" r="12" fill="#d4145a" />
-            <circle cx="50" cy="50" r="6" fill="#fff" />
-          </svg>
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-}
-
 type SlotKey = "left" | "center" | "right";
 
 interface CardSlot {
@@ -155,18 +97,7 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   });
 
   const [deck, setDeck] = useState<string[]>(() => safeImages.map(i => i._id));
-  const [isUnboxingActive, setIsUnboxingActive] = useState(false);
   const [isInitial, setIsInitial] = useState(true);
-
-  useEffect(() => {
-    const hasUnboxed = localStorage.getItem("hero_deck_unboxed");
-    if (!hasUnboxed) setIsUnboxingActive(true);
-  }, []);
-
-  const handleUnboxingComplete = useCallback(() => {
-    localStorage.setItem("hero_deck_unboxed", "true");
-    setIsUnboxingActive(false);
-  }, []);
 
   const imageMap = useMemo(
     () => Object.fromEntries(safeImages.map(i => [i._id, i])),
@@ -199,7 +130,6 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
 
   if (safeImages.length === 0) return null;
 
-  const centerSlot = slots.find(s => s.slot === "center");
   const slotOffsets = getSlotOffsets(cardDims.w);
 
   return (
@@ -213,20 +143,6 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
       touchAction: "pan-y",
       userSelect: "none",
     }}>
-      {isUnboxingActive && centerSlot && (
-        <div style={{
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 40,
-          width: cardDims.w,
-          height: cardDims.h,
-        }}>
-          <RibbonUnboxing onComplete={handleUnboxingComplete} />
-        </div>
-      )}
-
       {slots.map(({ id, slot }) => {
         const img = imageMap[id];
         if (!img?.imageUrl) return null;
@@ -242,7 +158,6 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
             w={cardDims.w}
             h={cardDims.h}
             isCenter={isCenter}
-            isLocked={isUnboxingActive}
             onSwiped={handleSwiped}
           />
         );
@@ -258,7 +173,6 @@ function CardItem({
   w,
   h,
   isCenter,
-  isLocked,
   onSwiped,
 }: {
   img: HeroImage;
@@ -267,7 +181,6 @@ function CardItem({
   w: number;
   h: number;
   isCenter: boolean;
-  isLocked: boolean;
   onSwiped: (dir: "left" | "right") => void;
 }) {
   const dragX = useMotionValue(0);
@@ -279,7 +192,7 @@ function CardItem({
   }, [slot, dragX]);
 
   function handleDragEnd(_: unknown, info: PanInfo) {
-    if (isCommitted.current || isLocked || !isCenter) return;
+    if (isCommitted.current || !isCenter) return;
     const committed =
       Math.abs(info.offset.x) > SWIPE_THRESHOLD ||
       Math.abs(info.velocity.x) > VELOCITY_THRESHOLD;
@@ -303,7 +216,7 @@ function CardItem({
 
   return (
     <motion.div
-      drag={isCenter && !isLocked ? "x" : false}
+      drag={isCenter ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.4}
       onDragEnd={handleDragEnd}
@@ -320,7 +233,7 @@ function CardItem({
         width: w,
         height: h,
         x: isCenter ? dragX : undefined,
-        cursor: isCenter && !isLocked ? "grab" : "default",
+        cursor: isCenter ? "grab" : "default",
         originX: 0.5,
         originY: 0.5,
       }}
@@ -328,7 +241,7 @@ function CardItem({
         duration: 0.35,
         ease: [0.25, 1, 0.5, 1],
       }}
-      whileDrag={isCenter && !isLocked ? { cursor: "grabbing" } : {}}
+      whileDrag={isCenter ? { cursor: "grabbing" } : {}}
     >
       <div style={{
         width: "100%",
