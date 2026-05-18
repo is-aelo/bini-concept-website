@@ -85,7 +85,6 @@ export default function CoachellaSection({
 
       {/* MESH LAYER */}
       <div className="absolute inset-0 pointer-events-none z-0">
-
         {/* teal blob */}
         <div
           className="coachella-blob1 absolute"
@@ -132,9 +131,9 @@ export default function CoachellaSection({
         />
       </div>
 
-      <div className="relative z-10 max-w-[1280px] mx-auto px-0 md:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
         {/* header */}
-        <div className="text-center mb-8 md:mb-10 px-4 md:px-0">
+        <div className="text-center mb-8 md:mb-10">
           <p className="text-label-mono mb-4" style={{ color: "#0C0C0A" }}>
             Historic Global Moment
           </p>
@@ -159,9 +158,52 @@ export default function CoachellaSection({
           </p>
         </div>
 
+        {/* mobile text (shows only on mobile, placed before image frame) */}
+        <div className="md:hidden mb-8">
+          <span
+            style={{
+              fontFamily: "var(--f-mono)",
+              fontSize: 10,
+              letterSpacing: ".12em",
+              color: "var(--c-ink)",
+              opacity: 0.75,
+            }}
+          >
+            FIRST PPOP ACT
+          </span>
+
+          <h3
+            style={{
+              fontFamily: "var(--f-display)",
+              fontSize: "2.2rem",
+              lineHeight: 0.95,
+              color: "var(--c-ink)",
+              marginTop: 8,
+            }}
+          >
+            A GLOBAL
+            <br />
+            MILESTONE
+          </h3>
+
+          <p
+            className="mt-4"
+            style={{
+              color: "var(--c-ink)",
+              opacity: 0.7,
+              lineHeight: 1.6,
+              fontSize: ".9rem",
+              maxWidth: 520,
+            }}
+          >
+            BINI became the first Filipino pop group to perform at Coachella —
+            opening a new chapter for P-pop on the world stage.
+          </p>
+        </div>
+
         {/* image frame */}
         <div
-          className="relative overflow-hidden rounded-none md:rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-[16/9] w-full z-10"
+          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-video w-full z-10"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;
@@ -254,86 +296,89 @@ export default function CoachellaSection({
           </div>
         </div>
 
-        {/* mobile text */}
-        <div className="md:hidden px-4 mt-10 sm:mt-12">
-          <span
-            style={{
-              fontFamily: "var(--f-mono)",
-              fontSize: 10,
-              letterSpacing: ".12em",
-              color: "var(--c-ink)",
-              opacity: 0.75,
-            }}
-          >
-            FIRST PPOP ACT
-          </span>
+        {/* context description layer & controls */}
+        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+          {/* desktop text (hidden on mobile to prevent duplication) */}
+          <div className="hidden md:block">
+            <span
+              style={{
+                fontFamily: "var(--f-mono)",
+                fontSize: 10,
+                letterSpacing: ".12em",
+                color: "var(--c-ink)",
+                opacity: 0.75,
+              }}
+            >
+              FIRST PPOP ACT
+            </span>
 
-          <h3
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "2.2rem",
-              lineHeight: 0.95,
-              color: "var(--c-ink)",
-              marginTop: 8,
-            }}
-          >
-            A GLOBAL
-            <br />
-            MILESTONE
-          </h3>
+            <h3
+              style={{
+                fontFamily: "var(--f-display)",
+                fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
+                lineHeight: 0.95,
+                color: "var(--c-ink)",
+                marginTop: 8,
+              }}
+            >
+              A GLOBAL
+              <br />
+              MILESTONE
+            </h3>
 
-          <p
-            className="mt-4"
-            style={{
-              color: "var(--c-ink)",
-              opacity: 0.7,
-              lineHeight: 1.6,
-              fontSize: ".9rem",
-              maxWidth: 520,
-            }}
-          >
-            BINI became the first Filipino pop group to perform at Coachella —
-            opening a new chapter for P-pop on the world stage.
-          </p>
-        </div>
-
-        {/* controls */}
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <motion.button
-            onClick={prev}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.92 }}
-            className="h-12 w-12 rounded-full flex items-center justify-center"
-            style={{
-              background: "rgba(255,255,255,.75)",
-              backdropFilter: "blur(14px)",
-            }}
-          >
-            <CaretLeft size={18} weight="bold" />
-          </motion.button>
-
-          <div
-            style={{
-              fontFamily: "var(--f-mono)",
-              fontSize: 10,
-              opacity: 0.45,
-            }}
-          >
-            Swipe / Tap
+            <p
+              className="mt-4"
+              style={{
+                color: "var(--c-ink)",
+                opacity: 0.7,
+                lineHeight: 1.6,
+                fontSize: "clamp(.9rem, 1.2vw, 1.05rem)",
+                maxWidth: 520,
+              }}
+            >
+              BINI became the first Filipino pop group to perform at Coachella —
+              opening a new chapter for P-pop on the world stage.
+            </p>
           </div>
 
-          <motion.button
-            onClick={next}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.92 }}
-            className="h-12 w-12 rounded-full flex items-center justify-center"
-            style={{
-              background:
-                "linear-gradient(135deg,var(--c-teal),var(--c-teal-dark))",
-            }}
-          >
-            <CaretRight size={18} color="white" weight="bold" />
-          </motion.button>
+          {/* controls */}
+          <div className="flex items-center justify-center md:justify-end gap-4 w-full md:w-auto md:mt-1">
+            <motion.button
+              onClick={prev}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.92 }}
+              className="h-12 w-12 rounded-full flex items-center justify-center"
+              style={{
+                background: "rgba(255,255,255,.75)",
+                backdropFilter: "blur(14px)",
+              }}
+            >
+              <CaretLeft size={18} weight="bold" />
+            </motion.button>
+
+            <div
+              style={{
+                fontFamily: "var(--f-mono)",
+                fontSize: 10,
+                opacity: 0.45,
+              }}
+            >
+              Swipe / Tap
+            </div>
+
+            <motion.button
+              onClick={next}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.92 }}
+              className="h-12 w-12 rounded-full flex items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(135deg,var(--c-teal),var(--c-teal-dark))",
+              }}
+            >
+              <CaretRight size={18} color="white" weight="bold" />
+            </motion.button>
+          </div>
         </div>
       </div>
 
