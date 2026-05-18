@@ -54,7 +54,7 @@ export default function ImageLightbox({
             className="sticky top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex gap-4 pointer-events-auto bg-black/20 backdrop-blur-md p-2 rounded-xl border border-white/5 md:bg-transparent md:backdrop-blur-none md:p-0 md:border-none">
+            <div className="flex gap-4 pointer-events-auto bg-black/20 backdrop-blur-md p-2 rounded-xl border border-white/5">
               <button 
                 onClick={() => setZoom(v => Math.max(.8, v - .25))}
                 className="p-1 opacity-70 hover:opacity-100 transition-opacity dynamic-icon-button"
@@ -72,7 +72,7 @@ export default function ImageLightbox({
             </div>
 
             <button
-              className="pointer-events-auto p-1 opacity-70 hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-md rounded-xl border border-white/5 md:bg-transparent md:backdrop-blur-none md:p-0 md:border-none"
+              className="pointer-events-auto p-1 opacity-70 hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-md rounded-xl border border-white/5"
               onClick={onClose}
               aria-label="Close lightbox"
             >
