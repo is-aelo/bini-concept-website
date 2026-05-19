@@ -177,7 +177,7 @@ export default function CoachellaSection({
               fontFamily: "var(--f-display)",
               fontSize: "2.2rem",
               lineHeight: 0.95,
-              color: "var(--c-ink)",
+              color: "var(--c-teal-dark)",
               marginTop: 8,
             }}
           >
@@ -317,7 +317,7 @@ export default function CoachellaSection({
                 fontFamily: "var(--f-display)",
                 fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
                 lineHeight: 0.95,
-                color: "var(--c-ink)",
+                color: "var(--c-teal)",
                 marginTop: 8,
               }}
             >

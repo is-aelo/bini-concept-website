@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 interface Member {
@@ -41,8 +41,8 @@ function ZodiacSymbol({ sign, color }: { sign?: string; color: string }) {
   return (
     <span
       aria-label={sign}
-      className="inline-flex items-center justify-center shrink-0 w-[var(--meta-icon-size)] h-[var(--meta-icon-size)]"
-      style={{ color }}
+      className="inline-flex items-center justify-center shrink-0"
+      style={{ color, width: 8, height: 8 }}
     >
       <Icon icon={iconName} className="w-full h-full" />
     </span>
@@ -72,588 +72,610 @@ function sortByBirthdayEldestToYoungest(members: Member[]): Member[] {
   });
 }
 
-function TickerTape({ members }: { members: Member[] }) {
-  const items = [...members, ...members];
-  const credits = items
-    .map((m) => `${m.stageName.toUpperCase()} · ${(m.roles?.[0] ?? "MEMBER").toUpperCase()}`)
-    .join("   /   ");
-
+function CardFront({
+  member,
+  index,
+  r,
+  g,
+  b,
+  shadow,
+}: {
+  member: Member;
+  index: number;
+  r: number;
+  g: number;
+  b: number;
+  shadow: string;
+}) {
+  const hasProfileImg = !!member.profileImage?.startsWith("http");
   return (
     <div
-      className="border-t border-b overflow-hidden relative"
+      className="absolute inset-0 overflow-hidden bg-zinc-900"
       style={{
-        borderColor: "rgba(255,255,255,0.08)",
-        paddingTop: "var(--ticker-py)",
-        paddingBottom: "var(--ticker-py)",
-        marginBottom: "var(--ticker-mb)",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        borderRadius: 16,
+        boxShadow: shadow,
       }}
     >
       <div
+        className="absolute inset-0 z-[3] pointer-events-none"
         style={{
-          display: "flex",
-          gap: "3rem",
-          whiteSpace: "nowrap",
-          animation: "bini-ticker 28s linear infinite",
-          willChange: "transform",
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px)",
+          mixBlendMode: "multiply",
         }}
+      />
+
+      {hasProfileImg ? (
+        <Image
+          src={member.profileImage!}
+          alt={member.stageName}
+          fill
+          sizes="(max-width: 1024px) 100vw, 210px"
+          className="object-cover object-top"
+          priority={index < 2}
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(160deg, rgba(${r},${g},${b},0.35), rgba(${r},${g},${b},0.06))`,
+          }}
+        />
+      )}
+
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background: `linear-gradient(to top, rgba(${r},${g},${b},0.85) 0%, rgba(12,12,10,0.2) 48%, transparent 72%)`,
+        }}
+      />
+
+      <div
+        className="absolute inset-0 z-[4] pointer-events-none"
+        style={{
+          borderRadius: 16,
+          border: `1px solid rgba(${r},${g},${b},0.45)`,
+          boxShadow: `inset 0 0 16px rgba(${r},${g},${b},0.12), inset 0 1px 0 rgba(255,255,255,0.18)`,
+        }}
+      />
+
+      <div className="absolute bottom-0 inset-x-0 z-[5] px-4 pb-4">
+        <div
+          className="text-[7px] tracking-widest opacity-70 mb-1"
+          style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
+        >
+          BINI
+        </div>
+        <div
+          className="font-normal tracking-wide"
+          style={{ fontFamily: "var(--f-display)", fontSize: "1.75rem", lineHeight: 0.88, color: "#fff" }}
+        >
+          {member.stageName}
+        </div>
+        <div
+          className="text-[7px] tracking-widest opacity-55 mt-1 uppercase"
+          style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
+        >
+          {member.fullName}
+        </div>
+      </div>
+
+      <div
+        className="absolute top-4 left-4 z-[5] text-[7px]"
+        style={{ fontFamily: "var(--f-mono)", color: "rgba(255,255,255,0.35)" }}
       >
-        {[credits, credits].map((c, i) => (
-          <span
-            key={i}
-            className="tracking-widest uppercase shrink-0"
-            style={{
-              fontFamily: "var(--f-mono)",
-              fontSize: "var(--ticker-fs)",
-              color: "rgba(255,255,255,0.35)",
-            }}
-          >
-            {c}
-          </span>
-        ))}
+        {String(index + 1).padStart(2, "0")}
       </div>
     </div>
   );
 }
 
-function PhotoCard({ member, index }: { member: Member; index: number }) {
-  const [isFlipped, setIsFlipped] = useState(false);
+function CardBack({
+  member,
+  index,
+  accent,
+  r,
+  g,
+  b,
+  shadow,
+  total,
+}: {
+  member: Member;
+  index: number;
+  accent: string;
+  r: number;
+  g: number;
+  b: number;
+  shadow: string;
+  total: number;
+}) {
+  const hasGalleryImg = !!member.galleryImage?.startsWith("http");
+  return (
+    <div
+      className="absolute inset-0 overflow-hidden"
+      style={{
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        transform: "rotateY(180deg)",
+        borderRadius: 16,
+        background: "var(--c-surface, #F5F3EE)",
+        boxShadow: shadow,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div className="relative w-full h-[52%] shrink-0 overflow-hidden bg-zinc-200">
+        {hasGalleryImg ? (
+          <Image
+            src={member.galleryImage!}
+            alt={`${member.stageName} gallery`}
+            fill
+            sizes="(max-width: 1024px) 100vw, 210px"
+            className="object-cover object-top"
+          />
+        ) : (
+          <div
+            className="w-full h-full"
+            style={{ background: `linear-gradient(160deg, ${accent}25, ${accent}05)` }}
+          />
+        )}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background: `linear-gradient(to top, rgba(${r},${g},${b},0.75) 0%, rgba(12,12,10,0.1) 52%, transparent 80%)`,
+          }}
+        />
+        <div className="absolute bottom-0 inset-x-0 z-[2] px-3 pb-2">
+          <div
+            className="text-base font-normal tracking-wide"
+            style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#F5F3EE" }}
+          >
+            {member.stageName}
+          </div>
+          <div
+            className="text-[6px] tracking-widest uppercase opacity-80 mt-0.5"
+            style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
+          >
+            {member.fullName}
+          </div>
+        </div>
+      </div>
+
+      <div className="px-3 py-3 flex flex-col grow justify-between text-zinc-900 bg-[#F5F3EE]">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between text-[7px] tracking-wide">
+            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Zodiac</span>
+            <span className="inline-flex items-center gap-1 uppercase font-medium" style={{ fontFamily: "var(--f-mono)" }}>
+              <ZodiacSymbol sign={member.zodiac} color="#0C0C0A" />
+              {member.zodiac || "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-[7px] tracking-wide">
+            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Birthday</span>
+            <span className="font-medium" style={{ fontFamily: "var(--f-mono)" }}>{formatBirthday(member.birthday)}</span>
+          </div>
+          {member.roles?.length ? (
+            <div className="flex items-start justify-between gap-2 text-[7px] tracking-wide">
+              <span className="opacity-40 uppercase mt-0.5" style={{ fontFamily: "var(--f-mono)" }}>Role</span>
+              <div className="flex flex-wrap gap-0.5 justify-end max-w-[70%]">
+                {member.roles.slice(0, 2).map((role) => (
+                  <span
+                    key={role}
+                    className="text-[5.5px] px-1 py-0.5 rounded-[2px] bg-black/5 border border-black/10 uppercase font-medium whitespace-nowrap"
+                    style={{ fontFamily: "var(--f-mono)" }}
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div
+          className="pt-2 border-t border-black/5 text-[6px] tracking-widest opacity-35 uppercase"
+          style={{ fontFamily: "var(--f-mono)" }}
+        >
+          BINI · {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </div>
+      </div>
+
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          borderRadius: 16,
+          border: `1px solid rgba(${r},${g},${b},0.18)`,
+          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35)`,
+        }}
+      />
+    </div>
+  );
+}
+
+function DesktopPhotoCard({
+  member,
+  index,
+  total,
+  isDeckHovered,
+}: {
+  member: Member;
+  index: number;
+  total: number;
+  isDeckHovered: boolean;
+}) {
+  const [isPressed, setIsPressed] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
   const accent = member.signatureColor || "#63CBD6";
   const { r, g, b } = hexToRgb(accent);
-  const hasProfileImg = !!member.profileImage?.startsWith("http");
-  const hasGalleryImg = !!member.galleryImage?.startsWith("http");
 
-  const BASE_ROTATION = (index % 2 === 0 ? -1 : 1) * (0.6 + (index % 3) * 0.4);
+  const midIndex = (total - 1) / 2;
+  const distanceFromCenter = index - midIndex;
+  const stackedX = distanceFromCenter * 30;
+  const stackedRotate = distanceFromCenter * 3;
+  const fannedX = distanceFromCenter * 140;
+  const fannedRotate = distanceFromCenter * 5;
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === "touch") {
-      setIsFlipped(!isFlipped);
-    }
+    e.preventDefault();
+    setIsPressed(true);
   };
-
+  const handlePointerUpOrLeave = () => {
+    setIsPressed(false);
+    setTilt({ x: 0, y: 0 });
+  };
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isFlipped) return;
     const rect = cardRef.current?.getBoundingClientRect();
     if (!rect) return;
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
-    setTilt({ x: -dy * 6, y: dx * 6 });
+    if (isPressed) {
+      setTilt({ x: dy * 4, y: -dx * 4 });
+    } else {
+      setTilt({ x: -dy * 2, y: dx * 2 });
+    }
   };
 
-  const handleMouseEnter = () => setIsFlipped(true);
-  const handleMouseLeave = () => {
-    setIsFlipped(false);
-    setTilt({ x: 0, y: 0 });
-  };
+  const shadow = isPressed
+    ? `0 20px 40px rgba(12, 12, 10, 0.2), 0 40px 80px -10px rgba(${r}, ${g}, ${b}, 0.4)`
+    : `0 2px 4px rgba(12, 12, 10, 0.08), 0 12px 28px -4px rgba(12, 12, 10, 0.12), 0 8px 20px -8px rgba(${r}, ${g}, ${b}, 0.15)`;
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
       onPointerDown={handlePointerDown}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerUp={handlePointerUpOrLeave}
+      onPointerLeave={handlePointerUpOrLeave}
       onMouseMove={handleMouseMove}
-      className="relative cursor-pointer select-none touch-manipulation w-full aspect-[2/3]"
+      className="absolute cursor-grab active:cursor-grabbing select-none touch-none origin-bottom"
       style={{
         perspective: "1500px",
-        transform: `rotate(${BASE_ROTATION}deg)`,
-        transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+        width: "210px",
+        height: "315px",
+        bottom: "10%",
+        left: "calc(50% - 105px)",
+        zIndex: isPressed ? 50 : 10 + index,
       }}
+      animate={{
+        x: isPressed ? 0 : isDeckHovered ? fannedX : stackedX,
+        rotate: isPressed ? 0 : isDeckHovered ? fannedRotate : stackedRotate,
+        y: isPressed ? -40 : isDeckHovered ? -15 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
         animate={{
-          rotateY: isFlipped ? 180 : 0,
-          rotateX: isFlipped ? 0 : tilt.x,
-          rotateZ: isFlipped ? 0 : tilt.y * 0.15,
-          scale: isFlipped ? 1.03 : 1,
-          z: isFlipped ? 20 : 0,
+          rotateY: isPressed ? 180 : 0,
+          rotateX: tilt.x,
+          rotateZ: isPressed ? 0 : tilt.y * 0.2,
+          scale: isPressed ? 1.15 : 1,
         }}
         transition={{
-          opacity: { duration: 0.5, delay: (index % 4) * 0.06 },
-          y: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: (index % 4) * 0.06 },
-          rotateY: { duration: 0.72, ease: [0.4, 0, 0.2, 1] },
+          rotateY: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
           rotateX: { duration: 0.12, ease: "linear" },
-          scale: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
+          rotateZ: { duration: 0.12, ease: "linear" },
+          scale: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
         }}
-        className="w-full h-full"
-        style={{
-          transformStyle: "preserve-3d",
-        }}
+        className="w-full h-full relative"
+        style={{ transformStyle: "preserve-3d" }}
       >
-        {/* ── FRONT ── */}
-        <div
-          className="absolute inset-0 overflow-hidden"
-          style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            borderRadius: 16,
-            boxShadow: `0 12px 32px -12px rgba(${r},${g},${b},0.25), 0 4px 16px rgba(0,0,0,0.18)`,
-          }}
-        >
-          <div
-            className="absolute inset-0 z-[3] pointer-events-none"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px)",
-              mixBlendMode: "multiply",
-            }}
-          />
-
-          {hasProfileImg ? (
-            <Image
-              src={member.profileImage!}
-              alt={member.stageName}
-              fill
-              sizes="(max-width: 480px) 50vw, (max-width: 1024px) 25vw, 20vw"
-              className="object-cover object-top"
-              priority={index < 4}
-            />
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(160deg, rgba(${r},${g},${b},0.38), rgba(${r},${g},${b},0.10))`,
-              }}
-            />
-          )}
-
-          <div
-            className="absolute inset-0 z-[1] pointer-events-none"
-            style={{
-              background: `linear-gradient(to top, rgba(${r},${g},${b},0.72) 0%, rgba(10,10,8,0.22) 42%, transparent 65%)`,
-            }}
-          />
-
-          <div
-            className="absolute inset-0 z-[4] pointer-events-none"
-            style={{
-              borderRadius: 16,
-              border: `1px solid rgba(${r},${g},${b},0.55)`,
-              boxShadow: `inset 0 0 18px rgba(${r},${g},${b},0.12), inset 0 1px 0 rgba(255,255,255,0.18)`,
-            }}
-          />
-
-          <div
-            className="absolute top-0 inset-x-0 h-[48%] z-[2] pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(175deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 100%)",
-            }}
-          />
-
-          <div
-            className="absolute top-0 right-0 w-[2px] h-full z-[5] pointer-events-none"
-            style={{
-              background: `rgba(${r},${g},${b},0.45)`,
-            }}
-          />
-
-          <div 
-            className="absolute bottom-0 inset-x-0 z-[5] card-pad"
-          >
-            <div
-              className="card-bini-label"
-              style={{
-                fontFamily: "var(--f-mono)",
-                textTransform: "uppercase",
-                color: "var(--c-surface, #F5F3EE)",
-                opacity: 0.8,
-              }}
-            >
-              BINI
-            </div>
-            <div
-              className="card-name"
-              style={{
-                fontFamily: "var(--f-display)",
-                lineHeight: 0.88,
-                letterSpacing: "0.01em",
-                color: "#fff",
-              }}
-            >
-              {member.stageName}
-            </div>
-          </div>
-
-          <div
-            className="absolute z-[5] card-serial"
-            style={{
-              fontFamily: "var(--f-mono)",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.45)",
-            }}
-          >
-            {String(index + 1).padStart(2, "0")} / 08
-          </div>
-
-          <div className="mv-light-sweep" style={{ borderRadius: 16 }} />
-        </div>
-
-        {/* ── BACK ── */}
-        <div
-          className="absolute inset-0 overflow-hidden"
-          style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
-            borderRadius: 16,
-            background: "var(--c-surface, #F5F3EE)",
-            boxShadow: `0 14px 36px -12px rgba(${r},${g},${b},0.25), 0 4px 14px rgba(0,0,0,0.16)`,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            className="absolute inset-0 z-[3] pointer-events-none"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 4px)",
-              mixBlendMode: "multiply",
-            }}
-          />
-
-          <div
-            className="absolute top-0 right-0 w-[2px] h-full z-[6] pointer-events-none"
-            style={{
-              background: `rgba(${r},${g},${b},0.25)`,
-            }}
-          />
-
-          <div className="relative w-full h-[58%] shrink-0 overflow-hidden">
-            {hasGalleryImg ? (
-              <Image
-                src={member.galleryImage!}
-                alt={`${member.stageName} gallery`}
-                fill
-                sizes="(max-width: 480px) 50vw, 20vw"
-                className="object-cover object-top"
-              />
-            ) : (
-              <div
-                className="w-full h-full"
-                style={{
-                  background: `linear-gradient(160deg, ${accent}33, ${accent}0a)`,
-                }}
-              />
-            )}
-
-            <div
-              className="absolute inset-0 z-[1] pointer-events-none"
-              style={{
-                background: `linear-gradient(to top, rgba(${r},${g},${b},0.68) 0%, rgba(12,12,10,0.18) 42%, transparent 65%)`,
-              }}
-            />
-
-            <div className="absolute bottom-0 inset-x-0 z-[2] card-back-header">
-              <div
-                className="card-back-name"
-                style={{
-                  fontFamily: "var(--f-display)",
-                  lineHeight: 0.9,
-                  color: "var(--c-surface, #F5F3EE)",
-                  letterSpacing: "0.01em",
-                }}
-              >
-                {member.stageName}
-              </div>
-              <div
-                className="card-fullname"
-                style={{
-                  fontFamily: "var(--f-mono)",
-                  textTransform: "uppercase",
-                  color: "var(--c-surface, #F5F3EE)",
-                  opacity: 0.85,
-                }}
-              >
-                {member.fullName}
-              </div>
-            </div>
-          </div>
-
-          <div 
-            className="card-meta-pad flex flex-col grow justify-between relative z-[4]"
-          >
-            <div className="flex flex-col container-gap">
-              <div className="flex items-center justify-between">
-                <span className="meta-label" style={{ fontFamily: "var(--f-mono)", textTransform: "uppercase", opacity: 0.5, color: "var(--c-ink, #0C0C0A)" }}>
-                  Zodiac
-                </span>
-                <span className="meta-value inline-flex items-center value-gap" style={{ fontFamily: "var(--f-mono)", textTransform: "uppercase", color: "var(--c-ink, #0C0C0A)" }}>
-                  <ZodiacSymbol sign={member.zodiac} color="var(--c-ink, #0C0C0A)" />
-                  {member.zodiac || "—"}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="meta-label" style={{ fontFamily: "var(--f-mono)", textTransform: "uppercase", opacity: 0.5, color: "var(--c-ink, #0C0C0A)" }}>
-                  Birthday
-                </span>
-                <span className="meta-value" style={{ fontFamily: "var(--f-mono)", color: "var(--c-ink, #0C0C0A)", opacity: 0.9 }}>
-                  {formatBirthday(member.birthday)}
-                </span>
-              </div>
-
-              {member.roles?.length ? (
-                <div className="flex items-start justify-between gap-2">
-                  <span className="meta-label shrink-0 mt-[2px]" style={{ fontFamily: "var(--f-mono)", textTransform: "uppercase", opacity: 0.5, color: "var(--c-ink, #0C0C0A)" }}>
-                    Role
-                  </span>
-                  <div className="flex flex-wrap badge-gap justify-end max-w-[72%]">
-                    {member.roles.map((role) => (
-                      <span
-                        key={role}
-                        className="role-badge"
-                        style={{
-                          fontFamily: "var(--f-mono)",
-                          textTransform: "uppercase",
-                          borderRadius: 3,
-                          background: "rgba(12, 12, 10, 0.06)",
-                          border: "1px solid rgba(12, 12, 10, 0.12)",
-                          color: "var(--c-ink, #0C0C0A)",
-                          lineHeight: 1.2,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {role}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="card-back-footer" style={{ borderTop: "1px solid rgba(12, 12, 10, 0.08)" }}>
-              <span
-                style={{
-                  fontFamily: "var(--f-mono)",
-                  textTransform: "uppercase",
-                  color: "var(--c-ink, #0C0C0A)",
-                  opacity: 0.4,
-                }}
-              >
-                BINI · {String(index + 1).padStart(2, "0")} / 08
-              </span>
-            </div>
-          </div>
-
-          <div
-            className="absolute inset-0 pointer-events-none z-[6]"
-            style={{
-              borderRadius: 16,
-              border: `1px solid rgba(${r},${g},${b},0.25)`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4)`,
-            }}
-          />
-        </div>
+        <CardFront member={member} index={index} r={r} g={g} b={b} shadow={shadow} />
+        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} shadow={shadow} total={total} />
       </motion.div>
+    </motion.div>
+  );
+}
+
+const STACK_TILTS = [-3.5, 1.8, -1.2, 2.6, -0.8, 3.1, -2.3, 0.9];
+const STACK_OFFSETS = [
+  { x: 0, y: 0 },
+  { x: 3, y: 5 },
+  { x: -2, y: 10 },
+  { x: 4, y: 15 },
+  { x: -1, y: 18 },
+];
+const SWIPE_THRESHOLD = 90;
+const MAX_VISIBLE_STACK = 4;
+
+function MobileDeckCard({
+  member,
+  index,
+  stackPosition,
+  total,
+  onSwiped,
+}: {
+  member: Member;
+  index: number;
+  stackPosition: number;
+  total: number;
+  onSwiped: () => void;
+}) {
+  const accent = member.signatureColor || "#63CBD6";
+  const { r, g, b } = hexToRgb(accent);
+
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 0, 200], [-14, STACK_TILTS[index % STACK_TILTS.length], 14]);
+  const opacity = useTransform(x, [-200, -140, 0, 140, 200], [0, 1, 1, 1, 0]);
+
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
+  
+  const isTopCard = stackPosition === 0;
+  const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
+  const offset = STACK_OFFSETS[Math.min(stackPosition, STACK_OFFSETS.length - 1)];
+
+  const shadow = isTopCard
+    ? `0 12px 40px rgba(12,12,10,0.18), 0 32px 60px -10px rgba(${r},${g},${b},0.3)`
+    : `0 4px 16px rgba(12,12,10,0.1), 0 8px 24px -4px rgba(${r},${g},${b},0.1)`;
+
+  const handleDragEnd = async (_event: any, info: any) => {
+    if (!isTopCard) return;
+
+    if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
+      const direction = info.offset.x > 0 ? 1 : -1;
+      await animate(x, direction * 420, { duration: 0.25, ease: [0.16, 1, 0.3, 1] });
+      onSwiped();
+      x.set(0);
+      setIsFlipped(false);
+    } else {
+      animate(x, 0, { type: "spring", stiffness: 260, damping: 26 });
+    }
+  };
+
+  const handleTap = () => {
+    if (!isTopCard) return;
+    setIsFlipped((f) => !f);
+    setIsHolding(true);
+    setTimeout(() => setIsHolding(false), 300);
+  };
+
+  if (stackPosition >= MAX_VISIBLE_STACK) return null;
+
+  const scale = 1 - stackPosition * 0.04;
+  const yShift = stackPosition * 14;
+
+  return (
+    <motion.div
+      drag={isTopCard ? "x" : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.65}
+      dragMomentum={false}
+      onDragEnd={handleDragEnd}
+      onTap={handleTap}
+      style={{
+        x: isTopCard ? x : 0,
+        rotate: isTopCard ? rotate : stackTilt + offset.x * 0.3,
+        opacity: isTopCard ? opacity : 1,
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        top: yShift,
+        left: 0,
+        zIndex: MAX_VISIBLE_STACK - stackPosition,
+        scale,
+        touchAction: "pan-y",
+        transformOrigin: "bottom center",
+      }}
+      className="cursor-grab active:cursor-grabbing select-none"
+      transition={{ type: "spring", stiffness: 180, damping: 22, mass: 0.8 }}
+    >
+      <motion.div
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full h-full relative"
+        style={{ transformStyle: "preserve-3d", perspective: "1200px" }}
+      >
+        <CardFront member={member} index={index} r={r} g={g} b={b} shadow={shadow} />
+        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} shadow={shadow} total={total} />
+      </motion.div>
+
+      <AnimatePresence>
+        {isHolding && (
+          <motion.div
+            initial={{ opacity: 0.6, scale: 0.95 }}
+            animate={{ opacity: 0, scale: 1.05 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              borderRadius: 16,
+              border: `2px solid rgba(${r},${g},${b},0.6)`,
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+function MobileDeckViewer({ members }: { members: Member[] }) {
+  const [queue, setQueue] = useState<number[]>(members.map((_, i) => i));
+
+  const handleSwiped = useCallback(() => {
+    setQueue((q) => {
+      const [first, ...rest] = q;
+      return [...rest, first];
+    });
+  }, []);
+
+  const topIndex = queue[0];
+  const topMember = members[topIndex];
+  const accentColor = topMember?.signatureColor || "#63CBD6";
+
+  return (
+    <div className="flex flex-col items-center gap-6 py-6 px-4">
+      <div
+        className="relative w-full select-none"
+        style={{ maxWidth: 220, height: 360, touchAction: "pan-y" }}
+      >
+        {[...queue].reverse().map((memberIndex, reversedPos) => {
+          const stackPosition = queue.length - 1 - reversedPos;
+          return (
+            <MobileDeckCard
+              key={memberIndex}
+              member={members[memberIndex]}
+              index={memberIndex}
+              stackPosition={stackPosition}
+              total={members.length}
+              onSwiped={handleSwiped}
+            />
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col items-center gap-2 mt-2">
+        <div className="flex items-center gap-2">
+          {members.map((_, i) => (
+            <div
+              key={i}
+              className="transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{
+                width: i === topIndex ? 18 : 5,
+                height: 5,
+                borderRadius: 3,
+                background: i === topIndex ? accentColor : "rgba(12,12,10,0.12)",
+              }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function Profile({ members }: ProfileProps) {
+  const [isDeckHovered, setIsDeckHovered] = useState(false);
   if (!members?.length) return null;
 
   const sorted = sortByBirthdayEldestToYoungest(members);
-  const row1 = sorted.slice(0, 4);
-  const row2 = sorted.slice(4, 8);
 
   return (
-    <>
-      <style>{`
-        @keyframes bini-ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
+    <section
+      className="relative py-12 sm:py-16 lg:py-24 overflow-hidden w-full"
+      style={{ background: "var(--c-surface, #F5F3EE)" }}
+    >
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 600,
+            height: 600,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(232,115,154,0.04) 0%, transparent 75%)",
+            filter: "blur(60px)",
+          }}
+        />
+      </div>
 
-        :root {
-          --ticker-fs: 7px;
-          --ticker-py: 6px;
-          --ticker-mb: 24px;
-        }
-
-        @media (min-width: 360px) {
-          :root {
-            --ticker-fs: 8px;
-            --ticker-py: 8px;
-            --ticker-mb: 32px;
-          }
-        }
-
-        @media (min-width: 768px) {
-          :root {
-            --ticker-fs: 9px;
-            --ticker-py: 9px;
-            --ticker-mb: 52px;
-          }
-        }
-
-        .card-pad { padding: 8px 10px; }
-        .card-bini-label { font-size: 6.5px; margin-bottom: 1px; }
-        .card-name { font-size: 0.9rem; }
-        .card-serial { top: 8px; left: 8px; font-size: 6.5px; }
-        
-        .card-back-header { padding: 0 10px 5px; }
-        .card-back-name { font-size: 0.95rem; }
-        .card-fullname { font-size: 5.5px; margin-top: 1px; letter-spacing: 0.04em; }
-        
-        .card-meta-pad { padding: 6px 10px 8px; }
-        .container-gap { gap: 3px; }
-        .value-gap { gap: 3px; }
-        .badge-gap { gap: 2px; }
-        
-        .meta-label { font-size: 6px; letter-spacing: 0.04em; }
-        .meta-value { font-size: 6px; letter-spacing: 0.02em; }
-        .role-badge { font-size: 5px; padding: 0.5px 3px; }
-        --meta-icon-size: 8px;
-        
-        .card-back-footer { padding-top: 4px; margin-top: 2px; font-size: 5.5px; letter-spacing: 0.06em; }
-
-        @media (min-width: 375px) {
-          .card-pad { padding: 10px 11px; }
-          .card-bini-label { font-size: 7px; }
-          .card-name { font-size: 1.05rem; }
-          .card-serial { top: 10px; left: 10px; font-size: 7px; }
-          
-          .card-back-header { padding: 0 11px 6px; }
-          .card-back-name { font-size: 1.1rem; }
-          .card-fullname { font-size: 6.5px; }
-          
-          .card-meta-pad { padding: 7px 11px 9px; }
-          .container-gap { gap: 4px; }
-          .meta-label { font-size: 6.5px; }
-          .meta-value { font-size: 6.5px; }
-          .role-badge { font-size: 5.5px; padding: 0.5px 4px; }
-          --meta-icon-size: 9px;
-          .card-back-footer { font-size: 6px; }
-        }
-
-        @media (min-width: 425px) {
-          .card-pad { padding: 12px 12px 10px; }
-          .card-name { font-size: 1.2rem; }
-          .card-back-header { padding: 0 12px 8px; }
-          .card-back-name { font-size: 1.25rem; }
-          .card-fullname { font-size: 7px; }
-          .card-meta-pad { padding: 8px 12px 10px; }
-          .container-gap { gap: 5px; }
-          .value-gap { gap: 4px; }
-          .badge-gap { gap: 3px; }
-          .meta-label { font-size: 7px; }
-          .meta-value { font-size: 7px; }
-          .role-badge { font-size: 6px; padding: 1px 4.5px; }
-          --meta-icon-size: 10px;
-          .card-back-footer { font-size: 6.5px; }
-        }
-
-        @media (min-width: 768px) {
-          .card-pad { padding: 16px 13px 14px; }
-          .card-bini-label { font-size: 7.5px; margin-bottom: 3px; }
-          .card-name { font-size: clamp(1.05rem, 2.4vw, 1.55rem); }
-          .card-serial { top: 12px; left: 12px; font-size: 7px; }
-          
-          .card-back-header { padding: 0 14px 10px; }
-          .card-back-name { font-size: clamp(1.2rem, 2.8vw, 1.65rem); }
-          .card-fullname { font-size: 7px; margin-top: 4px; letter-spacing: 0.08em; }
-          
-          .card-meta-pad { padding: 10px 14px 12px; }
-          .container-gap { gap: 5px; }
-          .value-gap { gap: 5px; }
-          .badge-gap { gap: 3px; }
-          
-          .meta-label { font-size: 7.5px; letter-spacing: 0.1em; }
-          .meta-value { font-size: 7.5px; letter-spacing: 0.08em; }
-          .role-badge { font-size: 6.5px; padding: 1px 5px; }
-          --meta-icon-size: 11px;
-          
-          .card-back-footer { padding-top: 6px; margin-top: 4px; font-size: 7px; letter-spacing: 0.12em; }
-        }
-      `}</style>
-
-      <section
-        className="relative py-12 sm:py-20 md:py-28 overflow-hidden"
-        style={{ background: "var(--c-surface, #F5F3EE)" }}
-      >
-        <div className="absolute inset-0 pointer-events-none">
-          <div style={{ position: "absolute", top: 0, left: "10%", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,115,154,0.07) 0%, transparent 70%)", filter: "blur(50px)" }} />
-          <div style={{ position: "absolute", bottom: "10%", right: "8%", width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,114,207,0.07) 0%, transparent 70%)", filter: "blur(50px)" }} />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
-          <div className="mb-6">
-            <p className="mb-2 sm:mb-4 text-xs tracking-widest opacity-80" style={{ fontFamily: "var(--f-mono)", color: "var(--c-ink, #0C0C0A)" }}>
-              THE NATION&apos;S GIRL GROUP
-            </p>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-5">
-              <h2
-                style={{
-                  fontFamily: "var(--f-display)",
-                  fontSize: "clamp(2.4rem, 7vw, 8rem)",
-                  lineHeight: 0.85,
-                  letterSpacing: "-0.03em",
-                  color: "var(--c-ink, #0C0C0A)",
-                }}
-              >
-                MEET<br />THE 8
-              </h2>
-              <p
-                style={{
-                  fontFamily: "var(--f-mono)",
-                  fontSize: "0.72rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  opacity: 0.6,
-                  maxWidth: 240,
-                  lineHeight: 1.4,
-                  color: "var(--c-ink, #0C0C0A)",
-                }}
-              >
-                Tap or hover to get to know your bias.
-              </p>
-            </div>
-          </div>
-
-          <TickerTape members={sorted} />
-
-          {/* ── DESKTOP: stacked offset rows ── */}
-          <div className="hidden md:flex flex-col gap-5">
-            <div
-              className="grid gap-4"
-              style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
-            >
-              {row1.map((member, i) => (
-                <PhotoCard key={member._id} member={member} index={i} />
-              ))}
-            </div>
-
-            <div
-              className="grid gap-4"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="mt-4 flex flex-col items-center lg:items-start text-center lg:text-left gap-2">
+          <div>
+            <span
               style={{
-                gridTemplateColumns: "repeat(4, 1fr)",
-                marginLeft: "calc((100% + 1rem) / 4 / 2)",
-                marginRight: 0,
-                width: "calc(100% - (100% + 1rem) / 4 / 2)",
+                fontFamily: "var(--f-mono)",
+                fontSize: 10,
+                letterSpacing: ".12em",
+                color: "var(--c-ink)",
+                opacity: 0.75,
               }}
             >
-              {row2.map((member, i) => (
-                <PhotoCard key={member._id} member={member} index={i + 4} />
-              ))}
-            </div>
-          </div>
+              THE NATION'S GIRL GROUP
+            </span>
 
-          {/* ── MOBILE/TABLET: 2-col uniform precise grid ── */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:hidden">
+            <h3
+              style={{
+                fontFamily: "var(--f-display)",
+                fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
+                lineHeight: 0.95,
+                color: "var(--c-teal-dark)",
+                marginTop: 8,
+              }}
+            >
+              MEET THE 8
+            </h3>
+            
+            <p
+              className="hidden lg:block mt-3"
+              style={{
+                fontFamily: "var(--f-mono)",
+                fontSize: "0.68rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                opacity: 0.5,
+                color: "var(--c-ink)",
+              }}
+            >
+              Hover to expand deck · Hold card to flip
+            </p>
+
+            <p
+              className="block lg:hidden mt-3"
+              style={{
+                fontFamily: "var(--f-mono)",
+                fontSize: "0.62rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                opacity: 0.5,
+                color: "var(--c-ink)",
+              }}
+            >
+              Swipe for more · Hold to flip
+            </p>
+          </div>
+        </div>
+
+        {/* Desktop Viewport: Visible ONLY on large viewports (1024px+) */}
+        <div
+          className="hidden lg:flex relative w-full items-center justify-center select-none mt-6"
+          style={{ height: "460px" }}
+          onMouseEnter={() => setIsDeckHovered(true)}
+          onMouseLeave={() => setIsDeckHovered(false)}
+        >
+          <div className="relative w-full h-full max-w-4xl mx-auto">
             {sorted.map((member, i) => (
-              <PhotoCard key={member._id} member={member} index={i} />
+              <DesktopPhotoCard
+                key={member._id}
+                member={member}
+                index={i}
+                total={sorted.length}
+                isDeckHovered={isDeckHovered}
+              />
             ))}
           </div>
         </div>
-      </section>
-    </>
+
+        {/* Tablet & Mobile Viewport: Strict block up to 1023px */}
+        <div className="block lg:hidden mt-4">
+          <MobileDeckViewer members={sorted} />
+        </div>
+      </div>
+    </section>
   );
 }
