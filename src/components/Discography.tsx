@@ -206,8 +206,8 @@ export default function Discography() {
       `}</style>
 
       <section
-        className="relative overflow-hidden w-full min-h-screen flex items-center"
-        style={{ background: 'var(--c-surface)', paddingBlock: 'clamp(2.5rem, 6vw, 5rem)' }}
+        className="relative overflow-hidden w-full min-h-screen flex items-start lg:items-center"
+        style={{ background: 'var(--c-surface)', paddingBlock: 'clamp(1.5rem, 5vw, 4rem)' }}
       >
         <div
           className="absolute inset-0 pointer-events-none z-0"
@@ -234,10 +234,10 @@ export default function Discography() {
 
         <div
           className="relative z-10 mx-auto w-full flex flex-col justify-center"
-          style={{ maxWidth: 1200, paddingInline: 'clamp(1rem, 6vw, 4.5rem)' }}
+          style={{ maxWidth: 1200, paddingInline: 'clamp(1rem, 4vw, 4.5rem)' }}
         >
           {/* Header Area */}
-          <div className="w-full flex items-end justify-between mb-8 lg:mb-10 pb-4" style={{ borderBottom: '1px solid rgba(12,12,10,0.08)' }}>
+          <div className="w-full flex items-end justify-between mb-6 lg:mb-10 pb-4" style={{ borderBottom: '1px solid rgba(12,12,10,0.08)' }}>
             <div className="flex flex-col">
               <p
                 className="mb-1"
@@ -255,13 +255,13 @@ export default function Discography() {
               <h3
                 style={{
                   fontFamily: 'var(--f-display)',
-                  fontSize: 'clamp(2.2rem, 5vw, 4.5rem)',
+                  fontSize: 'clamp(2rem, 5vw, 4.5rem)',
                   lineHeight: 0.9,
                   color: 'var(--c-teal-dark)',
                   letterSpacing: '-0.02em',
                 }}
               >
-                BINI CATALOGUE
+                DISCOGRAPHY
               </h3>
             </div>
 
@@ -275,7 +275,7 @@ export default function Discography() {
                   transition={{ duration: 0.2 }}
                   style={{
                     fontFamily: 'var(--f-display)',
-                    fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                    fontSize: 'clamp(2rem, 4vw, 3.5rem)',
                     lineHeight: 1,
                     color: accent,
                     fontWeight: 400,
@@ -297,18 +297,18 @@ export default function Discography() {
             </div>
           </div>
 
-          {/* Balanced Layout Grid */}
+          {/* Master Responsive Grid */}
           <div 
-            className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6 lg:gap-8 items-stretch w-full"
+            className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6 lg:gap-8 items-start w-full"
             style={{
               ['--track-accent' as any]: accent,
               ['--track-accent-alpha' as any]: `${accent}33`,
             }}
           >
             
-            {/* LEFT SIDE: Artwork & Details Container */}
+            {/* LEFT SIDE: Artwork, Meta Controls & Mobile Player (Sticky on Mobile) */}
             <div 
-              className="flex flex-col justify-between w-full gap-6"
+              className="flex flex-col w-full gap-4 lg:gap-6 sticky top-0 lg:relative bg-transparent z-30 lg:z-10"
               onTouchStart={(e) => {
                 touchStartX.current = e.touches[0].clientX;
                 touchStartY.current = e.touches[0].clientY;
@@ -319,8 +319,11 @@ export default function Discography() {
                 if (Math.abs(dx) > 45 && dy < 55) goTo(activeIndex + (dx > 0 ? 1 : -1));
               }}
             >
-              <div className="w-full flex lg:justify-start">
-                <div className="relative w-full aspect-square">
+              {/* Art + Meta card for mobile backdrop insulation */}
+              <div className="flex flex-row lg:flex-col gap-4 items-center lg:items-stretch bg-[var(--c-surface)] lg:bg-transparent p-3 lg:p-0 rounded-[var(--r-lg)] lg:rounded-none border border-[rgba(12,12,10,0.04)] lg:border-none shadow-sm lg:shadow-none">
+                
+                {/* Artwork (Scaled down beautifully on mobile) */}
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-full lg:h-auto lg:aspect-square shrink-0">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`art-${activeIndex}`}
@@ -330,7 +333,7 @@ export default function Discography() {
                       transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
                       className="relative overflow-hidden w-full h-full"
                       style={{
-                        borderRadius: 'var(--r-lg)',
+                        borderRadius: 'var(--r-md)',
                         background: 'var(--c-surface-2)',
                         border: `1px solid rgba(12,12,10,0.06)`,
                         boxShadow: `var(--shadow-float)`,
@@ -348,7 +351,7 @@ export default function Discography() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[3px]"
+                          className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px]"
                         >
                           <div
                             className="relative overflow-hidden rounded-full"
@@ -356,7 +359,6 @@ export default function Discography() {
                               width: '65%',
                               aspectRatio: '1 / 1',
                               background: 'var(--c-ink)',
-                              boxShadow: '0 16px 48px rgba(12,12,10,0.4)',
                               animation: 'vinylSpin 6s linear infinite',
                             }}
                           >
@@ -381,40 +383,17 @@ export default function Discography() {
                                 backgroundImage: `url(${album.art})`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
-                                boxShadow: '0 0 0 1.5px rgba(255,255,255,0.15)',
                               }}
                             />
                           </div>
                         </motion.div>
                       )}
-
-                      {activeIndex === 0 && (
-                        <div
-                          className="absolute top-4 right-4 z-10"
-                          style={{
-                            fontFamily: 'var(--f-mono)',
-                            fontSize: '0.55rem',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.12em',
-                            padding: '5px 12px',
-                            borderRadius: 'var(--r-full)',
-                            background: 'rgba(255,255,255,0.85)',
-                            color: 'var(--c-ink)',
-                            border: '1px solid rgba(12,12,10,0.1)',
-                            backdropFilter: 'blur(4px)',
-                            fontWeight: 600,
-                          }}
-                        >
-                          Latest Release
-                        </div>
-                      )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-4 w-full">
-                <div style={{ paddingInline: '0.25rem' }}>
+                {/* Typography metadata info wrapper */}
+                <div className="flex-1 min-w-0 lg:mt-4">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`meta-${activeIndex}`}
@@ -424,40 +403,96 @@ export default function Discography() {
                       transition={{ duration: 0.2 }}
                     >
                       <h4
-                        className="uppercase truncate"
+                        className="uppercase truncate font-medium"
                         style={{
                           fontFamily: 'var(--f-display)',
-                          fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-                          lineHeight: 1,
+                          fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
+                          lineHeight: 1.1,
                           color: 'var(--c-ink)',
-                          letterSpacing: '-0.01em',
                         }}
                       >
                         {album.name}
                       </h4>
-                      <p
-                        style={{
-                          fontFamily: 'var(--f-mono)',
-                          fontSize: '0.65rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.12em',
-                          color: 'var(--c-ink)',
-                          opacity: 0.5,
-                          marginTop: 6,
-                        }}
-                      >
-                        Released in {album.year} · {album.tracks.length} {album.tracks.length === 1 ? 'track' : 'tracks'}
-                      </p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <p
+                          style={{
+                            fontFamily: 'var(--f-mono)',
+                            fontSize: '0.6rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.12em',
+                            color: 'var(--c-ink)',
+                            opacity: 0.5,
+                          }}
+                        >
+                          {album.year} · {album.tracks.length} Tracks
+                        </p>
+                        
+                        {/* Conditional Latest Release Tag */}
+                        {activeIndex === 0 && (
+                          <span
+                            style={{
+                              fontFamily: 'var(--f-mono)',
+                              fontSize: '0.55rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.08em',
+                              color: '#ffffff',
+                              background: accent,
+                              padding: '2px 6px',
+                              borderRadius: '2px',
+                              display: 'inline-block',
+                              lineHeight: 1,
+                              transition: 'background 0.3s ease'
+                            }}
+                          >
+                            Latest Release
+                          </span>
+                        )}
+                      </div>
                     </motion.div>
                   </AnimatePresence>
-                </div>
 
+                  {/* Navigation slide nodes directly below metadata on mobile */}
+                  <div className="flex lg:hidden items-center gap-3 mt-3">
+                    <button
+                      onClick={() => goTo(activeIndex - 1)}
+                      className="disc-nav-btn flex items-center justify-center shrink-0"
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 'var(--r-full)',
+                        border: '1px solid rgba(12,12,10,0.1)',
+                        color: 'var(--c-ink)',
+                        background: 'transparent',
+                      }}
+                    >
+                      <Icon icon="mingcute:left-line" style={{ width: 14, height: 14 }} />
+                    </button>
+                    <button
+                      onClick={() => goTo(activeIndex + 1)}
+                      className="disc-nav-btn flex items-center justify-center shrink-0"
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 'var(--r-full)',
+                        border: '1px solid rgba(12,12,10,0.1)',
+                        color: 'var(--c-ink)',
+                        background: 'transparent',
+                      }}
+                    >
+                      <Icon icon="mingcute:right-line" style={{ width: 14, height: 14 }} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Only Extra Controls */}
+              <div className="hidden lg:flex flex-col gap-4 w-full">
                 <div className="flex items-center gap-3 w-full">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => goTo(activeIndex - 1)}
                       className="disc-nav-btn flex items-center justify-center shrink-0"
-                      aria-label="Previous release"
                       style={{
                         width: 40,
                         height: 40,
@@ -465,7 +500,6 @@ export default function Discography() {
                         border: '1px solid rgba(12,12,10,0.1)',
                         color: 'var(--c-ink)',
                         background: 'transparent',
-                        cursor: 'pointer',
                       }}
                     >
                       <Icon icon="mingcute:left-line" style={{ width: 16, height: 16 }} />
@@ -473,7 +507,6 @@ export default function Discography() {
                     <button
                       onClick={() => goTo(activeIndex + 1)}
                       className="disc-nav-btn flex items-center justify-center shrink-0"
-                      aria-label="Next release"
                       style={{
                         width: 40,
                         height: 40,
@@ -481,7 +514,6 @@ export default function Discography() {
                         border: '1px solid rgba(12,12,10,0.1)',
                         color: 'var(--c-ink)',
                         background: 'transparent',
-                        cursor: 'pointer',
                       }}
                     >
                       <Icon icon="mingcute:right-line" style={{ width: 16, height: 16 }} />
@@ -493,7 +525,6 @@ export default function Discography() {
                       <button
                         key={i}
                         onClick={() => goTo(i)}
-                        aria-label={`Go to slide ${i + 1}`}
                         style={{
                           height: 5,
                           width: i === activeIndex ? 16 : 5,
@@ -501,7 +532,6 @@ export default function Discography() {
                           background: i === activeIndex ? accent : 'rgba(12,12,10,0.1)',
                           border: 'none',
                           padding: 0,
-                          cursor: 'pointer',
                           transition: 'width 0.3s var(--ease-smooth), background 0.3s ease',
                         }}
                       />
@@ -510,10 +540,7 @@ export default function Discography() {
                 </div>
 
                 <a
-                  href={
-                    album.spotify_album_url ||
-                    `https://open.spotify.com/search/${encodeURIComponent(album.name + ' BINI')}`
-                  }
+                  href={album.spotify_album_url || `https://open.spotify.com/search/${encodeURIComponent(album.name + ' BINI')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="spotify-pill flex items-center justify-center gap-2 w-full text-center"
@@ -528,27 +555,57 @@ export default function Discography() {
                     letterSpacing: '0.1em',
                     fontWeight: 700,
                     textDecoration: 'none',
-                    boxShadow: '0 4px 15px rgba(12, 12, 10, 0.05)',
                   }}
                 >
                   <Icon icon="mdi:spotify" style={{ width: 16, height: 16 }} />
                   Listen on Spotify
                 </a>
               </div>
+
+              {/* Mobile Only Sticky Player Module */}
+              <div className="block lg:hidden w-full bg-[var(--c-surface)] pb-2">
+                <AnimatePresence mode="wait">
+                  {nowPlaying ? (
+                    <motion.div
+                      key={`mob-play-${nowPlaying.track.id}`}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      style={{
+                        borderRadius: 'var(--r-md)',
+                        overflow: 'hidden',
+                        border: `1px solid rgba(12,12,10,0.06)`,
+                        padding: 4,
+                        background: 'var(--c-surface)',
+                      }}
+                    >
+                      <iframe
+                        src={`https://open.spotify.com/embed/track/${nowPlaying.track.id}?utm_source=generator&theme=0`}
+                        width="100%"
+                        height="80"
+                        style={{ border: 'none', borderRadius: 6, display: 'block' }}
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      />
+                    </motion.div>
+                  ) : (
+                    <div 
+                      className="w-full flex items-center justify-center text-center p-4 border border-dashed border-[rgba(12,12,10,0.1)]"
+                      style={{ borderRadius: 'var(--r-md)', height: 80 }}
+                    >
+                      <p style={{ fontFamily: 'var(--f-mono)', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--c-ink)', opacity: 0.5 }}>
+                        Select a track below to stream
+                      </p>
+                    </div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {/* RIGHT SIDE: Tracklist Panel */}
+            {/* RIGHT SIDE: Tracklist Panel Container */}
             <div
-              className="flex flex-col w-full h-full min-h-[480px] lg:min-h-0 gap-3"
-              style={{
-                background: 'rgba(12,12,10,0.01)',
-                border: '1px solid rgba(12,12,10,0.04)',
-                borderRadius: 'var(--r-lg)',
-                padding: 'clamp(1rem, 2.5vw, 1.5rem)',
-              }}
+              className="flex flex-col w-full h-full lg:h-[540px] bg-[rgba(12,12,10,0.01)] border border-[rgba(12,12,10,0.04)] rounded-[var(--r-lg)] p-4 lg:p-6"
             >
-              {/* Header and Scrollable List wrapper */}
-              <div className="flex flex-col min-h-0 w-full flex-1">
+              <div className="flex flex-col min-h-0 w-full h-full">
                 <div 
                   className="flex items-center justify-between mb-3 pb-2 shrink-0"
                   style={{ borderBottom: `1px solid rgba(12,12,10,0.05)` }}
@@ -567,7 +624,8 @@ export default function Discography() {
                   </p>
                 </div>
 
-                <div className="scroller-balanced overflow-y-auto w-full flex-1" style={{ paddingRight: '4px' }}>
+                {/* Scrollable Area */}
+                <div className="scroller-balanced overflow-y-auto w-full flex-1" style={{ paddingRight: '2px' }}>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`tracks-${activeIndex}`}
@@ -586,7 +644,7 @@ export default function Discography() {
                             className={`track-btn track-item w-full flex items-center gap-3.5 text-left ${isSelected ? 'track-active' : ''}`}
                             style={{
                               animationDelay: `${i * 12}ms`,
-                              padding: '0.7rem 0.5rem',
+                              padding: '0.75rem 0.5rem',
                               borderRadius: 'var(--r-sm)',
                               cursor: 'pointer',
                               background: 'transparent',
@@ -601,7 +659,6 @@ export default function Discography() {
                                 height: 20,
                                 borderRadius: '50%',
                                 background: isSelected ? '#ffffff' : 'rgba(12,12,10,0.05)',
-                                transform: isSelected ? 'scale(1.05)' : 'scale(1)',
                               }}
                             >
                               <Icon
@@ -619,7 +676,6 @@ export default function Discography() {
                                 color: isSelected ? '#ffffff' : 'rgba(12,12,10,0.3)',
                                 width: 18,
                                 textAlign: 'right',
-                                flexShrink: 0,
                               }}
                             >
                               {String(i + 1).padStart(2, '0')}
@@ -633,7 +689,6 @@ export default function Discography() {
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.02em',
                                 color: isSelected ? '#ffffff' : 'var(--c-ink)',
-                                opacity: 1,
                                 fontWeight: isSelected ? 700 : 400,
                               }}
                             >
@@ -647,7 +702,6 @@ export default function Discography() {
                                 fontSize: '0.65rem',
                                 color: isSelected ? '#ffffff' : 'var(--c-ink)',
                                 opacity: isSelected ? 0.7 : 0.4,
-                                flexShrink: 0,
                               }}
                             >
                               {track.duration}
@@ -660,12 +714,12 @@ export default function Discography() {
                 </div>
               </div>
 
-              {/* Player Base Container */}
-              <div className="shrink-0 min-h-[88px] flex flex-col justify-end relative z-20 w-full">
+              {/* Desktop Only Embedded Player Base */}
+              <div className="hidden lg:flex shrink-0 min-h-[88px] flex-col justify-end mt-4 relative z-20 w-full">
                 <AnimatePresence mode="wait">
-                  {nowPlaying ? (
+                  {nowPlaying && (
                     <motion.div
-                      key={nowPlaying.track.id}
+                      key={`desk-play-${nowPlaying.track.id}`}
                       initial={{ opacity: 0, y: 4, scale: 0.99 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 4, scale: 0.99 }}
@@ -689,29 +743,10 @@ export default function Discography() {
                         loading="lazy"
                       />
                     </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.4 }}
-                      exit={{ opacity: 0 }}
-                      className="w-full flex flex-col items-center justify-center text-center p-6 border border-dashed border-[rgba(12,12,10,0.1)]"
-                      style={{ borderRadius: 'var(--r-md)', height: 88 }}
-                    >
-                      <p
-                        style={{
-                          fontFamily: 'var(--f-mono)',
-                          fontSize: '0.6rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.08em',
-                          color: 'var(--c-ink)',
-                        }}
-                      >
-                        Select a track to play
-                      </p>
-                    </motion.div>
                   )}
                 </AnimatePresence>
               </div>
+
             </div>
           </div>
         </div>
