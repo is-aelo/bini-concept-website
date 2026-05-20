@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
+import ProfileGridShader from "./ProfileGridShader";
 
 interface Member {
   _id: string;
@@ -78,14 +79,12 @@ function CardFront({
   r,
   g,
   b,
-  shadow,
 }: {
   member: Member;
   index: number;
   r: number;
   g: number;
   b: number;
-  shadow: string;
 }) {
   const hasProfileImg = !!member.profileImage?.startsWith("http");
   return (
@@ -95,11 +94,10 @@ function CardFront({
         backfaceVisibility: "hidden",
         WebkitBackfaceVisibility: "hidden",
         borderRadius: 16,
-        boxShadow: shadow,
       }}
     >
       <div
-        className="absolute inset-0 z-[3] pointer-events-none"
+        className="absolute inset-0 z-3 pointer-events-none"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px)",
@@ -126,14 +124,14 @@ function CardFront({
       )}
 
       <div
-        className="absolute inset-0 z-[1] pointer-events-none"
+        className="absolute inset-0 z-1 pointer-events-none"
         style={{
           background: `linear-gradient(to top, rgba(${r},${g},${b},0.85) 0%, rgba(12,12,10,0.2) 48%, transparent 72%)`,
         }}
       />
 
       <div
-        className="absolute inset-0 z-[4] pointer-events-none"
+        className="absolute inset-0 z-4 pointer-events-none"
         style={{
           borderRadius: 16,
           border: `1px solid rgba(${r},${g},${b},0.45)`,
@@ -141,7 +139,7 @@ function CardFront({
         }}
       />
 
-      <div className="absolute bottom-0 inset-x-0 z-[5] px-4 pb-4">
+      <div className="absolute bottom-0 inset-x-0 z-5 px-4 pb-4">
         <div
           className="text-[7px] tracking-widest opacity-70 mb-1"
           style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
@@ -163,7 +161,7 @@ function CardFront({
       </div>
 
       <div
-        className="absolute top-4 left-4 z-[5] text-[7px]"
+        className="absolute top-4 left-4 z-5 text-[7px]"
         style={{ fontFamily: "var(--f-mono)", color: "rgba(255,255,255,0.35)" }}
       >
         {String(index + 1).padStart(2, "0")}
@@ -179,7 +177,6 @@ function CardBack({
   r,
   g,
   b,
-  shadow,
   total,
 }: {
   member: Member;
@@ -188,7 +185,6 @@ function CardBack({
   r: number;
   g: number;
   b: number;
-  shadow: string;
   total: number;
 }) {
   const hasGalleryImg = !!member.galleryImage?.startsWith("http");
@@ -201,7 +197,6 @@ function CardBack({
         transform: "rotateY(180deg)",
         borderRadius: 16,
         background: "var(--c-surface, #F5F3EE)",
-        boxShadow: shadow,
         display: "flex",
         flexDirection: "column",
       }}
@@ -222,12 +217,12 @@ function CardBack({
           />
         )}
         <div
-          className="absolute inset-0 z-[1] pointer-events-none"
+          className="absolute inset-0 z-1 pointer-events-none"
           style={{
             background: `linear-gradient(to top, rgba(${r},${g},${b},0.75) 0%, rgba(12,12,10,0.1) 52%, transparent 80%)`,
           }}
         />
-        <div className="absolute bottom-0 inset-x-0 z-[2] px-3 pb-2">
+        <div className="absolute bottom-0 inset-x-0 z-2 px-3 pb-2">
           <div
             className="text-base font-normal tracking-wide"
             style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#F5F3EE" }}
@@ -263,7 +258,7 @@ function CardBack({
                 {member.roles.slice(0, 2).map((role) => (
                   <span
                     key={role}
-                    className="text-[5.5px] px-1 py-0.5 rounded-[2px] bg-black/5 border border-black/10 uppercase font-medium whitespace-nowrap"
+                    className="text-[5.5px] px-1 py-0.5 rounded-xs bg-black/5 border border-black/10 uppercase font-medium whitespace-nowrap"
                     style={{ fontFamily: "var(--f-mono)" }}
                   >
                     {role}
@@ -340,10 +335,6 @@ function DesktopPhotoCard({
     }
   };
 
-  const shadow = isPressed
-    ? `0 20px 40px rgba(12, 12, 10, 0.2), 0 40px 80px -10px rgba(${r}, ${g}, ${b}, 0.4)`
-    : `0 2px 4px rgba(12, 12, 10, 0.08), 0 12px 28px -4px rgba(12, 12, 10, 0.12), 0 8px 20px -8px rgba(${r}, ${g}, ${b}, 0.15)`;
-
   return (
     <motion.div
       ref={cardRef}
@@ -368,6 +359,31 @@ function DesktopPhotoCard({
       transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
     >
       <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          width: "84%",
+          height: "90%",
+          left: "8%",
+          bottom: 0,
+          borderRadius: 24,
+          backgroundColor: "rgba(12, 12, 10, 0.9)",
+          transformOrigin: "bottom center",
+        }}
+        animate={{
+          y: isPressed ? 36 : isDeckHovered ? 14 : 6,
+          scaleX: isPressed ? 0.86 : isDeckHovered ? 0.92 : 0.95,
+          scaleY: isPressed ? 0.80 : isDeckHovered ? 0.88 : 0.92,
+          filter: isPressed 
+            ? `blur(12px) drop-shadow(0 6px 12px rgba(${r}, ${g}, ${b}, 0.12))` 
+            : isDeckHovered 
+            ? `blur(6px) drop-shadow(0 3px 6px rgba(${r}, ${g}, ${b}, 0.06))` 
+            : "blur(2.5px)",
+          opacity: isPressed ? 0.12 : isDeckHovered ? 0.22 : 0.65,
+        }}
+        transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
+      />
+
+      <motion.div
         animate={{
           rotateY: isPressed ? 180 : 0,
           rotateX: tilt.x,
@@ -383,8 +399,8 @@ function DesktopPhotoCard({
         className="w-full h-full relative"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <CardFront member={member} index={index} r={r} g={g} b={b} shadow={shadow} />
-        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} shadow={shadow} total={total} />
+        <CardFront member={member} index={index} r={r} g={g} b={b} />
+        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
       </motion.div>
     </motion.div>
   );
@@ -428,21 +444,17 @@ function MobileDeckCard({
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
   const offset = STACK_OFFSETS[Math.min(stackPosition, STACK_OFFSETS.length - 1)];
 
-  const shadow = isTopCard
-    ? `0 12px 40px rgba(12,12,10,0.18), 0 32px 60px -10px rgba(${r},${g},${b},0.3)`
-    : `0 4px 16px rgba(12,12,10,0.1), 0 8px 24px -4px rgba(${r},${g},${b},0.1)`;
-
   const handleDragEnd = async (_event: any, info: any) => {
     if (!isTopCard) return;
 
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       const direction = info.offset.x > 0 ? 1 : -1;
-      await animate(x, direction * 420, { duration: 0.25, ease: [0.16, 1, 0.3, 1] });
+      await animate(x, direction * 420, { duration: 0.22, ease: [0.16, 1, 0.3, 1] });
       onSwiped();
       x.set(0);
       setIsFlipped(false);
     } else {
-      animate(x, 0, { type: "spring", stiffness: 260, damping: 26 });
+      animate(x, 0, { type: "spring", stiffness: 300, damping: 28 });
     }
   };
 
@@ -450,7 +462,7 @@ function MobileDeckCard({
     if (!isTopCard) return;
     setIsFlipped((f) => !f);
     setIsHolding(true);
-    setTimeout(() => setIsHolding(false), 300);
+    setTimeout(() => setIsHolding(false), 250);
   };
 
   if (stackPosition >= MAX_VISIBLE_STACK) return null;
@@ -462,7 +474,7 @@ function MobileDeckCard({
     <motion.div
       drag={isTopCard ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.65}
+      dragElastic={0.45}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       onTap={handleTap}
@@ -479,18 +491,43 @@ function MobileDeckCard({
         scale,
         touchAction: "pan-y",
         transformOrigin: "bottom center",
+        perspective: "1200px",
       }}
       className="cursor-grab active:cursor-grabbing select-none"
-      transition={{ type: "spring", stiffness: 180, damping: 22, mass: 0.8 }}
+      transition={{ type: "spring", stiffness: 220, damping: 24, mass: 0.6 }}
     >
       <motion.div
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute pointer-events-none"
+        style={{
+          width: "86%",
+          height: "90%",
+          left: "7%",
+          bottom: 0,
+          borderRadius: 20,
+          backgroundColor: "rgba(12, 12, 10, 0.9)",
+          transformOrigin: "bottom center",
+         }}
+        animate={{
+          y: isTopCard ? 8 : 4,
+          scaleX: isTopCard ? 0.92 : 0.95,
+          filter: isTopCard 
+            ? `blur(5px) drop-shadow(0 2px 4px rgba(${r}, ${g}, ${b}, 0.08))` 
+            : "blur(2px)",
+          opacity: isTopCard ? 0.25 : 0.65,
+        }}
+      />
+
+      <motion.div
         className="w-full h-full relative"
-        style={{ transformStyle: "preserve-3d", perspective: "1200px" }}
+        style={{ 
+          transformStyle: "preserve-3d",
+          willChange: "transform"
+        }}
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
       >
-        <CardFront member={member} index={index} r={r} g={g} b={b} shadow={shadow} />
-        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} shadow={shadow} total={total} />
+        <CardFront member={member} index={index} r={r} g={g} b={b} />
+        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
       </motion.div>
 
       <AnimatePresence>
@@ -499,7 +536,7 @@ function MobileDeckCard({
             initial={{ opacity: 0.6, scale: 0.95 }}
             animate={{ opacity: 0, scale: 1.05 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="absolute inset-0 pointer-events-none"
             style={{
               borderRadius: 16,
@@ -578,21 +615,7 @@ export default function Profile({ members }: ProfileProps) {
       className="relative py-12 sm:py-16 lg:py-24 overflow-hidden w-full"
       style={{ background: "var(--c-surface, #F5F3EE)" }}
     >
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 600,
-            height: 600,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(232,115,154,0.04) 0%, transparent 75%)",
-            filter: "blur(60px)",
-          }}
-        />
-      </div>
+      <ProfileGridShader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mt-4 flex flex-col items-center lg:items-start text-center lg:text-left gap-2">
@@ -646,7 +669,7 @@ export default function Profile({ members }: ProfileProps) {
                 color: "var(--c-ink)",
               }}
             >
-              Swipe for more · Hold to flip
+              Swipe for more · Tap to flip
             </p>
           </div>
         </div>
