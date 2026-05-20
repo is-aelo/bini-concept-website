@@ -29,7 +29,6 @@ interface SanityMember {
 }
 
 export default async function BiniPage() {
-  // 1. Fetch Dynamic CMS Assets from Sanity
   const coachellaImages = (await sanityFetch({
     query: COACHELLA_GALLERY_QUERY,
   })) as CoachellaImage[];
@@ -38,7 +37,6 @@ export default async function BiniPage() {
     query: ALL_MEMBERS_QUERY,
   })) as SanityMember[];
 
-  // 2. Static UI configurations to map onto the incoming CMS data
   const localUiMeta: Record<string, { signatureColor: string }> = {
     aiah: { signatureColor: "var(--c-aiah)" },
     colet: { signatureColor: "var(--c-colet)" },
@@ -50,7 +48,6 @@ export default async function BiniPage() {
     sheena: { signatureColor: "var(--c-sheena)" },
   };
 
-  // 3. Normalize and enrich CMS records with local UI metadata
   const members = sanityMembersData.map((cmsMember) => {
     const lookupKey = cmsMember.stageName.toLowerCase();
     const meta = localUiMeta[lookupKey];
@@ -65,21 +62,9 @@ export default async function BiniPage() {
     <div className="relative">
       <Header />
       <Hero />
-
       <CoachellaSection images={coachellaImages} />
-
-      {/* PROFILE */}
       <Profile members={members} />
-
-      {/* DISCOGRAPHY */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Discography</h2>
-          <Discography />
-        </div>
-      </section>
-      
-      {/* REST OF PAGE UNCHANGED */}
+      <Discography />
     </div>
   );
 }
