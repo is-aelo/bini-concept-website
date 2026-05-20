@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
 import Profile from "@/components/Profile";
+import Discography from "@/components/Discography";
 
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { COACHELLA_GALLERY_QUERY, ALL_MEMBERS_QUERY } from "@/sanity/lib/queries";
@@ -56,25 +57,9 @@ export default async function BiniPage() {
 
     return {
       ...cmsMember,
-      // Prioritize Sanity field input, fallback to matching UI local variable configuration
       signatureColor: cmsMember.signatureColor || meta?.signatureColor || "var(--c-teal)",
     };
   });
-
-  const albums = [
-    { title: "Signals", type: "EP", year: "2026" },
-    { title: "FLAMES", type: "Album", year: "2025" },
-    { title: "Talaarawan", type: "EP", year: "2024" },
-    { title: "Feel Good", type: "Album", year: "2022" },
-  ];
-
-  const tours = [
-    { event: "Summer Sonic 2026", city: "Tokyo", status: "Upcoming" },
-    { event: "Signals World Tour", city: "Manila", status: "Upcoming" },
-    { event: "Coachella 2026", city: "California", status: "Past" },
-    { event: "Grand BINIverse", city: "Bulacan", status: "Past" },
-    { event: "Signals World Tour", city: "Singapore", status: "Upcoming" },
-  ];
 
   return (
     <div className="relative">
@@ -86,6 +71,14 @@ export default async function BiniPage() {
       {/* PROFILE */}
       <Profile members={members} />
 
+      {/* DISCOGRAPHY */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-12">Discography</h2>
+          <Discography />
+        </div>
+      </section>
+      
       {/* REST OF PAGE UNCHANGED */}
     </div>
   );
