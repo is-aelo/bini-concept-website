@@ -1,0 +1,875 @@
+{
+  "total": 37,
+  "items": [
+    {
+      "id": "7EKQ3Mw77tsyP4Ymaa5hlM",
+      "name": "Signals",
+      "type": "single",
+      "release_date": "2026-04-09",
+      "year": "2026",
+      "total_tracks": 6,
+      "art": "https://i.scdn.co/image/ab67616d0000b2738dee6313595bea4594c2851d",
+      "spotify_url": "https://open.spotify.com/album/7EKQ3Mw77tsyP4Ymaa5hlM",
+      "tracks": [
+        {
+          "id": "1yhQJwdcU0HAwAKZdRURfM",
+          "name": "Blush",
+          "uri": "spotify:track:1yhQJwdcU0HAwAKZdRURfM",
+          "duration": "3:15"
+        },
+        {
+          "id": "6psIvmSNjBFKIAaaA5D5ik",
+          "name": "Unang Kilig",
+          "uri": "spotify:track:6psIvmSNjBFKIAaaA5D5ik",
+          "duration": "3:37"
+        },
+        {
+          "id": "5JkfmdqhfR8B9aErrm5wah",
+          "name": "Honey Honey",
+          "uri": "spotify:track:5JkfmdqhfR8B9aErrm5wah",
+          "duration": "2:38"
+        },
+        {
+          "id": "7p0yhoW25GIawuucfI1KUx",
+          "name": "Tic Tac Toe",
+          "uri": "spotify:track:7p0yhoW25GIawuucfI1KUx",
+          "duration": "3:02"
+        },
+        {
+          "id": "4CaaLtLET15FQFMHdYX0Pu",
+          "name": "Sugar Rush",
+          "uri": "spotify:track:4CaaLtLET15FQFMHdYX0Pu",
+          "duration": "3:28"
+        },
+        {
+          "id": "4sDGLlaH25cN1i3KFxIGsl",
+          "name": "Step Back",
+          "uri": "spotify:track:4sDGLlaH25cN1i3KFxIGsl",
+          "duration": "3:04"
+        }
+      ]
+    },
+    {
+      "id": "3KDnE33OQ0tkI2qtvoVA0r",
+      "name": "Unang Kilig / Honey Honey",
+      "type": "single",
+      "release_date": "2026-03-05",
+      "year": "2026",
+      "total_tracks": 2,
+      "art": "https://i.scdn.co/image/ab67616d0000b273bd2925ff9a38cdf6c8d35acf",
+      "spotify_url": "https://open.spotify.com/album/3KDnE33OQ0tkI2qtvoVA0r",
+      "tracks": [
+        {
+          "id": "7mfaRuBDtbywhmLSoPSscp",
+          "name": "Unang Kilig",
+          "uri": "spotify:track:7mfaRuBDtbywhmLSoPSscp",
+          "duration": "3:37"
+        },
+        {
+          "id": "282XNtIdfDh0NupdD8zBzp",
+          "name": "Honey Honey",
+          "uri": "spotify:track:282XNtIdfDh0NupdD8zBzp",
+          "duration": "2:38"
+        }
+      ]
+    },
+    {
+      "id": "42s2X3WQppxdHafUT2dfmF",
+      "name": "FLAMES",
+      "type": "album",
+      "release_date": "2025-11-20",
+      "year": "2025",
+      "total_tracks": 7,
+      "art": "https://i.scdn.co/image/ab67616d0000b273853f23aa1c567d1b6c0d66f6",
+      "spotify_url": "https://open.spotify.com/album/42s2X3WQppxdHafUT2dfmF",
+      "tracks": [
+        {
+          "id": "6rVeBkOo3pq83wxoz17RK6",
+          "name": "First Luv",
+          "uri": "spotify:track:6rVeBkOo3pq83wxoz17RK6",
+          "duration": "2:56"
+        },
+        {
+          "id": "4255eE0aWSyfbIWTpIE1qu",
+          "name": "Sweet Tooth",
+          "uri": "spotify:track:4255eE0aWSyfbIWTpIE1qu",
+          "duration": "3:00"
+        },
+        {
+          "id": "5wY1eT5dLwh0j5DortGQff",
+          "name": "Paruparo",
+          "uri": "spotify:track:5wY1eT5dLwh0j5DortGQff",
+          "duration": "3:31"
+        },
+        {
+          "id": "6rKlGBShPmNsQkzvEvdwqq",
+          "name": "Infinity",
+          "uri": "spotify:track:6rKlGBShPmNsQkzvEvdwqq",
+          "duration": "3:55"
+        },
+        {
+          "id": "01R8mmP7FyotvSQkjlxK7v",
+          "name": "Katabi",
+          "uri": "spotify:track:01R8mmP7FyotvSQkjlxK7v",
+          "duration": "2:52"
+        },
+        {
+          "id": "03Tt2qPSQKaXMkLtZ3Zwg9",
+          "name": "Bikini",
+          "uri": "spotify:track:03Tt2qPSQKaXMkLtZ3Zwg9",
+          "duration": "2:09"
+        },
+        {
+          "id": "4i5d5Aa4fuWw2O5jOXdK9e",
+          "name": "Shagidi",
+          "uri": "spotify:track:4i5d5Aa4fuWw2O5jOXdK9e",
+          "duration": "2:28"
+        }
+      ]
+    },
+    {
+      "id": "7saibhKLxGgujJBDXjUCzg",
+      "name": "Paruparo",
+      "type": "single",
+      "release_date": "2025-11-06",
+      "year": "2025",
+      "total_tracks": 3,
+      "art": "https://i.scdn.co/image/ab67616d0000b273d2ed3e9717c39131965afa67",
+      "spotify_url": "https://open.spotify.com/album/7saibhKLxGgujJBDXjUCzg",
+      "tracks": [
+        {
+          "id": "0waZh26XErLP0Za4Dgc3T0",
+          "name": "Paruparo",
+          "uri": "spotify:track:0waZh26XErLP0Za4Dgc3T0",
+          "duration": "3:31"
+        },
+        {
+          "id": "7CwwaZjLSteGakqSmPaiR2",
+          "name": "First Luv",
+          "uri": "spotify:track:7CwwaZjLSteGakqSmPaiR2",
+          "duration": "2:56"
+        },
+        {
+          "id": "3q5vPxCNAdrQaGr95AdNYd",
+          "name": "Shagidi",
+          "uri": "spotify:track:3q5vPxCNAdrQaGr95AdNYd",
+          "duration": "2:28"
+        }
+      ]
+    },
+    {
+      "id": "6hR079yVpoqUG4sOswANT4",
+      "name": "First Luv",
+      "type": "single",
+      "release_date": "2025-10-02",
+      "year": "2025",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b27387bd6fa42bd73a4d6c4ec98b",
+      "spotify_url": "https://open.spotify.com/album/6hR079yVpoqUG4sOswANT4",
+      "tracks": [
+        {
+          "id": "0qHbCeNAPB7EaKxWiyaAMP",
+          "name": "First Luv",
+          "uri": "spotify:track:0qHbCeNAPB7EaKxWiyaAMP",
+          "duration": "2:56"
+        }
+      ]
+    },
+    {
+      "id": "0ORwovk2jEUiaLXYtnPsPJ",
+      "name": "OXYGEN",
+      "type": "single",
+      "release_date": "2025-08-02",
+      "year": "2025",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273f5b5637273b302db06d03c13",
+      "spotify_url": "https://open.spotify.com/album/0ORwovk2jEUiaLXYtnPsPJ",
+      "tracks": [
+        {
+          "id": "2rvqMC6SRBCHcwFdMmaHfK",
+          "name": "OXYGEN",
+          "uri": "spotify:track:2rvqMC6SRBCHcwFdMmaHfK",
+          "duration": "3:10"
+        }
+      ]
+    },
+    {
+      "id": "14xJ5Qg9sEbCJmg2vBRCUZ",
+      "name": "Shagidi",
+      "type": "single",
+      "release_date": "2025-06-05",
+      "year": "2025",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2730505b8d3483fcb5ce27ac80b",
+      "spotify_url": "https://open.spotify.com/album/14xJ5Qg9sEbCJmg2vBRCUZ",
+      "tracks": [
+        {
+          "id": "7zKYsYbbC7N8C5QOOtTlZx",
+          "name": "Shagidi",
+          "uri": "spotify:track:7zKYsYbbC7N8C5QOOtTlZx",
+          "duration": "2:28"
+        }
+      ]
+    },
+    {
+      "id": "29rcLP1Uni7elTtxuiXF1J",
+      "name": "Blink Twice (Dos Veces Remix)",
+      "type": "single",
+      "release_date": "2025-03-14",
+      "year": "2025",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273689213b188a4f6f11b3e29d3",
+      "spotify_url": "https://open.spotify.com/album/29rcLP1Uni7elTtxuiXF1J",
+      "tracks": [
+        {
+          "id": "6SNHfk6CipQOSALhblynof",
+          "name": "Blink Twice - Dos Veces Remix",
+          "uri": "spotify:track:6SNHfk6CipQOSALhblynof",
+          "duration": "2:34"
+        }
+      ]
+    },
+    {
+      "id": "0N41GI4E4w6irltx8mJhY5",
+      "name": "BINIverse",
+      "type": "single",
+      "release_date": "2025-02-27",
+      "year": "2025",
+      "total_tracks": 6,
+      "art": "https://i.scdn.co/image/ab67616d0000b2735fd949ce33c3d4cddc5b2e6a",
+      "spotify_url": "https://open.spotify.com/album/0N41GI4E4w6irltx8mJhY5",
+      "tracks": [
+        {
+          "id": "0G2SvoKHnMnoX5UQDCIx51",
+          "name": "Blink Twice",
+          "uri": "spotify:track:0G2SvoKHnMnoX5UQDCIx51",
+          "duration": "2:33"
+        },
+        {
+          "id": "4xWZwHrIn5uS3Nft08Rk5O",
+          "name": "Zero Pressure",
+          "uri": "spotify:track:4xWZwHrIn5uS3Nft08Rk5O",
+          "duration": "2:50"
+        },
+        {
+          "id": "0hzFVTCkNnMgRrBiTgRuXC",
+          "name": "Secrets (feat. eaJ)",
+          "uri": "spotify:track:0hzFVTCkNnMgRrBiTgRuXC",
+          "duration": "3:24"
+        },
+        {
+          "id": "6SKjhbUSGDjTPCEGYYonWO",
+          "name": "Out Of My Head",
+          "uri": "spotify:track:6SKjhbUSGDjTPCEGYYonWO",
+          "duration": "3:35"
+        },
+        {
+          "id": "2JniqTObhmaYjn83J6qiED",
+          "name": "Cherry On Top",
+          "uri": "spotify:track:2JniqTObhmaYjn83J6qiED",
+          "duration": "2:55"
+        },
+        {
+          "id": "0x4uB9NwFEmYrGlUFI9Kci",
+          "name": "Cherry On Top - BiniMo Remix",
+          "uri": "spotify:track:0x4uB9NwFEmYrGlUFI9Kci",
+          "duration": "3:21"
+        }
+      ]
+    },
+    {
+      "id": "3JhgbOO543sMPYpkuIr6Mx",
+      "name": "Blink Twice",
+      "type": "single",
+      "release_date": "2025-02-13",
+      "year": "2025",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273c350e2d08a3ea63be712938c",
+      "spotify_url": "https://open.spotify.com/album/3JhgbOO543sMPYpkuIr6Mx",
+      "tracks": [
+        {
+          "id": "5nVby0RIRtqFSYN5TDDGeb",
+          "name": "Blink Twice",
+          "uri": "spotify:track:5nVby0RIRtqFSYN5TDDGeb",
+          "duration": "2:33"
+        }
+      ]
+    },
+    {
+      "id": "5AfAmrLLNS50UFcrBrvX6I",
+      "name": "Cherry On Top (BiniMo Remix)",
+      "type": "single",
+      "release_date": "2024-10-03",
+      "year": "2024",
+      "total_tracks": 2,
+      "art": "https://i.scdn.co/image/ab67616d0000b27384f208d825f9e8be6dfb348a",
+      "spotify_url": "https://open.spotify.com/album/5AfAmrLLNS50UFcrBrvX6I",
+      "tracks": [
+        {
+          "id": "6DUoR9vnTgJCwiKELneaH9",
+          "name": "Cherry On Top - BiniMo Remix",
+          "uri": "spotify:track:6DUoR9vnTgJCwiKELneaH9",
+          "duration": "3:21"
+        },
+        {
+          "id": "5eoT30UmAbbvdKxG1w2WMm",
+          "name": "Cherry On Top",
+          "uri": "spotify:track:5eoT30UmAbbvdKxG1w2WMm",
+          "duration": "2:55"
+        }
+      ]
+    },
+    {
+      "id": "3AkWtVg5gEkxmfr1q4qTLk",
+      "name": "Cherry On Top (Single Pack)",
+      "type": "single",
+      "release_date": "2024-09-06",
+      "year": "2024",
+      "total_tracks": 3,
+      "art": "https://i.scdn.co/image/ab67616d0000b273c8d52a3a16ffb772d465476e",
+      "spotify_url": "https://open.spotify.com/album/3AkWtVg5gEkxmfr1q4qTLk",
+      "tracks": [
+        {
+          "id": "44JMPXkqDyFp0GccLRZWU7",
+          "name": "Cherry On Top",
+          "uri": "spotify:track:44JMPXkqDyFp0GccLRZWU7",
+          "duration": "2:55"
+        },
+        {
+          "id": "3iHjhr565c3GT8pt2GGpq8",
+          "name": "Cherry On Top (Sped Up)",
+          "uri": "spotify:track:3iHjhr565c3GT8pt2GGpq8",
+          "duration": "2:50"
+        },
+        {
+          "id": "7zPfoGPWXxCKvUGZKUFoQo",
+          "name": "Cherry On Top (Slowed Down + Reverb)",
+          "uri": "spotify:track:7zPfoGPWXxCKvUGZKUFoQo",
+          "duration": "3:26"
+        }
+      ]
+    },
+    {
+      "id": "1szsJbD0DF0n4zw0S6vAkz",
+      "name": "Cherry on Top",
+      "type": "single",
+      "release_date": "2024-07-11",
+      "year": "2024",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273df6a32dcdb5ef9640f5ea847",
+      "spotify_url": "https://open.spotify.com/album/1szsJbD0DF0n4zw0S6vAkz",
+      "tracks": [
+        {
+          "id": "3tYYTkBwnmxxEUaxz96Pc3",
+          "name": "Cherry on Top",
+          "uri": "spotify:track:3tYYTkBwnmxxEUaxz96Pc3",
+          "duration": "2:55"
+        }
+      ]
+    },
+    {
+      "id": "2eT1XApzS0GmkJLMlCBdVv",
+      "name": "Talaarawan",
+      "type": "single",
+      "release_date": "2024-03-08",
+      "year": "2024",
+      "total_tracks": 6,
+      "art": "https://i.scdn.co/image/ab67616d0000b27369c364be39f1f1f81a8faa03",
+      "spotify_url": "https://open.spotify.com/album/2eT1XApzS0GmkJLMlCBdVv",
+      "tracks": [
+        {
+          "id": "1RL9cRcuzCrs75Wb2aq9Op",
+          "name": "Karera",
+          "uri": "spotify:track:1RL9cRcuzCrs75Wb2aq9Op",
+          "duration": "4:28"
+        },
+        {
+          "id": "1iIJtD9hkzw4ZHfR7ND9yb",
+          "name": "Salamin, Salamin",
+          "uri": "spotify:track:1iIJtD9hkzw4ZHfR7ND9yb",
+          "duration": "3:50"
+        },
+        {
+          "id": "03vwhCqyxupZDVEncdnCSc",
+          "name": "Pantropiko",
+          "uri": "spotify:track:03vwhCqyxupZDVEncdnCSc",
+          "duration": "3:45"
+        },
+        {
+          "id": "7Dx27QY6OJmWv4ZSCW9OpF",
+          "name": "Ang Huling Cha Cha",
+          "uri": "spotify:track:7Dx27QY6OJmWv4ZSCW9OpF",
+          "duration": "3:21"
+        },
+        {
+          "id": "3iiFRTfSUP34KVekvWoV3F",
+          "name": "Na Na Nandito Lang",
+          "uri": "spotify:track:3iiFRTfSUP34KVekvWoV3F",
+          "duration": "4:01"
+        },
+        {
+          "id": "7j3FzXqlvcSpe58Ska2tes",
+          "name": "Diyan Ka Lang",
+          "uri": "spotify:track:7j3FzXqlvcSpe58Ska2tes",
+          "duration": "3:17"
+        }
+      ]
+    },
+    {
+      "id": "3NYOeU6Uwj2FP1Zz1rWVz8",
+      "name": "Pantropiko",
+      "type": "single",
+      "release_date": "2023-11-17",
+      "year": "2023",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b27395a69386806a14d1949bbb9c",
+      "spotify_url": "https://open.spotify.com/album/3NYOeU6Uwj2FP1Zz1rWVz8",
+      "tracks": [
+        {
+          "id": "6Csrqur3IfnVp0EtHskjMw",
+          "name": "Pantropiko",
+          "uri": "spotify:track:6Csrqur3IfnVp0EtHskjMw",
+          "duration": "3:45"
+        }
+      ]
+    },
+    {
+      "id": "6eG8V6yBx09xmexOLpcn9R",
+      "name": "Karera",
+      "type": "single",
+      "release_date": "2023-09-22",
+      "year": "2023",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2733c8cf1ec61e1b3ab4ab3daeb",
+      "spotify_url": "https://open.spotify.com/album/6eG8V6yBx09xmexOLpcn9R",
+      "tracks": [
+        {
+          "id": "6xfsvHFXr8GgRzaFAkmjAY",
+          "name": "Karera",
+          "uri": "spotify:track:6xfsvHFXr8GgRzaFAkmjAY",
+          "duration": "4:28"
+        }
+      ]
+    },
+    {
+      "id": "7H64wogfyQUcRqFZFbMV9S",
+      "name": "Feel Good",
+      "type": "album",
+      "release_date": "2022-09-29",
+      "year": "2022",
+      "total_tracks": 7,
+      "art": "https://i.scdn.co/image/ab67616d0000b2733813da6b90e2db9f17b945ad",
+      "spotify_url": "https://open.spotify.com/album/7H64wogfyQUcRqFZFbMV9S",
+      "tracks": [
+        {
+          "id": "5xNbWnsQJ9lyzPlK36J1cm",
+          "name": "No Fear",
+          "uri": "spotify:track:5xNbWnsQJ9lyzPlK36J1cm",
+          "duration": "3:27"
+        },
+        {
+          "id": "5YV9UyeC3dMV4kuRiTMGJs",
+          "name": "Lagi",
+          "uri": "spotify:track:5YV9UyeC3dMV4kuRiTMGJs",
+          "duration": "4:16"
+        },
+        {
+          "id": "4ugPBlOXJtKOkOxQRQpUVE",
+          "name": "I Feel Good",
+          "uri": "spotify:track:4ugPBlOXJtKOkOxQRQpUVE",
+          "duration": "3:48"
+        },
+        {
+          "id": "7haQq014RoahMX6spW4z1z",
+          "name": "Huwag Muna Tayong Umuwi",
+          "uri": "spotify:track:7haQq014RoahMX6spW4z1z",
+          "duration": "4:57"
+        },
+        {
+          "id": "4J20QVGtdAAOYMpb8iY2GG",
+          "name": "Strings",
+          "uri": "spotify:track:4J20QVGtdAAOYMpb8iY2GG",
+          "duration": "3:20"
+        },
+        {
+          "id": "4o9MuuglWRF9SqZ9hDDHE4",
+          "name": "Lagi - Acoustic",
+          "uri": "spotify:track:4o9MuuglWRF9SqZ9hDDHE4",
+          "duration": "4:02"
+        },
+        {
+          "id": "2u12rBuVmArXK9N1iGsaIa",
+          "name": "Strings - Dance Version",
+          "uri": "spotify:track:2u12rBuVmArXK9N1iGsaIa",
+          "duration": "3:19"
+        }
+      ]
+    },
+    {
+      "id": "1ppmbYNg0L2ALAYkoGdsqx",
+      "name": "I Feel Good",
+      "type": "single",
+      "release_date": "2022-09-22",
+      "year": "2022",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273e041c94a68957d9eaf74c1d5",
+      "spotify_url": "https://open.spotify.com/album/1ppmbYNg0L2ALAYkoGdsqx",
+      "tracks": [
+        {
+          "id": "2QaYbIofyb0Jjy53i8JpSN",
+          "name": "I Feel Good",
+          "uri": "spotify:track:2QaYbIofyb0Jjy53i8JpSN",
+          "duration": "3:48"
+        }
+      ]
+    },
+    {
+      "id": "0zsJHiYmBaQWhL9LLA9yLP",
+      "name": "Lagi",
+      "type": "single",
+      "release_date": "2022-06-24",
+      "year": "2022",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273e61f8b15b18610933ef57edc",
+      "spotify_url": "https://open.spotify.com/album/0zsJHiYmBaQWhL9LLA9yLP",
+      "tracks": [
+        {
+          "id": "5nHB5r0p0G9t4mi3pjzn35",
+          "name": "Lagi",
+          "uri": "spotify:track:5nHB5r0p0G9t4mi3pjzn35",
+          "duration": "4:16"
+        }
+      ]
+    },
+    {
+      "id": "171y9p1J2lKb8QhdEXEt7S",
+      "name": "Pit a Pat",
+      "type": "single",
+      "release_date": "2022-04-29",
+      "year": "2022",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273ca0b21ae2b80087466d5b5c1",
+      "spotify_url": "https://open.spotify.com/album/171y9p1J2lKb8QhdEXEt7S",
+      "tracks": [
+        {
+          "id": "5uo819IFkx2XeL5cLNhfsU",
+          "name": "Pit a Pat",
+          "uri": "spotify:track:5uo819IFkx2XeL5cLNhfsU",
+          "duration": "3:40"
+        }
+      ]
+    },
+    {
+      "id": "23RGswjOxurfScSRytvs9z",
+      "name": "Up!",
+      "type": "single",
+      "release_date": "2022-04-01",
+      "year": "2022",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273d909f6ae085cd4e657f3166b",
+      "spotify_url": "https://open.spotify.com/album/23RGswjOxurfScSRytvs9z",
+      "tracks": [
+        {
+          "id": "2J0Rq5QTaW3lClPjTHzQMl",
+          "name": "Up!",
+          "uri": "spotify:track:2J0Rq5QTaW3lClPjTHzQMl",
+          "duration": "3:52"
+        }
+      ]
+    },
+    {
+      "id": "3udXu1CsMJWL6N1zE4J9BX",
+      "name": "Kabataang Pinoy",
+      "type": "single",
+      "release_date": "2022-03-18",
+      "year": "2022",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273cee28d7bd3e88e40657e5e87",
+      "spotify_url": "https://open.spotify.com/album/3udXu1CsMJWL6N1zE4J9BX",
+      "tracks": [
+        {
+          "id": "6aXWWGw7sQJLx82jZndSQZ",
+          "name": "Kabataang Pinoy",
+          "uri": "spotify:track:6aXWWGw7sQJLx82jZndSQZ",
+          "duration": "4:17"
+        }
+      ]
+    },
+    {
+      "id": "43WZS9p6EJQDLpID0cTNRN",
+      "name": "Kapit Lang",
+      "type": "single",
+      "release_date": "2021-09-10",
+      "year": "2021",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2735c0cf2b2812fb6c9d7d8c63b",
+      "spotify_url": "https://open.spotify.com/album/43WZS9p6EJQDLpID0cTNRN",
+      "tracks": [
+        {
+          "id": "4lfn07QfbMLwpBL4q2Kt4P",
+          "name": "Kapit Lang",
+          "uri": "spotify:track:4lfn07QfbMLwpBL4q2Kt4P",
+          "duration": "2:49"
+        }
+      ]
+    },
+    {
+      "id": "2q7odZS1tj00mpjUpNrjbD",
+      "name": "Born To Win",
+      "type": "single",
+      "release_date": "2021-06-04",
+      "year": "2021",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2734860095d399c489faa1f2900",
+      "spotify_url": "https://open.spotify.com/album/2q7odZS1tj00mpjUpNrjbD",
+      "tracks": [
+        {
+          "id": "3FNkVoyQqk8J24zDnTSojI",
+          "name": "Born To Win",
+          "uri": "spotify:track:3FNkVoyQqk8J24zDnTSojI",
+          "duration": "2:53"
+        }
+      ]
+    },
+    {
+      "id": "1tEsQz53V97UJzA1aUhxhd",
+      "name": "Da Coconut Nut",
+      "type": "single",
+      "release_date": "2020-12-04",
+      "year": "2020",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2730280bdf28e9965cb33a39c6b",
+      "spotify_url": "https://open.spotify.com/album/1tEsQz53V97UJzA1aUhxhd",
+      "tracks": [
+        {
+          "id": "0oSyeQT1PrwyPreTBq2dDN",
+          "name": "Da Coconut Nut",
+          "uri": "spotify:track:0oSyeQT1PrwyPreTBq2dDN",
+          "duration": "3:32"
+        }
+      ]
+    },
+    {
+      "id": "08SG7eD7f66IbsYyz2h8pq",
+      "name": "Bata, Kaya Mo!",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2733c9fb9b81f444eb505b8799d",
+      "spotify_url": "https://open.spotify.com/album/08SG7eD7f66IbsYyz2h8pq",
+      "tracks": [
+        {
+          "id": "0pxEX9Q7eO5BcQQjoNRYz0",
+          "name": "Bata, Kaya Mo!",
+          "uri": "spotify:track:0pxEX9Q7eO5BcQQjoNRYz0",
+          "duration": "3:31"
+        }
+      ]
+    },
+    {
+      "id": "1Z2hyyTdVM2OZUqiUyrn65",
+      "name": "TOP",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273d7221e3172cf220d41828d35",
+      "spotify_url": "https://open.spotify.com/album/1Z2hyyTdVM2OZUqiUyrn65",
+      "tracks": [
+        {
+          "id": "2XZsdeacLnuHfQCetOSIdX",
+          "name": "TOP",
+          "uri": "spotify:track:2XZsdeacLnuHfQCetOSIdX",
+          "duration": "2:40"
+        }
+      ]
+    },
+    {
+      "id": "3h9ESiwFWb0JO485rjmCOI",
+      "name": "Super Crush",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273363da5b1d24c07844844aa82",
+      "spotify_url": "https://open.spotify.com/album/3h9ESiwFWb0JO485rjmCOI",
+      "tracks": [
+        {
+          "id": "56wTbR92GiVk86sH3KWR34",
+          "name": "Super Crush",
+          "uri": "spotify:track:56wTbR92GiVk86sH3KWR34",
+          "duration": "2:39"
+        }
+      ]
+    },
+    {
+      "id": "4aL2E0ETyWaagZ4FznXxYT",
+      "name": "Our Stories Shine This Christmas",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2739af5613f800691cd0dc924e1",
+      "spotify_url": "https://open.spotify.com/album/4aL2E0ETyWaagZ4FznXxYT",
+      "tracks": [
+        {
+          "id": "5YleyXVovexQBfPTQx6dJt",
+          "name": "Our Stories Shine This Christmas",
+          "uri": "spotify:track:5YleyXVovexQBfPTQx6dJt",
+          "duration": "5:52"
+        }
+      ]
+    },
+    {
+      "id": "17LSHdWNTq6FvEsu4ePXoW",
+      "name": "Made for All",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273ca6bd2b8a9e4d0a6139290d4",
+      "spotify_url": "https://open.spotify.com/album/17LSHdWNTq6FvEsu4ePXoW",
+      "tracks": [
+        {
+          "id": "580EzR9sfqKVUTRGAcPzcN",
+          "name": "Made for All",
+          "uri": "spotify:track:580EzR9sfqKVUTRGAcPzcN",
+          "duration": "2:00"
+        }
+      ]
+    },
+    {
+      "id": "4EVCfjzuz8UVBL7euIdMK4",
+      "name": "Love Yourself",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273d3912f5e792de3559c12a15b",
+      "spotify_url": "https://open.spotify.com/album/4EVCfjzuz8UVBL7euIdMK4",
+      "tracks": [
+        {
+          "id": "51hPr73ZZSP9Wfki09vyOI",
+          "name": "Love Yourself",
+          "uri": "spotify:track:51hPr73ZZSP9Wfki09vyOI",
+          "duration": "2:55"
+        }
+      ]
+    },
+    {
+      "id": "4b8ZtXfgVSXcEKNqUf9LH7",
+      "name": "Laging Fudgee, Fudgee Lagi!",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b27316e0af999206c458dc3aa3b9",
+      "spotify_url": "https://open.spotify.com/album/4b8ZtXfgVSXcEKNqUf9LH7",
+      "tracks": [
+        {
+          "id": "6Rne3AZj7AcRcrmnKT3nRM",
+          "name": "Laging Fudgee, Fudgee Lagi",
+          "uri": "spotify:track:6Rne3AZj7AcRcrmnKT3nRM",
+          "duration": "2:31"
+        }
+      ]
+    },
+    {
+      "id": "30sBK7vSI8Dz0fLcV3Hx3Y",
+      "name": "Joy To The World",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 2,
+      "art": "https://i.scdn.co/image/ab67616d0000b27354958b3ceeb171720e7f17b5",
+      "spotify_url": "https://open.spotify.com/album/30sBK7vSI8Dz0fLcV3Hx3Y",
+      "tracks": [
+        {
+          "id": "0SpVJoztP97waXXnu0GjbL",
+          "name": "Joy To The World",
+          "uri": "spotify:track:0SpVJoztP97waXXnu0GjbL",
+          "duration": "2:41"
+        },
+        {
+          "id": "4yYs78Dt1jvFc3WfVNiLVt",
+          "name": "Cherry On Top - Christmas Remix",
+          "uri": "spotify:track:4yYs78Dt1jvFc3WfVNiLVt",
+          "duration": "2:56"
+        }
+      ]
+    },
+    {
+      "id": "0ZQswvgQsfCYoboOU5lyBd",
+      "name": "ICON",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b2734ba1c6ad31c95ebb229c93be",
+      "spotify_url": "https://open.spotify.com/album/0ZQswvgQsfCYoboOU5lyBd",
+      "tracks": [
+        {
+          "id": "5nqKckFx3jU5JM3bd1EwGB",
+          "name": "ICON",
+          "uri": "spotify:track:5nqKckFx3jU5JM3bd1EwGB",
+          "duration": "3:26"
+        }
+      ]
+    },
+    {
+      "id": "0pmaK0PxEEJyNeJ0Z5lubi",
+      "name": "Gandang Vitakeratin",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b273ff5bff9f4c6ef44f96ecbc1e",
+      "spotify_url": "https://open.spotify.com/album/0pmaK0PxEEJyNeJ0Z5lubi",
+      "tracks": [
+        {
+          "id": "5tQvi25iQvL5Raxg4rkdEN",
+          "name": "Gandang Vitakeratin",
+          "uri": "spotify:track:5tQvi25iQvL5Raxg4rkdEN",
+          "duration": "2:11"
+        }
+      ]
+    },
+    {
+      "id": "6i6Q70btIJbZyElTWbIsaH",
+      "name": "Dahil Sa'yo",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b27394e6ff215e948a7025ffc57c",
+      "spotify_url": "https://open.spotify.com/album/6i6Q70btIJbZyElTWbIsaH",
+      "tracks": [
+        {
+          "id": "2tsjg4jJekOdqacTp8wdcr",
+          "name": "Dahil Sa'yo",
+          "uri": "spotify:track:2tsjg4jJekOdqacTp8wdcr",
+          "duration": "3:34"
+        }
+      ]
+    },
+    {
+      "id": "3lJZmrFNjrKzn6OarSVHRe",
+      "name": "Blooming",
+      "type": "single",
+      "release_date": "2019-01-01",
+      "year": "2019",
+      "total_tracks": 1,
+      "art": "https://i.scdn.co/image/ab67616d0000b27368a4cdf8c01cc54c5fc7ff55",
+      "spotify_url": "https://open.spotify.com/album/3lJZmrFNjrKzn6OarSVHRe",
+      "tracks": [
+        {
+          "id": "52YkZd4cJahDlGxQquQqSa",
+          "name": "Blooming",
+          "uri": "spotify:track:52YkZd4cJahDlGxQquQqSa",
+          "duration": "3:52"
+        }
+      ]
+    }
+  ]
+}

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx src/sanity/seed.ts"
+    "seed": "tsx src/sanity/seed.ts",
+    "fetch-bini": "npx dotenv-cli -e .env.local node fetchDiscography.js"
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
@@ -15,6 +16,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@sanity/vision": "^5.24.0",
+    "axios": "^1.16.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.38.0",
