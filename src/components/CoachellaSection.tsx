@@ -85,7 +85,6 @@ export default function CoachellaSection({
 
       {/* MESH LAYER */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {/* teal blob */}
         <div
           className="coachella-blob1 absolute"
           style={{
@@ -100,7 +99,6 @@ export default function CoachellaSection({
           }}
         />
 
-        {/* aiah blue blob */}
         <div
           className="coachella-blob2 absolute"
           style={{
@@ -115,7 +113,6 @@ export default function CoachellaSection({
           }}
         />
 
-        {/* blend mid blob for depth */}
         <div
           className="coachella-blob3 absolute"
           style={{
@@ -132,73 +129,24 @@ export default function CoachellaSection({
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-        {/* header */}
-        <div className="text-center mb-8 md:mb-10">
-          <p className="text-label-mono mb-4" style={{ color: "#0C0C0A" }}>
-            Historic Global Moment
-          </p>
+        {/* IMPROVED HEADER COMPOSITION */}
+        <div className="flex flex-col items-center text-center mb-12 md:mb-16">
+          <div className="flex flex-col gap-2 mb-6">
+            <p className="text-label-mono" style={{ color: "var(--c-ink)", opacity: 0.6 }}>
+              HISTORIC GLOBAL MOMENT
+            </p>
+            <p className="text-sm tracking-[0.2em]" style={{ color: "var(--c-ink)", opacity: 0.4 }}>
+              MOJAVE STAGE · COACHELLA 2026
+            </p>
+          </div>
 
           <h2
-            className="leading-[.9]"
-            style={{ fontSize: "clamp(3rem,9vw,8rem)" }}
+            className="leading-[.85] tracking-tighter"
+            style={{ fontSize: "clamp(4rem, 12vw, 10rem)" }}
           >
             <span style={{ color: "var(--c-teal)" }}>BINI</span>
             <span style={{ color: "var(--c-aiah)" }}>CHELLA</span>
           </h2>
-
-          <p
-            className="mt-4"
-            style={{
-              color: "#0C0C0A",
-              opacity: 0.75,
-              fontSize: "clamp(.9rem,1.5vw,1.1rem)",
-            }}
-          >
-            Mojave Stage · Coachella 2026
-          </p>
-        </div>
-
-        {/* mobile text (shows only on mobile, placed before image frame) */}
-        <div className="md:hidden mb-8">
-          <span
-            style={{
-              fontFamily: "var(--f-mono)",
-              fontSize: 10,
-              letterSpacing: ".12em",
-              color: "var(--c-ink)",
-              opacity: 0.75,
-            }}
-          >
-            FIRST PPOP ACT
-          </span>
-
-          <h3
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "2.2rem",
-              lineHeight: 0.95,
-              color: "var(--c-teal-dark)",
-              marginTop: 8,
-            }}
-          >
-            A GLOBAL
-            <br />
-            MILESTONE
-          </h3>
-
-          <p
-            className="mt-4"
-            style={{
-              color: "var(--c-ink)",
-              opacity: 0.7,
-              lineHeight: 1.6,
-              fontSize: ".9rem",
-              maxWidth: 520,
-            }}
-          >
-            BINI became the first Filipino pop group to perform at Coachella —
-            opening a new chapter for P-pop on the world stage.
-          </p>
         </div>
 
         {/* image frame */}
@@ -242,7 +190,7 @@ export default function CoachellaSection({
                 draggable={false}
                 src={current.imageUrl}
                 alt={current.title || "BINICHELLA"}
-                className="object-cover select-none animate-mvZoom"
+                className="object-cover select-none"
               />
 
               <div
@@ -255,7 +203,6 @@ export default function CoachellaSection({
             </motion.div>
           </AnimatePresence>
 
-          {/* counter */}
           <div
             className="absolute top-4 right-4 z-20 px-3 py-2 rounded-full"
             style={{
@@ -275,7 +222,6 @@ export default function CoachellaSection({
             </span>
           </div>
 
-          {/* dots */}
           <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex gap-2 z-20">
             {photos.map((_, i) => (
               <button
@@ -297,9 +243,8 @@ export default function CoachellaSection({
         </div>
 
         {/* context description layer & controls */}
-        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-          {/* desktop text (hidden on mobile to prevent duplication) */}
-          <div className="hidden md:block">
+        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row md:justify-between md:items-start gap-8">
+          <div>
             <span
               style={{
                 fontFamily: "var(--f-mono)",
@@ -341,7 +286,6 @@ export default function CoachellaSection({
             </p>
           </div>
 
-          {/* controls */}
           <div className="flex items-center justify-center md:justify-end gap-4 w-full md:w-auto md:mt-1">
             <motion.button
               onClick={prev}
@@ -363,7 +307,7 @@ export default function CoachellaSection({
                 opacity: 0.45,
               }}
             >
-              Swipe / Tap
+              SWIPE
             </div>
 
             <motion.button
