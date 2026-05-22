@@ -131,9 +131,7 @@ export default function Discography() {
   if (!selectedRelease) return null;
 
   const selectedIndex = items.findIndex((i) => i.id === selectedRelease.id);
-
-  const selectedColor =
-    memberColors[selectedIndex >= 0 ? selectedIndex % memberColors.length : 0];
+  const selectedColor = memberColors[selectedIndex >= 0 ? selectedIndex % memberColors.length : 0];
 
   const getEmbedUrl = (albumId: string, trackId: string | null) => {
     const targetId = trackId || selectedRelease.tracks[0]?.id || albumId;
@@ -157,47 +155,19 @@ export default function Discography() {
 
   return (
     <section className="w-full py-20 relative overflow-hidden">
-
       <style dangerouslySetInnerHTML={{
         __html: `
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 6px;
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.05);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.15);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: ${selectedColor || "rgba(0,0,0,0.3)"};
-        }
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.05);
-        }
-        .track-item {
-          transition: all 0.3s var(--ease-smooth);
-        }
-        .track-item.active {
-          background-color: ${selectedColor} !important;
-          color: #F5F3EE !important;
-        }
-        .track-item.active .opacity-50 {
-          opacity: 1 !important;
-          color: #F5F3EE !important;
-        }
-      `
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: ${selectedColor || "rgba(0,0,0,0.3)"}; }
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.05); }
+        .track-item { transition: all 0.3s var(--ease-smooth); }
+        .track-item.active { background-color: ${selectedColor} !important; color: #F5F3EE !important; }
+        .track-item.active .opacity-50 { opacity: 1 !important; color: #F5F3EE !important; }
+        `
       }} />
 
       <div
@@ -206,15 +176,10 @@ export default function Discography() {
       />
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16">
-
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div>
-            <p className="text-label-mono text-[var(--c-ink)] mb-2">
-              BINI OFFICIAL MUSIC
-            </p>
-            <h3 className="text-5xl md:text-7xl text-[var(--c-teal-dark)] leading-none">
-              Discography
-            </h3>
+            <p className="text-label-mono text-[var(--c-ink)] mb-2">BINI OFFICIAL MUSIC</p>
+            <h3 className="text-5xl md:text-7xl text-[var(--c-teal-dark)] leading-none">Discography</h3>
           </div>
         </div>
 
@@ -284,7 +249,6 @@ export default function Discography() {
                     >
                       {item.year}
                     </span>
-
                     <h4 className="text-sm font-bold mt-2 leading-none text-[var(--c-teal-dark)] truncate">
                       {item.name}
                     </h4>
@@ -299,9 +263,7 @@ export default function Discography() {
           <motion.button
             disabled={!canScrollLeft}
             onClick={() => handleScroll("left")}
-            className={`h-12 w-12 rounded-full flex items-center justify-center border ${
-              !canScrollLeft ? "opacity-30" : ""
-            }`}
+            className={`h-12 w-12 rounded-full flex items-center justify-center border ${!canScrollLeft ? "opacity-30" : ""}`}
           >
             <CaretLeft size={18} weight="bold" />
           </motion.button>
@@ -309,55 +271,45 @@ export default function Discography() {
           <motion.button
             disabled={!canScrollRight}
             onClick={() => handleScroll("right")}
-            className={`h-12 w-12 rounded-full flex items-center justify-center text-white ${
-              !canScrollRight ? "opacity-30" : ""
-            }`}
-            style={{
-              background: `linear-gradient(135deg, var(--c-teal), var(--c-teal-dark))`
-            }}
+            className={`h-12 w-12 rounded-full flex items-center justify-center text-white ${!canScrollRight ? "opacity-30" : ""}`}
+            style={{ background: `linear-gradient(135deg, var(--c-teal), var(--c-teal-dark))` }}
           >
             <CaretRight size={18} weight="bold" />
           </motion.button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-[420px_1fr] gap-10 mt-12 items-start">
-
           <div className="space-y-6 md:sticky md:top-24">
+            {/* Spotify Embed Player - now first */}
+            <div className="rounded-md overflow-hidden shadow-md">
+              <iframe
+                src={getEmbedUrl(selectedRelease.id, activeTrackId)}
+                width="100%"
+                height="152"
+                className="block"
+              />
+            </div>
 
-            <div className="relative rounded-lg bg-[var(--c-surface-2)] p-4 sm:p-7 overflow-hidden border-2" 
-              style={{ borderColor: selectedColor }}
-            >
+            {/* Album Info - now second */}
+            <div className="relative rounded-lg bg-[var(--c-surface-2)] p-4 sm:p-7 overflow-hidden border-2" style={{ borderColor: selectedColor }}>
               <div
                 className="absolute w-[340px] h-[340px] blur-[120px] top-[-120px] right-[-120px]"
                 style={{ background: selectedColor, opacity: 0.2 }}
               />
 
               <div className="flex gap-5 relative z-10">
-                <div className="w-24 sm:w-44 aspect-square overflow-hidden rounded-lg shadow-lg"
-                  style={{ boxShadow: `0 10px 30px -10px ${selectedColor}` }}
-                >
-                  {selectedRelease.art && (
-                    <img src={selectedRelease.art} className="w-full h-full object-cover" />
-                  )}
-                </div>
-
-                <div className="flex flex-col justify-between min-w-0">
+                <div className="flex flex-col justify-between min-w-0 w-full">
                   <div>
                     <p className="text-[10px] sm:text-xs opacity-60 mb-1">
                       Released {selectedRelease.release_date}
                     </p>
-
-                    <h2 className="text-xl sm:text-3xl font-bold leading-tight"
-                      style={{ color: selectedColor }}
-                    >
+                    <h2 className="text-xl sm:text-3xl font-bold leading-tight" style={{ color: selectedColor }}>
                       {selectedRelease.name}
                     </h2>
-
                     <p className="text-[10px] sm:text-xs opacity-60 mt-1">
-                      {selectedRelease.total_tracks} Tracks
+                      {selectedRelease.total_tracks} {selectedRelease.total_tracks === 1 ? "Track" : "Tracks"}
                     </p>
                   </div>
-
                   <a
                     href={selectedRelease.spotify_url}
                     target="_blank"
@@ -368,23 +320,13 @@ export default function Discography() {
                 </div>
               </div>
             </div>
-
-            <div className="rounded-md overflow-hidden shadow-md">
-              <iframe
-                src={getEmbedUrl(selectedRelease.id, activeTrackId)}
-                width="100%"
-                height="152"
-                className="block"
-              />
-            </div>
           </div>
 
           <div className="bg-[var(--c-surface-2)]/40 rounded-lg p-6 md:p-8">
-
             <div className="flex justify-between mb-5">
               <h4 className="text-xs uppercase tracking-wider">Tracklist</h4>
               <span className="text-xs opacity-50 font-mono">
-                {selectedRelease.tracks?.length} tracks
+                {selectedRelease.tracks?.length} {selectedRelease.tracks?.length === 1 ? "track" : "tracks"}
               </span>
             </div>
 
@@ -406,16 +348,12 @@ export default function Discography() {
                       </span>
                       <span className="truncate text-sm">{track.name}</span>
                     </div>
-
-                    <span className="text-xs opacity-50 font-mono shrink-0">
-                      {track.duration}
-                    </span>
+                    <span className="text-xs opacity-50 font-mono shrink-0">{track.duration}</span>
                   </button>
                 );
               })}
             </div>
           </div>
-
         </div>
       </div>
     </section>
