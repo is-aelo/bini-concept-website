@@ -2,6 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
+import IridescentMesh from "@/components/TourBackground";
 import Profile from "@/components/Profile";
 import Discography from "@/components/Discography";
 import Tour from "@/components/Tour";
@@ -41,6 +42,8 @@ interface TourEvent {
   date: string;
   status: "confirmed" | "on-sale" | "sold-out";
   ticketLink?: string;
+  country: "PH" | "INTL";
+  memberKey?: string;
 }
 
 export default async function BiniPage() {
@@ -95,6 +98,7 @@ export default async function BiniPage() {
     <div className="relative">
       <Header />
       <Hero />
+      <IridescentMesh />
       <CoachellaSection
         images={(coachellaImages as CoachellaImage[]) || []}
       />
@@ -105,6 +109,7 @@ export default async function BiniPage() {
           ((tours as any[]) || []).map((t: any) => ({
             ...t,
             status: t.status || "confirmed",
+            country: t.country || "PH",
           })) as TourEvent[]
         }
       />
