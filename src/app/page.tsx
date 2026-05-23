@@ -4,9 +4,15 @@ import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
 import Profile from "@/components/Profile";
 import Discography from "@/components/Discography";
+import Tour from "@/components/Tour";
 
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { COACHELLA_GALLERY_QUERY, ALL_MEMBERS_QUERY } from "@/sanity/lib/queries";
+
+import {
+  COACHELLA_GALLERY_QUERY,
+  ALL_MEMBERS_QUERY,
+  ALL_TOURS_QUERY,
+} from "@/sanity/lib/queries";
 
 interface CoachellaImage {
   _id: string;
@@ -28,16 +34,38 @@ interface SanityMember {
   galleryImage?: string | null;
 }
 
+interface TourEvent {
+  _id: string;
+  eventName: string;
+  location: string;
+  date: string;
+  status: "confirmed" | "on-sale" | "sold-out";
+  ticketLink?: string;
+}
+
 export default async function BiniPage() {
-  const coachellaImages = (await sanityFetch({
-    query: COACHELLA_GALLERY_QUERY,
-  })) as CoachellaImage[];
+  const [
+    coachellaImages,
+    sanityMembersData,
+    tours,
+  ] = await Promise.all([
+    sanityFetch({
+      query: COACHELLA_GALLERY_QUERY,
+    }),
 
-  const sanityMembersData = (await sanityFetch({
-    query: ALL_MEMBERS_QUERY,
-  })) as SanityMember[];
+    sanityFetch({
+      query: ALL_MEMBERS_QUERY,
+    }),
 
-  const localUiMeta: Record<string, { signatureColor: string }> = {
+    sanityFetch({
+      query: ALL_TOURS_QUERY,
+    }),
+  ]);
+
+  const localUiMeta: Record<
+    string,
+    { signatureColor: string }
+  > = {
     aiah: { signatureColor: "var(--c-aiah)" },
     colet: { signatureColor: "var(--c-colet)" },
     maloi: { signatureColor: "var(--c-maloi)" },
@@ -48,13 +76,18 @@ export default async function BiniPage() {
     sheena: { signatureColor: "var(--c-sheena)" },
   };
 
-  const members = sanityMembersData.map((cmsMember) => {
+  const members = (
+    (sanityMembersData as SanityMember[]) || []
+  ).map((cmsMember) => {
     const lookupKey = cmsMember.stageName.toLowerCase();
     const meta = localUiMeta[lookupKey];
 
     return {
       ...cmsMember,
-      signatureColor: cmsMember.signatureColor || meta?.signatureColor || "var(--c-teal)",
+      signatureColor:
+        cmsMember.signatureColor ||
+        meta?.signatureColor ||
+        "var(--c-teal)",
     };
   });
 
@@ -62,9 +95,19 @@ export default async function BiniPage() {
     <div className="relative">
       <Header />
       <Hero />
-      <CoachellaSection images={coachellaImages} />
+      <CoachellaSection
+        images={(coachellaImages as CoachellaImage[]) || []}
+      />
       <Profile members={members} />
       <Discography />
+      <Tour
+        tours={
+          ((tours as any[]) || []).map((t: any) => ({
+            ...t,
+            status: t.status || "confirmed",
+          })) as TourEvent[]
+        }
+      />
     </div>
   );
 }
