@@ -19,6 +19,10 @@ interface TourProps {
 }
 
 const ITEMS_PER_PAGE = 4;
+const ITEM_MIN_HEIGHT = 116;
+const GAP_SIZE = 16;
+// Total height for the container to hold 4 items + gaps
+const FIXED_CONTAINER_HEIGHT = ITEMS_PER_PAGE * ITEM_MIN_HEIGHT + (ITEMS_PER_PAGE - 1) * GAP_SIZE;
 
 const isLocal = (location: string) => {
   const loc = location.toLowerCase();
@@ -250,7 +254,12 @@ export default function Tour({ tours = [] }: TourProps) {
             initial="hidden"
             animate="show"
             exit="exit"
-            style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}
+            style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: `${GAP_SIZE}px`,
+                minHeight: `${FIXED_CONTAINER_HEIGHT}px`
+            }}
           >
             {currentList.map((tour) => {
               const accent   = getAccent(tour.memberKey, tour.status);
@@ -275,7 +284,7 @@ export default function Tour({ tours = [] }: TourProps) {
                       border: `1.5px solid ${accent}`,
                       clipPath: `url(#${clipId})`,
                       opacity: isPast ? 0.6 : 1,
-                      minHeight: "116px",
+                      minHeight: `${ITEM_MIN_HEIGHT}px`,
                       display: "flex",
                       alignItems: "stretch",
                     }}
@@ -357,7 +366,7 @@ export default function Tour({ tours = [] }: TourProps) {
               alignItems: "center",
               justifyContent: "center",
               background: "var(--c-surface-2)",
-              border: `1.5px solid ${currentPage === 1 ? "var(--c-surface-3)" : "var(--c-surface-3)"}`,
+              border: `1.5px solid var(--c-surface-3)`,
               borderRadius: 9999,
               width: 36,
               height: 36,
@@ -397,7 +406,7 @@ export default function Tour({ tours = [] }: TourProps) {
               alignItems: "center",
               justifyContent: "center",
               background: "var(--c-surface-2)",
-              border: `1.5px solid ${currentPage === totalPages ? "var(--c-surface-3)" : "var(--c-surface-3)"}`,
+              border: `1.5px solid var(--c-surface-3)`,
               borderRadius: 9999,
               width: 36,
               height: 36,

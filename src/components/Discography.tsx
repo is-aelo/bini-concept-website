@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { SpotifyLogo } from "@phosphor-icons/react";
 import discographyData from "../../bini_discography.json";
+import { ReleaseArt } from "./ReleaseArt";
+import DiscographyBackground from "./DiscographyBackground";
 
 interface Track {
   id: string;
@@ -25,337 +27,480 @@ interface DiscographyItem {
   tracks: Track[];
 }
 
-const memberColors = [
-  "var(--c-aiah)",
-  "var(--c-colet)",
-  "var(--c-maloi)",
-  "var(--c-gwen)",
-  "var(--c-stacey)",
-  "var(--c-mikha)",
-  "var(--c-jhoanna)",
-  "var(--c-sheena)"
-];
-
 type CategoryType = "all" | "album" | "ep" | "single";
+
+const TYPE_LABELS: Record<CategoryType, string> = {
+  all: "All",
+  album: "Albums",
+  ep: "EPs",
+  single: "Singles",
+};
+
+function getNormalizedType(item: DiscographyItem): string {
+  const nameLower = item.name.toLowerCase();
+  const typeLower = item.type?.toLowerCase();
+  if (nameLower.includes("talaarawan") || nameLower.includes("ep")) return "ep";
+  if (item.total_tracks >= 4 && item.total_tracks <= 6 && typeLower === "single") return "ep";
+  return typeLower;
+}
+
+const SCROLL_STYLE = `
+  .disc-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-surface-3) transparent;
+  }
+  .disc-scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .disc-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .disc-scroll::-webkit-scrollbar-thumb {
+    background: var(--c-surface-3);
+    border-radius: 99px;
+  }
+  .disc-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--c-teal-dark);
+  }
+`;
 
 export default function Discography() {
   const items = (discographyData.items || []) as DiscographyItem[];
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const albumRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<CategoryType>("all");
   const [selectedRelease, setSelectedRelease] = useState<DiscographyItem | null>(items[0] || null);
   const [activeTrackId, setActiveTrackId] = useState<string | null>(null);
-
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const getNormalizedType = (item: DiscographyItem): string => {
-    const nameLower = item.name.toLowerCase();
-    const typeLower = item.type?.toLowerCase();
-
-    if (nameLower.includes("talaarawan") || nameLower.includes("ep")) return "ep";
-
-    if (item.total_tracks >= 4 && item.total_tracks <= 6 && typeLower === "single") {
-      return "ep";
-    }
-
-    return typeLower;
-  };
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [drawerExpanded, setDrawerExpanded] = useState(true);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === "all") return items;
     return items.filter((item) => getNormalizedType(item) === activeCategory);
   }, [items, activeCategory]);
 
-  const checkScrollPosition = () => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScrollLeft = scrollWidth - clientWidth;
-    const epsilon = 1;
-
-    setCanScrollLeft(scrollLeft > epsilon);
-    setCanScrollRight(scrollLeft < maxScrollLeft - epsilon);
-  };
-
-  const safeCheckScroll = () => {
-    requestAnimationFrame(() => {
-      checkScrollPosition();
-    });
-  };
-
-  useEffect(() => {
-    if (filteredItems.length > 0) {
-      const exists = filteredItems.some((item) => item.id === selectedRelease?.id);
-      if (!exists) {
-        setSelectedRelease(filteredItems[0]);
-        setActiveTrackId(null);
-      }
-    }
-    safeCheckScroll();
-  }, [filteredItems]);
-
-  useEffect(() => {
-    if (selectedRelease && scrollContainerRef.current) {
-      const index = filteredItems.findIndex(i => i.id === selectedRelease.id);
-      const activeEl = albumRefs.current[index];
-      if (activeEl) {
-        activeEl.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "center"
-        });
-      }
-    }
-  }, [selectedRelease, filteredItems]);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const onScroll = () => checkScrollPosition();
-
-    container.addEventListener("scroll", onScroll);
-    window.addEventListener("resize", onScroll);
-
-    safeCheckScroll();
-
-    return () => {
-      container.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [filteredItems]);
-
   if (!selectedRelease) return null;
 
-  const selectedIndex = items.findIndex((i) => i.id === selectedRelease.id);
-  const selectedColor = memberColors[selectedIndex >= 0 ? selectedIndex % memberColors.length : 0];
-
-  const getEmbedUrl = (albumId: string, trackId: string | null) => {
-    const targetId = trackId || selectedRelease.tracks[0]?.id || albumId;
-    return `https://open.spotify.com/embed/track/${targetId}?utm_source=generator&theme=0`;
+  const selectRelease = (item: DiscographyItem) => {
+    setSelectedRelease(item);
+    setActiveTrackId(null);
+    setDrawerExpanded(true);
+    setMobileDetailOpen(true);
   };
 
-  const handleScroll = (direction: "left" | "right") => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const scrollAmount = direction === "left" ? -200 : 200;
-
-    container.scrollBy({
-      left: scrollAmount,
-      behavior: "smooth"
-    });
-
-    setTimeout(safeCheckScroll, 150);
-    setTimeout(safeCheckScroll, 400);
-  };
+  const embedUrl = `https://open.spotify.com/embed/track/${
+    activeTrackId || selectedRelease.tracks?.[0]?.id || selectedRelease.id
+  }?utm_source=generator&theme=0`;
 
   return (
-    <section className="w-full py-20 relative overflow-hidden">
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: ${selectedColor || "rgba(0,0,0,0.3)"}; }
-        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.05); }
-        .track-item { transition: all 0.3s var(--ease-smooth); }
-        .track-item.active { background-color: ${selectedColor} !important; color: #F5F3EE !important; }
-        .track-item.active .opacity-50 { opacity: 1 !important; color: #F5F3EE !important; }
-        `
-      }} />
+    <section className="w-full py-20 relative" style={{ background: "var(--c-surface)" }}>
 
-      <div
-        className="absolute right-[-120px] top-[180px] w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none"
-        style={{ background: selectedColor, opacity: 0.18 }}
-      />
+      {/* ── Blob gradient background ──────────────────────────────── */}
+      <DiscographyBackground />
 
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <div>
-            <p className="text-label-mono text-[var(--c-ink)] mb-2">BINI OFFICIAL MUSIC</p>
-            <h3 className="text-5xl md:text-7xl text-[var(--c-teal-dark)] leading-none">Discography</h3>
+      <style>{SCROLL_STYLE}</style>
+
+      <div className="relative z-10 w-full max-w-[1320px] mx-auto px-4 sm:px-8 md:px-16">
+
+        {/* ── HEADER ─────────────────────────────────────────────────── */}
+        <div className="mb-10 flex flex-col gap-1">
+          <p
+            className="text-label-mono"
+            style={{
+              display: "inline-block",
+              alignSelf: "flex-start",
+              color: "var(--c-surface)",
+              background: "var(--c-teal-dark)",
+              padding: "3px 10px",
+              borderRadius: "2px",
+            }}
+          >
+            BINI Official Music
+          </p>
+
+          <div className="flex items-end justify-between gap-6 flex-wrap">
+            <h2
+              style={{
+                fontFamily: "var(--f-display)",
+                fontSize: "clamp(56px, 9vw, 120px)",
+                letterSpacing: "-0.04em",
+                lineHeight: 0.88,
+                color: "var(--c-teal-dark)",
+                textTransform: "uppercase",
+              }}
+            >
+              Disco<br />graphy
+            </h2>
+
+            {/* Filters — desktop */}
+            <div className="hidden sm:flex items-center gap-2 pb-2 flex-wrap">
+              {(["all", "album", "ep", "single"] as CategoryType[]).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  style={{
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    padding: "6px 16px",
+                    borderRadius: "999px",
+                    border: activeCategory === cat
+                      ? "1.5px solid var(--c-teal-dark)"
+                      : "1.5px solid var(--c-surface-3)",
+                    background: activeCategory === cat ? "var(--c-teal-dark)" : "transparent",
+                    color: activeCategory === cat ? "#fff" : "var(--c-ink)",
+                    opacity: activeCategory === cat ? 1 : 0.6,
+                    transition: "all 0.2s ease",
+                    cursor: "pointer",
+                  }}
+                >
+                  {TYPE_LABELS[cat]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-2 mb-10 border-b border-[var(--c-teal-dark)]/10 pb-4 overflow-x-auto hide-scrollbar whitespace-nowrap">
-          {(["all", "album", "ep", "single"] as CategoryType[]).map((category) => (
+        {/* Filters — mobile */}
+        <div className="flex sm:hidden gap-2 mb-6 overflow-x-auto pb-1 disc-scroll">
+          {(["all", "album", "ep", "single"] as CategoryType[]).map((cat) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-wider transition-all shrink-0
-                ${activeCategory === category
-                  ? "bg-[#E8739A] text-white font-bold"
-                  : "bg-[var(--c-surface-2)]/60 text-[var(--c-ink)] opacity-70 hover:opacity-100"
-                }`}
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              style={{
+                fontFamily: "var(--f-mono)",
+                fontSize: "10px",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                padding: "5px 14px",
+                borderRadius: "999px",
+                border: activeCategory === cat
+                  ? "1.5px solid var(--c-teal-dark)"
+                  : "1.5px solid var(--c-surface-3)",
+                background: activeCategory === cat ? "var(--c-teal-dark)" : "transparent",
+                color: activeCategory === cat ? "#fff" : "var(--c-ink)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                transition: "all 0.2s ease",
+                cursor: "pointer",
+              }}
             >
-              {category === "all" ? "All Releases" : `${category}s`}
+              {TYPE_LABELS[cat]}
             </button>
           ))}
         </div>
 
-        <div className="relative -mx-4 sm:-mx-8 md:-mx-16">
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[var(--c-surface)] via-[var(--c-surface)]/80 to-transparent z-20 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[var(--c-surface)] via-[var(--c-surface)]/80 to-transparent z-20 pointer-events-none" />
-          
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto snap-x snap-mandatory pt-4 pb-6 px-16 sm:px-24 md:px-32 hide-scrollbar items-center"
-          >
-            {filteredItems.map((item, index) => {
-              const isSelected = item.id === selectedRelease.id;
-              const globalIndex = items.findIndex((i) => i.id === item.id);
-              const color = memberColors[globalIndex % memberColors.length];
+        {/* Divider */}
+        <div style={{ height: "1.5px", background: "var(--c-ink)" }} />
 
-              return (
-                <button
-                  key={item.id}
-                  ref={(el) => { albumRefs.current[index] = el; }}
-                  onClick={() => {
-                    setSelectedRelease(item);
-                    setActiveTrackId(null);
-                  }}
-                  className={`snap-center shrink-0 w-[140px] sm:w-[190px] text-left group transition-all duration-500 ${
-                    isSelected ? "scale-110 md:scale-100" : "scale-90 opacity-50"
-                  }`}
-                >
-                  <div
-                    className={`aspect-square overflow-hidden transition-all duration-300 rounded-xl ${
-                      isSelected ? "scale-[1.02]" : ""
-                    }`}
-                    style={{
-                      border: isSelected ? "3px solid #fff" : "3px solid transparent",
-                      outline: isSelected ? `2px solid ${color}` : "none",
-                      boxShadow: isSelected ? `0 10px 25px -5px ${color}` : "none"
-                    }}
-                  >
-                    {item.art && (
-                      <img src={item.art} alt={item.name} className="w-full h-full object-cover" />
-                    )}
-                  </div>
+        {/* ── DESKTOP LAYOUT ─────────────────────────────────────────── */}
+        <div className="hidden lg:grid lg:grid-cols-[340px_1fr] lg:items-start">
 
-                  <div className="mt-4 px-1">
-                    <span
-                      className="text-[9px] px-2 py-0.5 rounded-full font-mono"
-                      style={{
-                        backgroundColor: isSelected ? color : "rgba(0,0,0,0.05)",
-                        color: isSelected ? "#fff" : "var(--c-ink)"
-                      }}
-                    >
-                      {item.year}
-                    </span>
-                    <h4 className="text-sm font-bold mt-2 leading-none text-[var(--c-teal-dark)] truncate">
-                      {item.name}
-                    </h4>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-4 mt-2">
-          <motion.button
-            disabled={!canScrollLeft}
-            onClick={() => handleScroll("left")}
-            className={`h-12 w-12 rounded-full flex items-center justify-center border ${!canScrollLeft ? "opacity-30" : ""}`}
-          >
-            <CaretLeft size={18} weight="bold" />
-          </motion.button>
-
-          <motion.button
-            disabled={!canScrollRight}
-            onClick={() => handleScroll("right")}
-            className={`h-12 w-12 rounded-full flex items-center justify-center text-white ${!canScrollRight ? "opacity-30" : ""}`}
-            style={{ background: `linear-gradient(135deg, var(--c-teal), var(--c-teal-dark))` }}
-          >
-            <CaretRight size={18} weight="bold" />
-          </motion.button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-[420px_1fr] gap-10 mt-12 items-start">
-          <div className="space-y-6 md:sticky md:top-24">
-            {/* Spotify Embed Player - now first */}
-            <div className="rounded-md overflow-hidden shadow-md">
-              <iframe
-                src={getEmbedUrl(selectedRelease.id, activeTrackId)}
-                width="100%"
-                height="152"
-                className="block"
-              />
-            </div>
-
-            {/* Album Info - now second */}
-            <div className="relative rounded-lg bg-[var(--c-surface-2)] p-4 sm:p-7 overflow-hidden border-2" style={{ borderColor: selectedColor }}>
-              <div
-                className="absolute w-[340px] h-[340px] blur-[120px] top-[-120px] right-[-120px]"
-                style={{ background: selectedColor, opacity: 0.2 }}
-              />
-
-              <div className="flex gap-5 relative z-10">
-                <div className="flex flex-col justify-between min-w-0 w-full">
-                  <div>
-                    <p className="text-[10px] sm:text-xs opacity-60 mb-1">
-                      Released {selectedRelease.release_date}
-                    </p>
-                    <h2 className="text-xl sm:text-3xl font-bold leading-tight" style={{ color: selectedColor }}>
-                      {selectedRelease.name}
-                    </h2>
-                    <p className="text-[10px] sm:text-xs opacity-60 mt-1">
-                      {selectedRelease.total_tracks} {selectedRelease.total_tracks === 1 ? "Track" : "Tracks"}
-                    </p>
-                  </div>
-                  <a
-                    href={selectedRelease.spotify_url}
-                    target="_blank"
-                    className="btn-primary mt-2 w-full justify-center text-[11px] whitespace-nowrap"
-                  >
-                    Listen on Spotify
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-[var(--c-surface-2)]/40 rounded-lg p-6 md:p-8">
-            <div className="flex justify-between mb-5">
-              <h4 className="text-xs uppercase tracking-wider">Tracklist</h4>
-              <span className="text-xs opacity-50 font-mono">
-                {selectedRelease.tracks?.length} {selectedRelease.tracks?.length === 1 ? "track" : "tracks"}
+          {/* LEFT: scrollable release list */}
+          <div className="border-r" style={{ borderColor: "var(--c-ink)" }}>
+            <div
+              className="pr-6 py-3 border-b flex justify-between items-center"
+              style={{ borderColor: "var(--c-surface-3)" }}
+            >
+              <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>
+                Release
+              </span>
+              <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>
+                Year
               </span>
             </div>
 
-            <div className="max-h-[520px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-              {selectedRelease.tracks?.map((track, idx) => {
-                const isActive = activeTrackId === track.id || (!activeTrackId && idx === 0);
-
-                return (
-                  <button
-                    key={track.id}
-                    onClick={() => setActiveTrackId(track.id)}
-                    className={`track-item w-full px-5 py-3 rounded-md text-left flex items-center justify-between ${
-                      isActive ? "active" : "hover:translate-x-1"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs opacity-50 font-mono w-6 text-right">
-                        {(idx + 1).toString().padStart(2, "0")}
-                      </span>
-                      <span className="truncate text-sm">{track.name}</span>
-                    </div>
-                    <span className="text-xs opacity-50 font-mono shrink-0">{track.duration}</span>
-                  </button>
-                );
-              })}
+            <div
+              className="disc-scroll"
+              style={{ height: "560px", overflowY: "auto", paddingRight: "6px" }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCategory}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {filteredItems.map((item, idx) => {
+                    const isSelected = selectedRelease.id === item.id;
+                    const nType = getNormalizedType(item);
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => selectRelease(item)}
+                        className="w-full text-left"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "10px 0",
+                          paddingRight: "18px",
+                          borderBottom: "0.5px solid var(--c-surface-3)",
+                          background: isSelected ? "rgba(58,170,182,0.07)" : "transparent",
+                          transition: "background 0.15s ease",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div style={{ width: "3px", alignSelf: "stretch", background: isSelected ? "var(--c-teal-dark)" : "transparent", transition: "background 0.15s ease", flexShrink: 0 }} />
+                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: "var(--c-ink)", opacity: 0.3, width: "18px", flexShrink: 0 }}>
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                        <ReleaseArt src={item.art} alt={item.name} size={40} radius={4} selected={isSelected} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: "13px", fontWeight: isSelected ? 700 : 500, color: "var(--c-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>
+                            {item.name}
+                          </p>
+                          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: nType === "album" ? "var(--c-teal-dark)" : nType === "ep" ? "var(--c-gwen)" : "var(--c-mikha)", opacity: 0.85 }}>
+                            {nType} · {item.total_tracks} tracks
+                          </span>
+                        </div>
+                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.4, flexShrink: 0 }}>
+                          {item.year}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
+
+          {/* RIGHT: detail panel */}
+          <div className="pl-10 pt-6 pb-6">
+            <DetailPanel
+              release={selectedRelease}
+              activeTrackId={activeTrackId}
+              setActiveTrackId={setActiveTrackId}
+              embedUrl={embedUrl}
+            />
+          </div>
         </div>
+
+        {/* ── MOBILE LAYOUT ──────────────────────────────────────────── */}
+        <div className="lg:hidden">
+
+          {/* Horizontal thumbnail strip */}
+          <div className="disc-scroll" style={{ overflowX: "auto" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeCategory}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                style={{ display: "flex", gap: "10px", padding: "14px 0 16px" }}
+              >
+                {filteredItems.map((item) => {
+                  const isSelected = selectedRelease.id === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => selectRelease(item)}
+                      style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                    >
+                      <ReleaseArt src={item.art} alt={item.name} size={64} radius={6} selected={isSelected} />
+                      <span style={{ fontFamily: "var(--f-mono)", fontSize: "8px", color: isSelected ? "var(--c-teal-dark)" : "var(--c-ink)", opacity: isSelected ? 1 : 0.45, maxWidth: "64px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.15s, opacity 0.15s" }}>
+                        {item.year}
+                      </span>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Selected release name + View button */}
+          <div style={{ borderTop: "0.5px solid var(--c-surface-3)", paddingTop: "12px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontFamily: "var(--f-mono)", fontSize: "8px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "2px" }}>
+                {getNormalizedType(selectedRelease)} · {selectedRelease.year}
+              </p>
+              <p style={{ fontFamily: "var(--f-display)", fontSize: "22px", letterSpacing: "-0.03em", lineHeight: 1, color: "var(--c-ink)", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {selectedRelease.name}
+              </p>
+            </div>
+            <button
+              onClick={() => { setDrawerExpanded(true); setMobileDetailOpen(true); }}
+              style={{ flexShrink: 0, fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", padding: "7px 14px", borderRadius: "999px", border: "1.5px solid var(--c-ink)", background: "transparent", color: "var(--c-ink)", cursor: "pointer" }}
+            >
+              View ↗
+            </button>
+          </div>
+        </div>
+
+        {/* ── MOBILE: Collapsible bottom drawer ──────────────────────── */}
+        <AnimatePresence>
+          {mobileDetailOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 z-40 lg:hidden"
+                style={{ background: "rgba(12,12,10,0.4)", pointerEvents: drawerExpanded ? "auto" : "none" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: drawerExpanded ? 1 : 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setDrawerExpanded(false)}
+              />
+
+              <motion.div
+                className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
+                style={{
+                  background: "var(--c-surface)",
+                  borderRadius: "18px 18px 0 0",
+                  boxShadow: "0 -8px 40px rgba(12,12,10,0.12)",
+                  paddingBottom: "env(safe-area-inset-bottom, 12px)",
+                  overflow: "hidden",
+                }}
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 34 }}
+              >
+                <button
+                  onClick={() => setDrawerExpanded((v) => !v)}
+                  style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "stretch", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                  aria-label={drawerExpanded ? "Collapse drawer" : "Expand drawer"}
+                >
+                  <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 6px" }}>
+                    <div style={{ width: "36px", height: "4px", borderRadius: "2px", background: "var(--c-surface-3)" }} />
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "6px 20px 12px", borderBottom: drawerExpanded ? "0.5px solid var(--c-surface-3)" : "none" }}>
+                    <ReleaseArt src={selectedRelease.art} alt={selectedRelease.name} size={44} radius={6} />
+                    <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                      <p style={{ fontFamily: "var(--f-mono)", fontSize: "8px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "2px" }}>
+                        {getNormalizedType(selectedRelease)} · {selectedRelease.year}
+                      </p>
+                      <p style={{ fontFamily: "var(--f-display)", fontSize: "18px", letterSpacing: "-0.02em", lineHeight: 1, color: "var(--c-ink)", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {selectedRelease.name}
+                      </p>
+                    </div>
+                    <motion.span
+                      animate={{ rotate: drawerExpanded ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ flexShrink: 0, color: "var(--c-ink)", opacity: 0.4, fontSize: "16px", lineHeight: 1, display: "block" }}
+                    >
+                      ↑
+                    </motion.span>
+                  </div>
+                </button>
+
+                <motion.div
+                  initial={false}
+                  animate={{ height: drawerExpanded ? "auto" : 0, opacity: drawerExpanded ? 1 : 0 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 36 }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div className="disc-scroll" style={{ maxHeight: "58vh", overflowY: "auto", padding: "16px 20px 24px" }}>
+                    <DetailPanel
+                      release={selectedRelease}
+                      activeTrackId={activeTrackId}
+                      setActiveTrackId={setActiveTrackId}
+                      embedUrl={embedUrl}
+                      compact
+                    />
+                  </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
       </div>
     </section>
+  );
+}
+
+/* ── DETAIL PANEL ──────────────────────────────────────────────────── */
+interface DetailPanelProps {
+  release: DiscographyItem;
+  activeTrackId: string | null;
+  setActiveTrackId: (id: string) => void;
+  embedUrl: string;
+  compact?: boolean;
+}
+
+function DetailPanel({ release, activeTrackId, setActiveTrackId, embedUrl, compact }: DetailPanelProps) {
+  return (
+    <motion.div
+      key={release.id}
+      initial={{ opacity: 0, x: 12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="flex flex-col gap-6"
+    >
+      {/* Release meta — no cover art (embed has it). Hidden in compact/drawer mode. */}
+      {!compact && (
+        <div style={{ paddingTop: "4px" }}>
+          <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "6px" }}>
+            {getNormalizedType(release)} · {release.year}
+          </p>
+          <h3 style={{ fontFamily: "var(--f-display)", fontSize: "clamp(22px, 5vw, 36px)", letterSpacing: "-0.03em", lineHeight: 0.95, color: "var(--c-ink)", textTransform: "uppercase", marginBottom: "8px" }}>
+            {release.name}
+          </h3>
+          <p style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.45 }}>
+            {release.total_tracks} tracks
+          </p>
+        </div>
+      )}
+
+      {/* Spotify embed */}
+      <div style={{ borderRadius: "8px", overflow: "hidden" }}>
+        <iframe
+          src={embedUrl}
+          width="100%"
+          height="152"
+          style={{ display: "block", border: "none" }}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        />
+      </div>
+
+      {/* Tracklist */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid var(--c-ink)", marginBottom: "2px" }}>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Track</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Duration</span>
+        </div>
+
+        <div>
+          {release.tracks.map((track, idx) => {
+            const isActive = activeTrackId === track.id || (!activeTrackId && idx === 0);
+            return (
+              <button
+                key={track.id}
+                onClick={() => setActiveTrackId(track.id)}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "9px 0", borderBottom: "0.5px solid var(--c-surface-3)", background: "transparent", cursor: "pointer", textAlign: "left" }}
+              >
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)", opacity: isActive ? 1 : 0.3, width: "22px", flexShrink: 0, textAlign: "right" }}>
+                  {isActive ? "▶" : String(idx + 1).padStart(2, "0")}
+                </span>
+                <span style={{ flex: 1, fontSize: "13px", fontWeight: isActive ? 600 : 400, color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.15s" }}>
+                  {track.name}
+                </span>
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.35, flexShrink: 0 }}>
+                  {track.duration}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Spotify CTA */}
+      <a
+        href={release.spotify_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 20px", borderRadius: "999px", background: "var(--c-ink)", color: "#fff", fontSize: "11px", fontFamily: "var(--f-mono)", letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", alignSelf: "flex-start", transition: "background 0.2s" }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-teal-dark)")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "var(--c-ink)")}
+      >
+        <SpotifyLogo size={14} weight="fill" />
+        Stream on Spotify
+      </a>
+    </motion.div>
   );
 }
