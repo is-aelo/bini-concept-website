@@ -1,0 +1,49 @@
+{
+  "Talaarawan": {
+    "description": "BINI's first EP explored youth, friendship, love, and personal experiences through a diary-inspired concept. It became a defining release for the group and included some of their most recognized songs.",
+    "featuredTracks": [
+      "Pantropiko",
+      "Karera",
+      "Salamin, Salamin"
+    ],
+    "tagline": "Diary-inspired stories and breakout momentum.",
+    "theme": "youth"
+  },
+
+  "BINIverse": {
+    "description": "BINIverse expanded BINI's musical direction with a broader pop sound and marked a new phase following the success of Talaarawan.",
+    "featuredTracks": [
+      "Cherry on Top",
+      "Blink Twice"
+    ],
+    "tagline": "A larger world and a wider sound.",
+    "theme": "evolution"
+  },
+
+  "Pantropiko": {
+    "description": "Pantropiko became one of BINI's biggest breakout songs and was widely recognized as a summer anthem in the Philippines.",
+    "featuredTracks": [
+      "Pantropiko"
+    ],
+    "tagline": "The summer anthem era.",
+    "theme": "summer"
+  },
+
+  "Karera": {
+    "description": "Karera delivered a message about moving at your own pace and resonated strongly with listeners, especially students and younger audiences.",
+    "featuredTracks": [
+      "Karera"
+    ],
+    "tagline": "No need to rush your timeline.",
+    "theme": "growth"
+  },
+
+  "Salamin, Salamin": {
+    "description": "Salamin, Salamin explored the excitement and uncertainty of attraction through a playful and energetic sound.",
+    "featuredTracks": [
+      "Salamin, Salamin"
+    ],
+    "tagline": "Kilig, curiosity, and energy.",
+    "theme": "playful"
+  }
+}

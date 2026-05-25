@@ -10,7 +10,6 @@ export default function TourBackground() {
     setIsMounted(true);
   }, []);
 
-  // Return null or a static placeholder during SSR to prevent hydration mismatch
   if (!isMounted) {
     return null;
   }
@@ -31,7 +30,15 @@ export default function TourBackground() {
   };
 
   return (
-    <div
+    <motion.div
+      animate={{
+        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+      }}
+      transition={{
+        duration: 40,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
       style={{
         position: "absolute",
         top: 0,
@@ -41,7 +48,8 @@ export default function TourBackground() {
         zIndex: 0,
         overflow: "hidden",
         pointerEvents: "none",
-        background: "var(--c-surface-1)",
+        background: "linear-gradient(125deg, var(--c-surface-1), var(--c-surface), var(--c-surface-1))",
+        backgroundSize: "400% 400%",
       }}
     >
       {/* Top Right Blob */}
@@ -83,6 +91,6 @@ export default function TourBackground() {
           opacity: 0.3,
         }}
       />
-    </div>
+    </motion.div>
   );
 }
