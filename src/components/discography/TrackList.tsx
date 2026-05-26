@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface Track {
   id: string;
   name: string;
-  uri: string;
+  uri?: string;
   duration: string;
 }
 
@@ -19,11 +19,6 @@ interface TrackListProps {
   accentColor: string;
 }
 
-function trackUriToId(uri: string): string | null {
-  const match = uri?.match(/spotify:track:([a-zA-Z0-9]+)/);
-  return match ? match[1] : null;
-}
-
 export const TrackList: React.FC<TrackListProps> = ({
   tracks,
   activeTrackId,
@@ -32,14 +27,6 @@ export const TrackList: React.FC<TrackListProps> = ({
   tracklistId,
   accentColor,
 }) => {
-  const handleTrackClick = (uri: string) => {
-    const id = trackUriToId(uri);
-
-    if (!id) return;
-
-    onSelectTrack(id);
-  };
-
   if (!tracks?.length) {
     return (
       <p
@@ -79,7 +66,7 @@ export const TrackList: React.FC<TrackListProps> = ({
               height: 0,
             }}
             transition={{
-              duration: 0.25,
+              duration: .25,
               ease: "easeInOut",
             }}
             style={{
@@ -95,58 +82,51 @@ export const TrackList: React.FC<TrackListProps> = ({
               }}
             >
               {tracks.map((track, index) => {
-                const trackId = trackUriToId(track.uri);
-
                 const isActive =
-                  !!trackId &&
-                  activeTrackId === trackId;
-
-                const hasUri = !!trackId;
+                  activeTrackId === track.id;
 
                 return (
                   <motion.button
                     key={track.id}
                     onClick={() =>
-                      hasUri &&
-                      handleTrackClick(track.uri)
+                      onSelectTrack(track.id)
                     }
-                    disabled={!hasUri}
-                    aria-pressed={isActive}
                     initial={false}
                     animate={{
-                      backgroundColor: isActive
-                        ? `${accentColor}10`
-                        : "transparent",
+                      backgroundColor:
+                        isActive
+                          ? `${accentColor}10`
+                          : "transparent",
                     }}
                     transition={{
-                      duration: 0.18,
+                      duration: .18,
                     }}
                     style={{
                       width: "100%",
                       display: "flex",
                       border: "none",
                       padding: 0,
-                      background: "transparent",
-                      cursor: hasUri
-                        ? "pointer"
-                        : "default",
+                      background:
+                        "transparent",
+                      cursor: "pointer",
                       textAlign: "left",
-                      borderBottom: `1px solid ${
-                        isActive
-                          ? accentColor + "18"
-                          : "var(--c-surface-2)"
-                      }`,
+                      borderBottom:
+                        `1px solid ${
+                          isActive
+                            ? accentColor +
+                              "18"
+                            : "var(--c-surface-2)"
+                        }`,
                     }}
                   >
                     <div
                       style={{
                         width: "2px",
                         flexShrink: 0,
-                        background: isActive
-                          ? accentColor
-                          : "transparent",
-                        transition:
-                          "all .2s ease",
+                        background:
+                          isActive
+                            ? accentColor
+                            : "transparent",
                       }}
                     />
 
@@ -154,7 +134,8 @@ export const TrackList: React.FC<TrackListProps> = ({
                       style={{
                         flex: 1,
                         display: "flex",
-                        alignItems: "center",
+                        alignItems:
+                          "center",
                         gap: "12px",
                         padding:
                           "11px 12px",
@@ -165,72 +146,27 @@ export const TrackList: React.FC<TrackListProps> = ({
                         style={{
                           width: "24px",
                           flexShrink: 0,
-                          textAlign: "right",
-                          fontSize: "11px",
+                          textAlign:
+                            "right",
+                          fontSize:
+                            "11px",
                           fontFamily:
                             "var(--f-mono)",
-                          color: isActive
-                            ? accentColor
-                            : "var(--c-ink)",
-                          opacity: isActive
-                            ? 1
-                            : 0.28,
+                          color:
+                            isActive
+                              ? accentColor
+                              : "var(--c-ink)",
+                          opacity:
+                            isActive
+                              ? 1
+                              : .28,
                         }}
                       >
-                        {isActive ? (
-                          <span
-                            style={{
-                              display:
-                                "inline-flex",
-                              alignItems:
-                                "flex-end",
-                              gap: "2px",
-                              height:
-                                "13px",
-                            }}
-                          >
-                            {[
-                              {
-                                h: "9px",
-                                d: "0s",
-                              },
-                              {
-                                h: "13px",
-                                d: ".15s",
-                              },
-                              {
-                                h: "6px",
-                                d: ".3s",
-                              },
-                            ].map(
-                              (
-                                bar,
-                                i
-                              ) => (
-                                <span
-                                  key={i}
-                                  style={{
-                                    width:
-                                      "2px",
-                                    height:
-                                      bar.h,
-                                    background:
-                                      accentColor,
-                                    borderRadius:
-                                      "2px",
-                                    animation: `eqBar .7s ease-in-out ${bar.d} infinite alternate`,
-                                  }}
-                                />
-                              )
-                            )}
-                          </span>
-                        ) : (
-                          String(
-                            index + 1
-                          ).padStart(
-                            2,
-                            "0"
-                          )
+                        {String(
+                          index + 1
+                        ).padStart(
+                          2,
+                          "0"
                         )}
                       </span>
 
@@ -245,6 +181,8 @@ export const TrackList: React.FC<TrackListProps> = ({
                             "nowrap",
                           fontSize:
                             "13px",
+                          fontFamily:
+                            "var(--f-body)",
                           color:
                             isActive
                               ? accentColor
@@ -266,13 +204,8 @@ export const TrackList: React.FC<TrackListProps> = ({
                           fontFamily:
                             "var(--f-mono)",
                           color:
-                            isActive
-                              ? accentColor
-                              : "var(--c-ink)",
-                          opacity:
-                            isActive
-                              ? .7
-                              : .3,
+                            "var(--c-ink)",
+                          opacity: .35,
                         }}
                       >
                         {track.duration}
@@ -285,18 +218,6 @@ export const TrackList: React.FC<TrackListProps> = ({
           </motion.section>
         )}
       </AnimatePresence>
-
-      <style>{`
-        @keyframes eqBar {
-          from {
-            transform: scaleY(.4);
-          }
-
-          to {
-            transform: scaleY(1);
-          }
-        }
-      `}</style>
     </div>
   );
 };
