@@ -71,12 +71,13 @@ export default function ImageLightbox({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length !== 2 || !pinchStartDistance.current) return;
+    const startDistance = pinchStartDistance.current;
+    if (e.touches.length !== 2 || startDistance === null) return;
 
     e.preventDefault();
     e.stopPropagation();
     const nextDistance = getTouchDistance(e.touches);
-    updateZoom(() => pinchStartZoom.current * (nextDistance / pinchStartDistance.current));
+    updateZoom(() => pinchStartZoom.current * (nextDistance / startDistance));
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {

@@ -130,7 +130,7 @@ export default function CoachellaSection({
         <div className="flex flex-col items-center text-center mb-10 md:mb-14">
           <h2
             className="leading-[.85] tracking-tighter"
-            style={{ fontSize: "clamp(3.25rem, 9vw, 7.5rem)" }}
+            style={{ fontSize: "clamp(4rem, 12vw, 10rem)" }}
           >
             <span style={{ color: "var(--c-teal)" }}>#BINI</span>
             <span style={{ color: "var(--c-aiah)" }}>CHELLA</span>
@@ -139,7 +139,7 @@ export default function CoachellaSection({
 
         {/* image frame */}
         <div
-          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-[4/3] sm:aspect-video w-full z-10"
+          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-video w-full z-10"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;
