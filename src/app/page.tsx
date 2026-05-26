@@ -4,7 +4,7 @@ import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
 import IridescentMesh from "@/components/TourBackground";
 import Profile from "@/components/Profile";
-import Discography from "@/components/Discography";
+import { Discography } from "@/components/discography/Discography";
 import Tour from "@/components/Tour";
 
 import { sanityFetch } from "@/sanity/lib/fetch";

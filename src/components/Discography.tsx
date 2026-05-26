@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SpotifyLogo } from "@phosphor-icons/react";
+import { SpotifyLogo, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import discographyData from "../../bini_discography.json";
 import { ReleaseArt } from "./ReleaseArt";
 import DiscographyBackground from "./DiscographyBackground";
@@ -69,101 +69,89 @@ export default function Discography() {
   const items = (discographyData.items || []) as DiscographyItem[];
 
   const [activeCategory, setActiveCategory] = useState<CategoryType>("all");
-  const [selectedRelease, setSelectedRelease] = useState<DiscographyItem | null>(items[0] || null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [activeTrackId, setActiveTrackId] = useState<string | null>(null);
-  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [drawerExpanded, setDrawerExpanded] = useState(true);
+  const shelfRef = useRef<HTMLDivElement>(null);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === "all") return items;
     return items.filter((item) => getNormalizedType(item) === activeCategory);
   }, [items, activeCategory]);
 
+  useEffect(() => {
+    setActiveIndex(0);
+    setActiveTrackId(null);
+  }, [activeCategory]);
+
+  const selectedRelease = filteredItems[activeIndex] ?? null;
+
+  const goTo = (idx: number) => {
+    const clamped = Math.max(0, Math.min(filteredItems.length - 1, idx));
+    setActiveIndex(clamped);
+    setActiveTrackId(null);
+
+    setTimeout(() => {
+      const shelf = shelfRef.current;
+      if (!shelf) return;
+      const btn = shelf.querySelectorAll<HTMLButtonElement>("[data-shelf-item]")[clamped];
+      if (btn) btn.scrollIntoView({ inline: "center", behavior: "smooth", block: "nearest" });
+    }, 50);
+  };
+
   if (!selectedRelease) return null;
 
-  const selectRelease = (item: DiscographyItem) => {
-    setSelectedRelease(item);
-    setActiveTrackId(null);
-    setDrawerExpanded(true);
-    setMobileDetailOpen(true);
-  };
+  const prevRelease = filteredItems[activeIndex - 1] ?? null;
+  const nextRelease = filteredItems[activeIndex + 1] ?? null;
 
   const embedUrl = `https://open.spotify.com/embed/track/${
     activeTrackId || selectedRelease.tracks?.[0]?.id || selectedRelease.id
   }?utm_source=generator&theme=0`;
 
+  const nType = getNormalizedType(selectedRelease);
+
   return (
-    <section className="w-full py-20 relative" style={{ background: "var(--c-surface)" }}>
-
-      {/* ── Blob gradient background ──────────────────────────────── */}
+    <section className="w-full relative overflow-hidden" style={{ background: "var(--c-surface)" }}>
       <DiscographyBackground />
-
       <style>{SCROLL_STYLE}</style>
 
-      <div className="relative z-10 w-full max-w-[1320px] mx-auto px-4 sm:px-8 md:px-16">
+      {/* ── HERO: teal full-bleed ──────────────────────────────────── */}
+      <div
+        className="relative z-10 w-full flex flex-col items-center"
+        style={{ background: "var(--c-teal)", paddingTop: "56px" }}
+      >
+        {/* Section eyebrow */}
+        <p
+          style={{
+            fontFamily: "var(--f-mono)",
+            fontSize: "10px",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--c-teal-pale)",
+            opacity: 0.75,
+            marginBottom: "8px",
+          }}
+        >
+          BINI Official Music
+        </p>
 
-        {/* ── HEADER ─────────────────────────────────────────────────── */}
-        <div className="mb-10 flex flex-col gap-1">
-          <p
-            className="text-label-mono"
-            style={{
-              display: "inline-block",
-              alignSelf: "flex-start",
-              color: "var(--c-surface)",
-              background: "var(--c-teal-dark)",
-              padding: "3px 10px",
-              borderRadius: "2px",
-            }}
-          >
-            BINI Official Music
-          </p>
+        {/* Section title */}
+        <h2
+          style={{
+            fontFamily: "var(--f-display)",
+            fontSize: "clamp(56px, 14vw, 120px)",
+            letterSpacing: "-0.04em",
+            lineHeight: 0.88,
+            color: "var(--c-teal-pale)",
+            textTransform: "uppercase",
+            textAlign: "center",
+            marginBottom: "32px",
+          }}
+        >
+          Discography
+        </h2>
 
-          <div className="flex items-end justify-between gap-6 flex-wrap">
-            <h2
-              style={{
-                fontFamily: "var(--f-display)",
-                fontSize: "clamp(56px, 9vw, 120px)",
-                letterSpacing: "-0.04em",
-                lineHeight: 0.88,
-                color: "var(--c-teal-dark)",
-                textTransform: "uppercase",
-              }}
-            >
-              Disco<br />graphy
-            </h2>
-
-            {/* Filters — desktop */}
-            <div className="hidden sm:flex items-center gap-2 pb-2 flex-wrap">
-              {(["all", "album", "ep", "single"] as CategoryType[]).map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  style={{
-                    fontFamily: "var(--f-mono)",
-                    fontSize: "10px",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    padding: "6px 16px",
-                    borderRadius: "999px",
-                    border: activeCategory === cat
-                      ? "1.5px solid var(--c-teal-dark)"
-                      : "1.5px solid var(--c-surface-3)",
-                    background: activeCategory === cat ? "var(--c-teal-dark)" : "transparent",
-                    color: activeCategory === cat ? "#fff" : "var(--c-ink)",
-                    opacity: activeCategory === cat ? 1 : 0.6,
-                    transition: "all 0.2s ease",
-                    cursor: "pointer",
-                  }}
-                >
-                  {TYPE_LABELS[cat]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Filters — mobile */}
-        <div className="flex sm:hidden gap-2 mb-6 overflow-x-auto pb-1 disc-scroll">
+        {/* Filters */}
+        <div className="flex items-center gap-2 flex-wrap justify-center" style={{ marginBottom: "40px" }}>
           {(["all", "album", "ep", "single"] as CategoryType[]).map((cat) => (
             <button
               key={cat}
@@ -173,15 +161,14 @@ export default function Discography() {
                 fontSize: "10px",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                padding: "5px 14px",
+                padding: "6px 16px",
                 borderRadius: "999px",
                 border: activeCategory === cat
-                  ? "1.5px solid var(--c-teal-dark)"
-                  : "1.5px solid var(--c-surface-3)",
-                background: activeCategory === cat ? "var(--c-teal-dark)" : "transparent",
-                color: activeCategory === cat ? "#fff" : "var(--c-ink)",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
+                  ? "1.5px solid var(--c-teal-pale)"
+                  : "1.5px solid rgba(229,248,250,0.35)",
+                background: activeCategory === cat ? "var(--c-teal-pale)" : "transparent",
+                color: activeCategory === cat ? "var(--c-teal-dark)" : "var(--c-teal-pale)",
+                opacity: activeCategory === cat ? 1 : 0.7,
                 transition: "all 0.2s ease",
                 cursor: "pointer",
               }}
@@ -191,297 +178,261 @@ export default function Discography() {
           ))}
         </div>
 
-        {/* Divider */}
-        <div style={{ height: "1.5px", background: "var(--c-ink)" }} />
-
-        {/* ── DESKTOP LAYOUT ─────────────────────────────────────────── */}
-        <div className="hidden lg:grid lg:grid-cols-[340px_1fr] lg:items-start">
-
-          {/* LEFT: scrollable release list */}
-          <div className="border-r" style={{ borderColor: "var(--c-ink)" }}>
-            <div
-              className="pr-6 py-3 border-b flex justify-between items-center"
-              style={{ borderColor: "var(--c-surface-3)" }}
-            >
-              <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>
-                Release
-              </span>
-              <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>
-                Year
-              </span>
-            </div>
-
-            <div
-              className="disc-scroll"
-              style={{ height: "560px", overflowY: "auto", paddingRight: "6px" }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeCategory}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {filteredItems.map((item, idx) => {
-                    const isSelected = selectedRelease.id === item.id;
-                    const nType = getNormalizedType(item);
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => selectRelease(item)}
-                        className="w-full text-left"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          padding: "10px 0",
-                          paddingRight: "18px",
-                          borderBottom: "0.5px solid var(--c-surface-3)",
-                          background: isSelected ? "rgba(58,170,182,0.07)" : "transparent",
-                          transition: "background 0.15s ease",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <div style={{ width: "3px", alignSelf: "stretch", background: isSelected ? "var(--c-teal-dark)" : "transparent", transition: "background 0.15s ease", flexShrink: 0 }} />
-                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: "var(--c-ink)", opacity: 0.3, width: "18px", flexShrink: 0 }}>
-                          {String(idx + 1).padStart(2, "0")}
-                        </span>
-                        <ReleaseArt src={item.art} alt={item.name} size={40} radius={4} selected={isSelected} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "13px", fontWeight: isSelected ? 700 : 500, color: "var(--c-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>
-                            {item.name}
-                          </p>
-                          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: nType === "album" ? "var(--c-teal-dark)" : nType === "ep" ? "var(--c-gwen)" : "var(--c-mikha)", opacity: 0.85 }}>
-                            {nType} · {item.total_tracks} tracks
-                          </span>
-                        </div>
-                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.4, flexShrink: 0 }}>
-                          {item.year}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* RIGHT: detail panel */}
-          <div className="pl-10 pt-6 pb-6">
-            <DetailPanel
-              release={selectedRelease}
-              activeTrackId={activeTrackId}
-              setActiveTrackId={setActiveTrackId}
-              embedUrl={embedUrl}
-            />
-          </div>
-        </div>
-
-        {/* ── MOBILE LAYOUT ──────────────────────────────────────────── */}
-        <div className="lg:hidden">
-
-          {/* Horizontal thumbnail strip */}
-          <div className="disc-scroll" style={{ overflowX: "auto" }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeCategory}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                style={{ display: "flex", gap: "10px", padding: "14px 0 16px" }}
-              >
-                {filteredItems.map((item) => {
-                  const isSelected = selectedRelease.id === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => selectRelease(item)}
-                      style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", background: "none", border: "none", padding: 0, cursor: "pointer" }}
-                    >
-                      <ReleaseArt src={item.art} alt={item.name} size={64} radius={6} selected={isSelected} />
-                      <span style={{ fontFamily: "var(--f-mono)", fontSize: "8px", color: isSelected ? "var(--c-teal-dark)" : "var(--c-ink)", opacity: isSelected ? 1 : 0.45, maxWidth: "64px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.15s, opacity 0.15s" }}>
-                        {item.year}
-                      </span>
-                    </button>
-                  );
-                })}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Selected release name + View button */}
-          <div style={{ borderTop: "0.5px solid var(--c-surface-3)", paddingTop: "12px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-            <div style={{ minWidth: 0 }}>
-              <p style={{ fontFamily: "var(--f-mono)", fontSize: "8px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "2px" }}>
-                {getNormalizedType(selectedRelease)} · {selectedRelease.year}
-              </p>
-              <p style={{ fontFamily: "var(--f-display)", fontSize: "22px", letterSpacing: "-0.03em", lineHeight: 1, color: "var(--c-ink)", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {selectedRelease.name}
-              </p>
-            </div>
-            <button
-              onClick={() => { setDrawerExpanded(true); setMobileDetailOpen(true); }}
-              style={{ flexShrink: 0, fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", padding: "7px 14px", borderRadius: "999px", border: "1.5px solid var(--c-ink)", background: "transparent", color: "var(--c-ink)", cursor: "pointer" }}
-            >
-              View ↗
-            </button>
-          </div>
-        </div>
-
-        {/* ── MOBILE: Collapsible bottom drawer ──────────────────────── */}
-        <AnimatePresence>
-          {mobileDetailOpen && (
-            <>
-              <motion.div
-                className="fixed inset-0 z-40 lg:hidden"
-                style={{ background: "rgba(12,12,10,0.4)", pointerEvents: drawerExpanded ? "auto" : "none" }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: drawerExpanded ? 1 : 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setDrawerExpanded(false)}
-              />
-
-              <motion.div
-                className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
+        {/* ── CAROUSEL ─────────────────────────────────────────────── */}
+        <div
+          className="w-full flex items-end justify-center"
+          style={{ gap: "clamp(12px, 3vw, 28px)", padding: "0 16px" }}
+        >
+          {/* Prev album */}
+          <AnimatePresence mode="wait">
+            {prevRelease ? (
+              <motion.button
+                key={prevRelease.id}
+                onClick={() => goTo(activeIndex - 1)}
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{
-                  background: "var(--c-surface)",
-                  borderRadius: "18px 18px 0 0",
-                  boxShadow: "0 -8px 40px rgba(12,12,10,0.12)",
-                  paddingBottom: "env(safe-area-inset-bottom, 12px)",
-                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: 0.42,
+                  transform: "scale(0.78)",
+                  transformOrigin: "bottom center",
+                  flexShrink: 0,
                 }}
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                exit={{ y: "100%" }}
-                transition={{ type: "spring", stiffness: 300, damping: 34 }}
               >
-                <button
-                  onClick={() => setDrawerExpanded((v) => !v)}
-                  style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "stretch", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-                  aria-label={drawerExpanded ? "Collapse drawer" : "Expand drawer"}
+                <ReleaseArt
+                  src={prevRelease.art}
+                  alt={prevRelease.name}
+                  size={100}
+                  radius={12}
+                />
+                <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: "var(--c-teal-pale)", letterSpacing: "0.05em", textAlign: "center", maxWidth: "90px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {prevRelease.name}
+                </p>
+              </motion.button>
+            ) : (
+              <div style={{ width: "100px", flexShrink: 0, opacity: 0 }} />
+            )}
+          </AnimatePresence>
+
+          {/* Active (center) album */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedRelease.id}
+              initial={{ opacity: 0, y: 12, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.96 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "10px",
+                flexShrink: 0,
+              }}
+            >
+              <ReleaseArt
+                src={selectedRelease.art}
+                alt={selectedRelease.name}
+                size={160}
+                radius={18}
+                selected
+              />
+              <div style={{ textAlign: "center" }}>
+                <p
+                  style={{
+                    fontFamily: "var(--f-display)",
+                    fontSize: "clamp(18px, 5vw, 26px)",
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1,
+                    color: "var(--c-teal-pale)",
+                    textTransform: "uppercase",
+                    marginBottom: "3px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
                 >
-                  <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 6px" }}>
-                    <div style={{ width: "36px", height: "4px", borderRadius: "2px", background: "var(--c-surface-3)" }} />
-                  </div>
+                  {selectedRelease.name}
+                </p>
+                <p style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-teal-pale)", opacity: 0.65, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  {nType} · {selectedRelease.year} · {selectedRelease.total_tracks} tracks
+                </p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "6px 20px 12px", borderBottom: drawerExpanded ? "0.5px solid var(--c-surface-3)" : "none" }}>
-                    <ReleaseArt src={selectedRelease.art} alt={selectedRelease.name} size={44} radius={6} />
-                    <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                      <p style={{ fontFamily: "var(--f-mono)", fontSize: "8px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "2px" }}>
-                        {getNormalizedType(selectedRelease)} · {selectedRelease.year}
-                      </p>
-                      <p style={{ fontFamily: "var(--f-display)", fontSize: "18px", letterSpacing: "-0.02em", lineHeight: 1, color: "var(--c-ink)", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {selectedRelease.name}
-                      </p>
-                    </div>
-                    <motion.span
-                      animate={{ rotate: drawerExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      style={{ flexShrink: 0, color: "var(--c-ink)", opacity: 0.4, fontSize: "16px", lineHeight: 1, display: "block" }}
-                    >
-                      ↑
-                    </motion.span>
-                  </div>
-                </button>
-
-                <motion.div
-                  initial={false}
-                  animate={{ height: drawerExpanded ? "auto" : 0, opacity: drawerExpanded ? 1 : 0 }}
-                  transition={{ type: "spring", stiffness: 320, damping: 36 }}
-                  style={{ overflow: "hidden" }}
-                >
-                  <div className="disc-scroll" style={{ maxHeight: "58vh", overflowY: "auto", padding: "16px 20px 24px" }}>
-                    <DetailPanel
-                      release={selectedRelease}
-                      activeTrackId={activeTrackId}
-                      setActiveTrackId={setActiveTrackId}
-                      embedUrl={embedUrl}
-                      compact
-                    />
-                  </div>
-                </motion.div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
-      </div>
-    </section>
-  );
-}
-
-/* ── DETAIL PANEL ──────────────────────────────────────────────────── */
-interface DetailPanelProps {
-  release: DiscographyItem;
-  activeTrackId: string | null;
-  setActiveTrackId: (id: string) => void;
-  embedUrl: string;
-  compact?: boolean;
-}
-
-function DetailPanel({ release, activeTrackId, setActiveTrackId, embedUrl, compact }: DetailPanelProps) {
-  return (
-    <motion.div
-      key={release.id}
-      initial={{ opacity: 0, x: 12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="flex flex-col gap-6"
-    >
-      {/* Release meta — no cover art (embed has it). Hidden in compact/drawer mode. */}
-      {!compact && (
-        <div style={{ paddingTop: "4px" }}>
-          <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "6px" }}>
-            {getNormalizedType(release)} · {release.year}
-          </p>
-          <h3 style={{ fontFamily: "var(--f-display)", fontSize: "clamp(22px, 5vw, 36px)", letterSpacing: "-0.03em", lineHeight: 0.95, color: "var(--c-ink)", textTransform: "uppercase", marginBottom: "8px" }}>
-            {release.name}
-          </h3>
-          <p style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.45 }}>
-            {release.total_tracks} tracks
-          </p>
-        </div>
-      )}
-
-      {/* Spotify embed */}
-      <div style={{ borderRadius: "8px", overflow: "hidden" }}>
-        <iframe
-          src={embedUrl}
-          width="100%"
-          height="152"
-          style={{ display: "block", border: "none" }}
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        />
-      </div>
-
-      {/* Tracklist */}
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid var(--c-ink)", marginBottom: "2px" }}>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Track</span>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Duration</span>
+          {/* Next album */}
+          <AnimatePresence mode="wait">
+            {nextRelease ? (
+              <motion.button
+                key={nextRelease.id}
+                onClick={() => goTo(activeIndex + 1)}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 16 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: 0.42,
+                  transform: "scale(0.78)",
+                  transformOrigin: "bottom center",
+                  flexShrink: 0,
+                }}
+              >
+                <ReleaseArt
+                  src={nextRelease.art}
+                  alt={nextRelease.name}
+                  size={100}
+                  radius={12}
+                />
+                <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: "var(--c-teal-pale)", letterSpacing: "0.05em", textAlign: "center", maxWidth: "90px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {nextRelease.name}
+                </p>
+              </motion.button>
+            ) : (
+              <div style={{ width: "100px", flexShrink: 0, opacity: 0 }} />
+            )}
+          </AnimatePresence>
         </div>
 
-        <div>
-          {release.tracks.map((track, idx) => {
-            const isActive = activeTrackId === track.id || (!activeTrackId && idx === 0);
+        {/* Nav dots + arrows */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "24px", marginBottom: "28px" }}>
+          <button
+            onClick={() => goTo(activeIndex - 1)}
+            disabled={activeIndex === 0}
+            aria-label="Previous release"
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              border: "1.5px solid rgba(229,248,250,0.4)",
+              background: "transparent",
+              color: "var(--c-teal-pale)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: activeIndex === 0 ? "not-allowed" : "pointer",
+              opacity: activeIndex === 0 ? 0.3 : 0.8,
+              transition: "opacity 0.15s",
+            }}
+          >
+            <CaretLeft size={14} weight="bold" />
+          </button>
+
+          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+            {filteredItems.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(idx)}
+                aria-label={`Go to release ${idx + 1}`}
+                style={{
+                  width: idx === activeIndex ? "20px" : "6px",
+                  height: "6px",
+                  borderRadius: "3px",
+                  background: idx === activeIndex ? "var(--c-teal-pale)" : "rgba(229,248,250,0.35)",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  transition: "width 0.25s var(--ease-smooth), background 0.2s",
+                }}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => goTo(activeIndex + 1)}
+            disabled={activeIndex === filteredItems.length - 1}
+            aria-label="Next release"
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              border: "1.5px solid rgba(229,248,250,0.4)",
+              background: "transparent",
+              color: "var(--c-teal-pale)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: activeIndex === filteredItems.length - 1 ? "not-allowed" : "pointer",
+              opacity: activeIndex === filteredItems.length - 1 ? 0.3 : 0.8,
+              transition: "opacity 0.15s",
+            }}
+          >
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      </div>
+
+      {/* ── MINI SHELF ────────────────────────────────────────────── */}
+      <div
+        className="relative z-10 w-full"
+        style={{ background: "var(--c-surface-2)", borderTop: "1px solid var(--c-surface-3)" }}
+      >
+        <div style={{ padding: "16px 20px 4px" }}>
+          <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>
+            All releases
+          </p>
+        </div>
+        <div
+          ref={shelfRef}
+          className="disc-scroll"
+          style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "10px 20px 18px" }}
+        >
+          {filteredItems.map((item, idx) => {
+            const isActive = idx === activeIndex;
             return (
               <button
-                key={track.id}
-                onClick={() => setActiveTrackId(track.id)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "9px 0", borderBottom: "0.5px solid var(--c-surface-3)", background: "transparent", cursor: "pointer", textAlign: "left" }}
+                key={item.id}
+                data-shelf-item
+                onClick={() => goTo(idx)}
+                style={{
+                  flexShrink: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "5px",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }}
               >
-                <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)", opacity: isActive ? 1 : 0.3, width: "22px", flexShrink: 0, textAlign: "right" }}>
-                  {isActive ? "▶" : String(idx + 1).padStart(2, "0")}
-                </span>
-                <span style={{ flex: 1, fontSize: "13px", fontWeight: isActive ? 600 : 400, color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.15s" }}>
-                  {track.name}
-                </span>
-                <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.35, flexShrink: 0 }}>
-                  {track.duration}
+                <ReleaseArt
+                  src={item.art}
+                  alt={item.name}
+                  size={56}
+                  radius={8}
+                  selected={isActive}
+                />
+                <span
+                  style={{
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "8px",
+                    color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)",
+                    opacity: isActive ? 1 : 0.4,
+                    maxWidth: "56px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    transition: "color 0.15s, opacity 0.15s",
+                  }}
+                >
+                  {item.year}
                 </span>
               </button>
             );
@@ -489,18 +440,141 @@ function DetailPanel({ release, activeTrackId, setActiveTrackId, embedUrl, compa
         </div>
       </div>
 
-      {/* Spotify CTA */}
-      <a
-        href={release.spotify_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 20px", borderRadius: "999px", background: "var(--c-ink)", color: "#fff", fontSize: "11px", fontFamily: "var(--f-mono)", letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", alignSelf: "flex-start", transition: "background 0.2s" }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-teal-dark)")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "var(--c-ink)")}
+      {/* ── DETAIL + SPOTIFY EMBED ────────────────────────────────── */}
+      <div
+        className="relative z-10 w-full max-w-[680px] mx-auto"
+        style={{ padding: "32px 20px 56px" }}
       >
-        <SpotifyLogo size={14} weight="fill" />
-        Stream on Spotify
-      </a>
-    </motion.div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedRelease.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
+            {/* Release header */}
+            <div>
+              <p style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--c-teal-dark)", marginBottom: "4px" }}>
+                {nType} · {selectedRelease.year}
+              </p>
+              <h3
+                style={{
+                  fontFamily: "var(--f-display)",
+                  fontSize: "clamp(28px, 8vw, 48px)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 0.92,
+                  color: "var(--c-ink)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {selectedRelease.name}
+              </h3>
+            </div>
+
+            {/* Spotify embed */}
+            <div style={{ borderRadius: "10px", overflow: "hidden", border: "1px solid var(--c-surface-3)" }}>
+              <iframe
+                src={embedUrl}
+                width="100%"
+                height="152"
+                style={{ display: "block", border: "none" }}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Tracklist */}
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  paddingBottom: "8px",
+                  borderBottom: "1px solid var(--c-ink)",
+                  marginBottom: "2px",
+                }}
+              >
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Track</span>
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-ink)", opacity: 0.4 }}>Duration</span>
+              </div>
+
+              {selectedRelease.tracks.map((track, idx) => {
+                const isActive = activeTrackId === track.id || (!activeTrackId && idx === 0);
+                return (
+                  <button
+                    key={track.id}
+                    onClick={() => setActiveTrackId(track.id)}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      padding: "9px 0",
+                      borderBottom: "0.5px solid var(--c-surface-3)",
+                      background: "transparent",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--f-mono)",
+                        fontSize: "9px",
+                        color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)",
+                        opacity: isActive ? 1 : 0.3,
+                        width: "22px",
+                        flexShrink: 0,
+                        textAlign: "right",
+                        transition: "color 0.15s",
+                      }}
+                    >
+                      {isActive ? "▶" : String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      style={{
+                        flex: 1,
+                        fontSize: "13px",
+                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? "var(--c-teal-dark)" : "var(--c-ink)",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        transition: "color 0.15s",
+                      }}
+                    >
+                      {track.name}
+                    </span>
+                    <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--c-ink)", opacity: 0.35, flexShrink: 0 }}>
+                      {track.duration}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Spotify CTA */}
+            <a
+              href={selectedRelease.spotify_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{
+                alignSelf: "flex-start",
+                fontFamily: "var(--f-mono)",
+                fontSize: "11px",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+              }}
+            >
+              <SpotifyLogo size={14} weight="fill" />
+              Stream on Spotify
+            </a>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </section>
   );
 }
