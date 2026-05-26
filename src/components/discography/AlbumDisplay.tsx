@@ -283,7 +283,7 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
                 fontSize: "9px",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: accentColor,
+                color: "var(--c-ink)",
                 background: `${accentColor}15`,
                 padding: "3px 12px",
                 borderRadius: "999px",
