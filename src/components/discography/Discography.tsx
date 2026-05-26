@@ -10,53 +10,53 @@ type Album = (typeof discographyData.items)[0];
 type FilterType = "All" | "Albums" | "EPs" | "Singles";
 
 const IS_SINGLE = (n: number) => n <= 2;
-const IS_EP     = (n: number) => n >= 3 && n <= 6;
-const IS_ALBUM  = (n: number) => n >= 7;
+const IS_EP = (n: number) => n >= 3 && n <= 6;
+const IS_ALBUM = (n: number) => n >= 7;
 const FILTERS: FilterType[] = ["All", "Albums", "EPs", "Singles"];
 
-// Synced with AlbumDisplay order
 const MEMBER_ACCENTS = [
-  "#008691", // aiah
-  "#B5E550", // colet
-  "#FFC40C", // maloi
-  "#FFA500", // gwen
-  "#FF69B4", // stacey
-  "#D94040", // mikha
-  "#016795", // jhoanna
-  "#DDA0DD", // sheena
+  "#008691", "#B5E550", "#FFC40C", "#FFA500", 
+  "#FF69B4", "#D94040", "#016795", "#DDA0DD",
 ];
 
 export const Discography: React.FC = () => {
-  const [filter, setFilter]               = useState<FilterType>("All");
+  const [filter, setFilter] = useState<FilterType>("All");
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
 
   const filteredAlbums = useMemo(() => {
     return discographyData.items.filter((item) => {
       const n = item.total_tracks || 0;
-      if (filter === "All")     return true;
+      if (filter === "All") return true;
       if (filter === "Singles") return IS_SINGLE(n);
-      if (filter === "EPs")     return IS_EP(n);
-      if (filter === "Albums")  return IS_ALBUM(n);
+      if (filter === "EPs") return IS_EP(n);
+      if (filter === "Albums") return IS_ALBUM(n);
       return false;
     });
   }, [filter]);
 
-  // Keep selection valid
   React.useEffect(() => {
     if (!selectedAlbum || !filteredAlbums.find((a) => a.id === selectedAlbum.id)) {
       setSelectedAlbum(filteredAlbums[0] ?? null);
     }
-  }, [filteredAlbums]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filteredAlbums]);
 
   const selectedIndex = filteredAlbums.findIndex((a) => a.id === selectedAlbum?.id);
-  const accentColor   = MEMBER_ACCENTS[(selectedIndex < 0 ? 0 : selectedIndex) % MEMBER_ACCENTS.length];
+  const accentColor = MEMBER_ACCENTS[(selectedIndex < 0 ? 0 : selectedIndex) % MEMBER_ACCENTS.length];
 
   return (
     <section
-      className="w-full py-16 sm:py-20"
-      style={{ background: "var(--c-surface)", position: "relative", overflow: "hidden" }}
+      style={{
+        background: "var(--c-surface)",
+        position: "relative",
+        overflow: "hidden",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "80px 0",
+      }}
     >
-      {/* Full-section ambient glow — very subtle */}
       <AnimatePresence>
         <motion.div
           key={accentColor + "-bg"}
@@ -79,10 +79,9 @@ export const Discography: React.FC = () => {
       </AnimatePresence>
 
       <div
-        className="max-w-[1320px] mx-auto px-4 sm:px-8 md:px-16"
+        className="max-w-[1320px] w-full px-4 sm:px-8 md:px-16"
         style={{ position: "relative", zIndex: 1 }}
       >
-        {/* ── Header ───────────────────────────────────── */}
         <div style={{ marginBottom: "clamp(24px, 5vw, 40px)" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <p
@@ -114,18 +113,12 @@ export const Discography: React.FC = () => {
                 Music
               </h2>
 
-              {/* Desktop filters */}
-              <div
-                className="hidden sm:flex items-center gap-2 pb-2"
-                role="group"
-                aria-label="Filter discography"
-              >
+              <div className="hidden sm:flex items-center gap-2 pb-2">
                 {FILTERS.map((f) => (
                   <FilterPill
                     key={f}
                     label={f}
                     active={filter === f}
-                    accentColor={accentColor}
                     onClick={() => setFilter(f)}
                   />
                 ))}
@@ -134,32 +127,23 @@ export const Discography: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile filters */}
-        <div
-          className="flex sm:hidden gap-2 mb-6 overflow-x-auto pb-1"
-          role="group"
-          aria-label="Filter discography"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="flex sm:hidden gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           {FILTERS.map((f) => (
             <FilterPill
               key={f}
               label={f}
               active={filter === f}
-              accentColor={accentColor}
               onClick={() => setFilter(f)}
             />
           ))}
         </div>
 
-        {/* Divider — accent-tinted */}
         <motion.div
           animate={{ background: `linear-gradient(90deg, ${accentColor}, var(--c-ink) 40%)` }}
           transition={{ duration: 0.5 }}
           style={{ height: "1.5px", marginBottom: "clamp(24px, 5vw, 40px)" }}
         />
 
-        {/* ── Carousel ─────────────────────────────────── */}
         <AlbumDisplay
           albums={filteredAlbums}
           selectedId={selectedAlbum?.id ?? null}
@@ -167,7 +151,6 @@ export const Discography: React.FC = () => {
           accentColor={accentColor}
         />
 
-        {/* ── Tracklist ────────────────────────────────── */}
         <AnimatePresence mode="wait">
           {selectedAlbum && (
             <motion.div
@@ -186,34 +169,20 @@ export const Discography: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Bottom spacer so floating player doesn't cover last track */}
-        <div style={{ height: "100px" }} />
       </div>
     </section>
   );
 };
 
-// ── Sub-component: filter pill ──────────────────────────
-function FilterPill({
-  label,
-  active,
-  accentColor,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  accentColor: string;
-  onClick: () => void;
-}) {
+function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <motion.button
       onClick={onClick}
       aria-pressed={active}
       animate={{
-        background: active ? accentColor : "transparent",
+        background: active ? "var(--c-teal-dark)" : "transparent",
         color: active ? "#fff" : "var(--c-ink)",
-        borderColor: active ? accentColor : "var(--c-surface-3)",
+        borderColor: active ? "var(--c-teal-dark)" : "var(--c-surface-3)",
         opacity: active ? 1 : 0.55,
       }}
       transition={{ duration: 0.2 }}
@@ -227,7 +196,6 @@ function FilterPill({
         border: "1.5px solid",
         cursor: "pointer",
         whiteSpace: "nowrap",
-        flexShrink: 0,
       }}
       whileTap={{ scale: 0.96 }}
     >

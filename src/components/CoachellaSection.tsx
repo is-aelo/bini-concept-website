@@ -55,7 +55,6 @@ export default function CoachellaSection({
   const photos = images.slice(0, 4);
 
   const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const dragStartX = useRef(0);
@@ -63,10 +62,9 @@ export default function CoachellaSection({
   const go = useCallback(
     (next: number) => {
       const clamped = (next + photos.length) % photos.length;
-      setDirection(next >= index ? 1 : -1);
       setIndex(clamped);
     },
-    [index, photos.length]
+    [photos.length]
   );
 
   const next = useCallback(() => go(index + 1), [go, index]);
@@ -129,29 +127,19 @@ export default function CoachellaSection({
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-        {/* IMPROVED HEADER COMPOSITION */}
-        <div className="flex flex-col items-center text-center mb-12 md:mb-16">
-          <div className="flex flex-col gap-2 mb-6">
-            <p className="text-label-mono" style={{ color: "var(--c-ink)", opacity: 0.6 }}>
-              HISTORIC GLOBAL MOMENT
-            </p>
-            <p className="text-sm tracking-[0.2em]" style={{ color: "var(--c-ink)", opacity: 0.4 }}>
-              MOJAVE STAGE · COACHELLA 2026
-            </p>
-          </div>
-
+        <div className="flex flex-col items-center text-center mb-10 md:mb-14">
           <h2
             className="leading-[.85] tracking-tighter"
-            style={{ fontSize: "clamp(4rem, 12vw, 10rem)" }}
+            style={{ fontSize: "clamp(3.25rem, 9vw, 7.5rem)" }}
           >
-            <span style={{ color: "var(--c-teal)" }}>BINI</span>
+            <span style={{ color: "var(--c-teal)" }}>#BINI</span>
             <span style={{ color: "var(--c-aiah)" }}>CHELLA</span>
           </h2>
         </div>
 
         {/* image frame */}
         <div
-          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-video w-full z-10"
+          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-[4/3] sm:aspect-video w-full z-10"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;
@@ -254,7 +242,7 @@ export default function CoachellaSection({
                 opacity: 0.75,
               }}
             >
-              FIRST PPOP ACT
+              MOJAVE STAGE &bull; COACHELLA 2026
             </span>
 
             <h3
@@ -266,9 +254,7 @@ export default function CoachellaSection({
                 marginTop: 8,
               }}
             >
-              A GLOBAL
-              <br />
-              MILESTONE
+              A GLOBAL MILESTONE
             </h3>
 
             <p
@@ -281,8 +267,8 @@ export default function CoachellaSection({
                 maxWidth: 520,
               }}
             >
-              BINI became the first Filipino pop group to perform at Coachella —
-              opening a new chapter for P-pop on the world stage.
+              BINI became the first Filipino pop group to perform at
+              Coachella, opening a new chapter for P-pop on the world stage.
             </p>
           </div>
 

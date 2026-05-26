@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Track {
@@ -29,6 +29,32 @@ interface AlbumDisplayProps {
   accentColor: string;
 }
 
+// How many neighbours to show on each side
+const SIDE_COUNT = 2;
+
+function getTransform(offset: number): {
+  rotateY: number;
+  translateX: number;
+  translateZ: number;
+  scale: number;
+  opacity: number;
+  zIndex: number;
+} {
+  if (offset === 0) {
+    return { rotateY: 0, translateX: 0, translateZ: 0, scale: 1, opacity: 1, zIndex: 10 };
+  }
+  const sign = offset > 0 ? 1 : -1;
+  const abs = Math.abs(offset);
+  // Each step fans out by ~54% of card width; rotate 38deg per step
+  const rotateY = sign * 38 * abs;
+  const translateX = sign * 54 * abs;   // % of container, applied via calc in style
+  const translateZ = -80 * abs;
+  const scale = Math.max(0.52, 1 - 0.22 * abs);
+  const opacity = abs > SIDE_COUNT ? 0 : Math.max(0, 1 - 0.32 * abs);
+  const zIndex = 10 - abs;
+  return { rotateY, translateX, translateZ, scale, opacity, zIndex };
+}
+
 export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
   albums,
   selectedId,
@@ -55,173 +81,202 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
     if (e.key === "ArrowRight") handleNext();
   };
 
+  // Touch / swipe support
+  const touchStartX = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 40) {
+      dx < 0 ? handleNext() : handlePrev();
+    }
+    touchStartX.current = null;
+  };
+
   if (!selected) return null;
+
+  // Visible range: activeIndex ± SIDE_COUNT, clamped
+  const startIdx = Math.max(0, activeIndex - SIDE_COUNT);
+  const endIdx = Math.min(albums.length - 1, activeIndex + SIDE_COUNT);
+  const visibleAlbums = albums.slice(startIdx, endIdx + 1);
+
+  // Card dimensions (responsive via CSS custom property)
+  // We use a 1:1 aspect ratio. Width is set via the wrapper.
+  const CARD_W = "clamp(190px, 52vw, 290px)";
 
   return (
     <div
       onKeyDown={handleKeyDown}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       tabIndex={0}
       role="group"
       aria-label="Album carousel"
       style={{ outline: "none", width: "100%" }}
     >
-      {/* ── Big sleeve layout ──────────────────────────── */}
-      <div style={{ position: "relative", width: "100%" }}>
-
-        {/* Ambient wash — bleeds behind the art */}
-        <AnimatePresence>
-          <motion.div
-            key={accentColor}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{
-              position: "absolute",
-              inset: "-40px -20px",
-              background: `radial-gradient(ellipse 80% 60% at 50% 40%, ${accentColor}28 0%, transparent 70%)`,
-              pointerEvents: "none",
-              zIndex: 0,
-            }}
-          />
-        </AnimatePresence>
-
-        {/* Art + side nav row */}
-        <div
+      {/* Ambient glow behind the whole carousel */}
+      <AnimatePresence>
+        <motion.div
+          key={accentColor + "-glow"}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
           style={{
-            position: "relative",
-            zIndex: 1,
-            display: "flex",
-            alignItems: "center",
-            gap: "clamp(12px, 3vw, 20px)",
-            justifyContent: "center",
+            position: "absolute",
+            inset: "-80px -40px",
+            background: `radial-gradient(ellipse 70% 55% at 50% 45%, ${accentColor}22 0%, transparent 68%)`,
+            pointerEvents: "none",
+            zIndex: 0,
           }}
-        >
-          {/* Prev */}
-          <button
-            onClick={handlePrev}
-            disabled={!canPrev}
-            aria-label="Previous album"
-            style={{
-              flexShrink: 0,
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              border: `1px solid ${canPrev ? accentColor + "60" : "transparent"}`,
-              background: canPrev ? `${accentColor}10` : "transparent",
-              color: canPrev ? accentColor : "var(--c-surface-3)",
-              cursor: canPrev ? "pointer" : "not-allowed",
-              opacity: canPrev ? 1 : 0.2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s ease",
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+        />
+      </AnimatePresence>
 
-          {/* Album sleeve — card flip on change */}
-          <div
-            style={{
-              flex: "0 0 auto",
-              width: "clamp(200px, 52vw, 260px)",
-              aspectRatio: "1 / 1",
-              perspective: "800px",
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selected.id}
-                initial={{ rotateY: -25, opacity: 0, scale: 0.96 }}
-                animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-                exit={{ rotateY: 15, opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      {/* ─── Coverflow stage ─────────────────────────────────── */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          // Height = card height + overflow for side cards
+          height: `calc(${CARD_W} + 16px)`,
+          perspective: "900px",
+          perspectiveOrigin: "50% 48%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1,
+        }}
+      >
+        {visibleAlbums.map((album) => {
+          const globalIdx = albums.indexOf(album);
+          const offset = globalIdx - activeIndex;
+          const t = getTransform(offset);
+          const isActive = offset === 0;
+
+          return (
+            <motion.div
+              key={album.id}
+              onClick={() => onSelectAlbum(album)}
+              animate={{
+                rotateY: t.rotateY,
+                x: `${t.translateX}%`,
+                z: t.translateZ,
+                scale: t.scale,
+                opacity: t.opacity,
+              }}
+              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                position: "absolute",
+                width: CARD_W,
+                aspectRatio: "1 / 1",
+                transformStyle: "preserve-3d",
+                zIndex: t.zIndex,
+                cursor: isActive ? "default" : "pointer",
+                // Side reflection / gloss overlay
+                willChange: "transform, opacity",
+              }}
+              whileHover={!isActive ? { scale: t.scale * 1.04 } : undefined}
+              whileTap={!isActive ? { scale: t.scale * 0.97 } : undefined}
+              aria-label={album.name}
+            >
+              {/* Album art */}
+              <div
                 style={{
                   width: "100%",
                   height: "100%",
-                  borderRadius: "16px",
+                  borderRadius: "clamp(10px, 2vw, 16px)",
                   overflow: "hidden",
-                  boxShadow: [
-                    `0 0 0 1px ${accentColor}25`,
-                    `0 6px 20px -4px ${accentColor}45`,
-                    `0 20px 50px -10px ${accentColor}30`,
-                    "0 2px 8px rgba(0,0,0,0.12)",
-                  ].join(", "),
-                  transformStyle: "preserve-3d",
+                  boxShadow: isActive
+                    ? [
+                        `0 0 0 1.5px ${accentColor}35`,
+                        `0 8px 32px -4px ${accentColor}55`,
+                        `0 32px 72px -12px ${accentColor}35`,
+                        "0 4px 16px rgba(0,0,0,0.18)",
+                      ].join(", ")
+                    : [
+                        "0 4px 18px rgba(0,0,0,0.22)",
+                        `0 0 0 1px rgba(255,255,255,0.04)`,
+                      ].join(", "),
+                  transition: "box-shadow 0.4s ease",
+                  position: "relative",
                 }}
               >
                 <img
-                  src={selected.art}
-                  alt={selected.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  src={album.art}
+                  alt={album.name}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                   draggable={false}
                 />
-                {/* Bottom tint for depth */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: "45%",
-                    background: `linear-gradient(to top, ${accentColor}30, transparent)`,
-                    pointerEvents: "none",
-                  }}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
 
-          {/* Next */}
-          <button
-            onClick={handleNext}
-            disabled={!canNext}
-            aria-label="Next album"
-            style={{
-              flexShrink: 0,
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              border: `1px solid ${canNext ? accentColor + "60" : "transparent"}`,
-              background: canNext ? `${accentColor}10` : "transparent",
-              color: canNext ? accentColor : "var(--c-surface-3)",
-              cursor: canNext ? "pointer" : "not-allowed",
-              opacity: canNext ? 1 : 0.2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s ease",
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
+                {/* Tinted overlay on non-active cards for depth */}
+                {!isActive && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(0,0,0,0.28)",
+                      borderRadius: "inherit",
+                    }}
+                  />
+                )}
 
-        {/* ── Album meta ─────────────────────────────── */}
+                {/* Active card: bottom gradient */}
+                {isActive && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: "40%",
+                      background: `linear-gradient(to top, ${accentColor}2a, transparent)`,
+                      pointerEvents: "none",
+                    }}
+                  />
+                )}
+
+                {/* Gloss sheen on side cards */}
+                {!isActive && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        offset < 0
+                          ? "linear-gradient(to right, rgba(255,255,255,0.07) 0%, transparent 60%)"
+                          : "linear-gradient(to left, rgba(255,255,255,0.07) 0%, transparent 60%)",
+                      borderRadius: "inherit",
+                      pointerEvents: "none",
+                    }}
+                  />
+                )}
+              </div>
+
+
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* ─── Meta below ──────────────────────────────────────── */}
+      <div style={{ marginTop: "clamp(36px, 8vw, 52px)", textAlign: "center" }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={selected.id + "-meta"}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            style={{
-              position: "relative",
-              zIndex: 1,
-              marginTop: "20px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "6px",
-              textAlign: "center",
-            }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
           >
-            {/* Type badge */}
+            {/* Type + year pill */}
             <span
               style={{
                 fontFamily: "var(--f-mono)",
@@ -230,7 +285,7 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
                 textTransform: "uppercase",
                 color: accentColor,
                 background: `${accentColor}15`,
-                padding: "3px 10px",
+                padding: "3px 12px",
                 borderRadius: "999px",
                 border: `1px solid ${accentColor}30`,
               }}
@@ -238,72 +293,112 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
               {selected.type} · {selected.year}
             </span>
 
-            {/* Title */}
+            {/* Album title */}
             <h3
               style={{
                 fontFamily: "var(--f-display)",
                 fontSize: "clamp(22px, 6vw, 32px)",
-                letterSpacing: "-0.03em",
-                lineHeight: 1,
                 color: "var(--c-ink)",
                 margin: 0,
                 textTransform: "uppercase",
+                letterSpacing: "-0.02em",
+                lineHeight: 1,
               }}
             >
               {selected.name}
             </h3>
 
-            {/* Track count */}
-            <span
+            {/* ─── Nav row: prev arrow · dots · next arrow ─── */}
+            <div
               style={{
-                fontFamily: "var(--f-mono)",
-                fontSize: "10px",
-                color: "var(--c-ink)",
-                opacity: 0.35,
-                letterSpacing: "0.06em",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "6px",
               }}
             >
-              {selected.total_tracks} {selected.total_tracks === 1 ? "track" : "tracks"}
-            </span>
+              {/* Prev */}
+              <button
+                onClick={handlePrev}
+                disabled={!canPrev}
+                aria-label="Previous album"
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  border: `1px solid ${canPrev ? accentColor + "55" : "transparent"}`,
+                  background: canPrev ? `${accentColor}10` : "transparent",
+                  color: canPrev ? accentColor : "var(--c-surface-3)",
+                  cursor: canPrev ? "pointer" : "not-allowed",
+                  opacity: canPrev ? 1 : 0.2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s ease",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                  <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {/* Dot indicators */}
+              <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                {albums.map((_, i) => {
+                  const dist = Math.abs(i - activeIndex);
+                  const isActive = i === activeIndex;
+                  // Show max 7 dots, compress far ones
+                  if (albums.length > 7 && dist > 3) return null;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => onSelectAlbum(albums[i])}
+                      aria-label={`Go to album ${i + 1}`}
+                      style={{
+                        width: isActive ? "18px" : dist === 1 ? "6px" : "4px",
+                        height: isActive ? "4px" : dist === 1 ? "6px" : "4px",
+                        borderRadius: "999px",
+                        background: isActive ? accentColor : `${accentColor}40`,
+                        border: "none",
+                        padding: 0,
+                        cursor: "pointer",
+                        transition: "all 0.25s ease",
+                        flexShrink: 0,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Next */}
+              <button
+                onClick={handleNext}
+                disabled={!canNext}
+                aria-label="Next album"
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  border: `1px solid ${canNext ? accentColor + "55" : "transparent"}`,
+                  background: canNext ? `${accentColor}10` : "transparent",
+                  color: canNext ? accentColor : "var(--c-surface-3)",
+                  cursor: canNext ? "pointer" : "not-allowed",
+                  opacity: canNext ? 1 : 0.2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s ease",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                  <path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
           </motion.div>
         </AnimatePresence>
-
-        {/* ── Dot strip ──────────────────────────────── */}
-        {albums.length > 1 && (
-          <div
-            style={{
-              position: "relative",
-              zIndex: 1,
-              marginTop: "16px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            role="tablist"
-            aria-label="Album pages"
-          >
-            {albums.map((album, i) => (
-              <button
-                key={album.id}
-                role="tab"
-                aria-selected={i === activeIndex}
-                aria-label={album.name}
-                onClick={() => onSelectAlbum(album)}
-                style={{
-                  width: i === activeIndex ? "22px" : "5px",
-                  height: "5px",
-                  borderRadius: "999px",
-                  background: i === activeIndex ? accentColor : `${accentColor}35`,
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
