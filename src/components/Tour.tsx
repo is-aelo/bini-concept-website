@@ -58,7 +58,7 @@ const STYLES = `
 
   .tour-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
   @media (max-width: 640px) {
@@ -69,6 +69,7 @@ const STYLES = `
 
   .ticket-outer {
     height: 100%;
+    min-width: 0;
   }
   .ticket-inner {
     height: 100%;
@@ -154,7 +155,9 @@ const STYLES = `
     border: none;
     transition: background 0.2s ease, color 0.2s ease;
     align-self: flex-start;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
+    min-width: 0;
   }
   .ticket-cta:focus-visible {
     outline: 2px solid var(--c-teal-dark);
@@ -246,7 +249,7 @@ export default function Tour({ tours = [] }: TourProps) {
 
   return (
     <section
-      className="w-full py-20 relative"
+      className="w-full py-20 relative overflow-hidden"
       style={{ background: "var(--c-surface)" }}
       aria-label="BINI Tour Dates"
     >

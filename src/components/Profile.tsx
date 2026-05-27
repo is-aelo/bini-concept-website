@@ -153,8 +153,8 @@ function CardFront({
           {member.stageName}
         </div>
         <div
-          className="text-[7px] tracking-widest opacity-55 mt-1 uppercase"
-          style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
+          className="text-[7px] tracking-widest mt-1 uppercase"
+          style={{ fontFamily: "var(--f-mono)", color: "#fff" }}
         >
           {member.fullName}
         </div>
@@ -225,41 +225,41 @@ function CardBack({
         <div className="absolute bottom-0 inset-x-0 z-2 px-3 pb-2">
           <div
             className="text-base font-normal tracking-wide"
-            style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#F5F3EE" }}
+            style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#fff" }}
           >
             {member.stageName}
           </div>
           <div
             className="text-[6px] tracking-widest uppercase opacity-80 mt-0.5"
-            style={{ fontFamily: "var(--f-mono)", color: "#F5F3EE" }}
+            style={{ fontFamily: "var(--f-mono)", color: "#fff" }}
           >
             {member.fullName}
           </div>
         </div>
       </div>
 
-      <div className="px-3 py-3 flex flex-col grow justify-between text-zinc-900 bg-[#F5F3EE]">
+      <div className="px-3 py-3 flex flex-col grow justify-between bg-[#F5F3EE]">
         <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
-            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Zodiac</span>
-            <span className="inline-flex items-center gap-1 uppercase font-medium" style={{ fontFamily: "var(--f-mono)" }}>
+          <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
+            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.65)" }}>Zodiac</span>
+            <span className="inline-flex items-center gap-1 uppercase font-medium" style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A", fontSize: 12 }}>
               <ZodiacSymbol sign={member.zodiac} color="#0C0C0A" />
               {member.zodiac || "—"}
             </span>
           </div>
-          <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
-            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Birthday</span>
-            <span className="font-medium" style={{ fontFamily: "var(--f-mono)" }}>{formatBirthday(member.birthday)}</span>
+          <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
+            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.65)" }}>Birthday</span>
+            <span className="font-medium" style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}>{formatBirthday(member.birthday)}</span>
           </div>
           {member.roles?.length ? (
-            <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
-              <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Role</span>
-              <div className="flex flex-wrap gap-0.5">
+            <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
+              <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.65)" }}>Role</span>
+              <div className="flex flex-wrap gap-1">
                 {member.roles.slice(0, 2).map((role) => (
                   <span
                     key={role}
-                    className="text-[5.5px] px-1 py-0.5 rounded-xs bg-black/5 border border-black/10 uppercase font-medium whitespace-nowrap"
-                    style={{ fontFamily: "var(--f-mono)" }}
+                    className="text-[7px] px-1 py-0.5 rounded-xs bg-black/5 border border-black/10 uppercase font-medium"
+                    style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}
                   >
                     {role}
                   </span>
@@ -269,8 +269,8 @@ function CardBack({
           ) : null}
         </div>
         <div
-          className="pt-2 border-t border-black/5 text-[6px] tracking-widest opacity-35 uppercase"
-          style={{ fontFamily: "var(--f-mono)" }}
+          className="pt-2 border-t border-black/5 text-[7px] tracking-widest uppercase"
+          style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.55)" }}
         >
           BINI · {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </div>

@@ -36,6 +36,16 @@ export const ALL_GALLERY_QUERY = groq`
   }
 `;
 
+export const NON_FEATURED_GALLERY_QUERY = groq`
+  *[_type == "gallery" && featured == false] | order(_createdAt desc) {
+    _id,
+    title,
+    featured,
+    "imageUrl": image.asset->url,
+    "lqip": image.asset->metadata.lqip
+  }
+`;
+
 export const HERO_GALLERY_QUERY = groq`
   *[
     _type == "gallery" && 

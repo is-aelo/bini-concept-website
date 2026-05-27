@@ -6,6 +6,7 @@ import IridescentMesh from "@/components/TourBackground";
 import Profile from "@/components/Profile";
 import { Discography } from "@/components/discography/Discography";
 import Tour from "@/components/Tour";
+import { Gallery } from "@/components/Gallery";
 
 import { sanityFetch } from "@/sanity/lib/fetch";
 
@@ -13,6 +14,7 @@ import {
   COACHELLA_GALLERY_QUERY,
   ALL_MEMBERS_QUERY,
   ALL_TOURS_QUERY,
+  ALL_GALLERY_QUERY,
 } from "@/sanity/lib/queries";
 
 interface CoachellaImage {
@@ -46,11 +48,20 @@ interface TourEvent {
   memberKey?: string;
 }
 
+interface GalleryItem {
+  _id: string;
+  title?: string;
+  featured?: boolean;
+  imageUrl: string;
+  lqip?: string;
+}
+
 export default async function BiniPage() {
   const [
     coachellaImages,
     sanityMembersData,
     tours,
+    galleryItems,
   ] = await Promise.all([
     sanityFetch({
       query: COACHELLA_GALLERY_QUERY,
@@ -62,6 +73,10 @@ export default async function BiniPage() {
 
     sanityFetch({
       query: ALL_TOURS_QUERY,
+    }),
+
+    sanityFetch({
+      query: ALL_GALLERY_QUERY,
     }),
   ]);
 
@@ -113,6 +128,7 @@ export default async function BiniPage() {
           })) as TourEvent[]
         }
       />
+      <Gallery items={(galleryItems as GalleryItem[]) || []} />
     </div>
   );
 }
