@@ -239,8 +239,6 @@ export const Discography: React.FC =
             "flex",
           flexDirection:
             "column",
-          justifyContent:
-            "center",
           alignItems:
             "center",
           padding:
@@ -458,14 +456,17 @@ export const Discography: React.FC =
             style={{
               position:
                 "sticky",
-              top: "clamp(76px,9vw,104px)",
-              zIndex: 5,
+              top: "0",
+              zIndex: 10,
               background:
                 "var(--c-surface)",
               paddingTop:
-                "10px",
+                "12px",
               paddingBottom:
                 "12px",
+              margin: "0 -4px",
+              paddingLeft: "4px",
+              paddingRight: "4px",
             }}
           >
             <TracklistToggle

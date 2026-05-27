@@ -46,7 +46,6 @@ export const TrackList: React.FC<TrackListProps> = ({
     <div
       style={{
         width: "100%",
-        marginTop: "clamp(14px,3vw,24px)",
       }}
     >
       <AnimatePresence initial={false}>
