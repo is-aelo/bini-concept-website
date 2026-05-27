@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CaretDown } from "@phosphor-icons/react";
+import { Icon } from "@iconify/react";
 import { AlbumDisplay } from "./AlbumDisplay";
 import { TrackList } from "./TrackList";
 import discographyData from "@/app/data/bini_discography.json";
@@ -404,53 +405,34 @@ export const Discography: React.FC =
             />
           )}
 
-          <AnimatePresence mode="wait">
-            {embedSrc && (
-              <motion.div
-                key={
-                  embedSrc
-                }
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                }}
-                transition={{
-                  duration:
-                    0.15,
-                }}
-                style={{
-                  width:
-                    PLAYER_WIDTH,
-                  margin:
-                    "14px auto 0",
-                  borderRadius:
-                    "14px",
-                  overflow:
-                    "hidden",
-                  border: `1.5px solid ${accentColor}45`,
-                  boxShadow: `0 4px 24px -4px ${accentColor}30`,
-                }}
-              >
-                <iframe
-                  title="preview"
-                  src={
-                    embedSrc
-                  }
-                  width="100%"
-                  height="80"
-                  style={{
-                    border:
-                      "none",
-                  }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div
+            style={{
+              width: PLAYER_WIDTH,
+              margin: "14px auto 0",
+              height: "82px",
+              borderRadius: "14px",
+              overflow: "hidden",
+              border: `1.5px solid ${accentColor}45`,
+              boxShadow: `0 4px 24px -4px ${accentColor}30`,
+              position: "relative",
+              background: `${accentColor}05`,
+            }}
+          >
+            <iframe
+              title="preview"
+              src={embedSrc || ""}
+              width="100%"
+              height="80"
+              style={{
+                border: "none",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                opacity: embedSrc ? 1 : 0,
+                transition: "opacity 0.3s ease",
+              }}
+            />
+          </div>
 
           <div
             style={{
@@ -677,6 +659,10 @@ function SpotifyCta({
           "uppercase",
       }}
     >
+      <Icon
+        icon="mingcute:spotify-line"
+        style={{ fontSize: "16px" }}
+      />
       Listen on Spotify
     </a>
   );

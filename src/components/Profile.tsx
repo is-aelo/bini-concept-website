@@ -240,21 +240,21 @@ function CardBack({
 
       <div className="px-3 py-3 flex flex-col grow justify-between text-zinc-900 bg-[#F5F3EE]">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-[7px] tracking-wide">
+          <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
             <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Zodiac</span>
             <span className="inline-flex items-center gap-1 uppercase font-medium" style={{ fontFamily: "var(--f-mono)" }}>
               <ZodiacSymbol sign={member.zodiac} color="#0C0C0A" />
               {member.zodiac || "—"}
             </span>
           </div>
-          <div className="flex items-center justify-between text-[7px] tracking-wide">
+          <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
             <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Birthday</span>
             <span className="font-medium" style={{ fontFamily: "var(--f-mono)" }}>{formatBirthday(member.birthday)}</span>
           </div>
           {member.roles?.length ? (
-            <div className="flex items-start justify-between gap-2 text-[7px] tracking-wide">
-              <span className="opacity-40 uppercase mt-0.5" style={{ fontFamily: "var(--f-mono)" }}>Role</span>
-              <div className="flex flex-wrap gap-0.5 justify-end max-w-[70%]">
+            <div className="flex flex-col gap-0.5 text-[7px] tracking-wide">
+              <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)" }}>Role</span>
+              <div className="flex flex-wrap gap-0.5">
                 {member.roles.slice(0, 2).map((role) => (
                   <span
                     key={role}
