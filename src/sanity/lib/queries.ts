@@ -22,7 +22,10 @@ export const ALL_MEMBERS_QUERY = groq`
     zodiac,
     roles,
     signatureColor,
-    bio
+    socials {
+      instagram,
+      tiktok
+    }
   }
 `;
 
@@ -105,6 +108,9 @@ export const MEMBER_BY_SLUG_QUERY = groq`
     zodiac,
     roles,
     signatureColor,
-    bio
+    socials {
+      instagram,
+      tiktok
+    }
   }
 `;

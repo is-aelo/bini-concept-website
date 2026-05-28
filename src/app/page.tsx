@@ -14,7 +14,7 @@ import {
   COACHELLA_GALLERY_QUERY,
   ALL_MEMBERS_QUERY,
   ALL_TOURS_QUERY,
-  ALL_GALLERY_QUERY,
+  NON_FEATURED_GALLERY_QUERY,
 } from "@/sanity/lib/queries";
 
 interface CoachellaImage {
@@ -76,7 +76,7 @@ export default async function BiniPage() {
     }),
 
     sanityFetch({
-      query: ALL_GALLERY_QUERY,
+      query: NON_FEATURED_GALLERY_QUERY,
     }),
   ]);
 
@@ -121,7 +121,7 @@ export default async function BiniPage() {
       <Discography />
       <Tour
         tours={
-          ((tours as any[]) || []).map((t: any) => ({
+          ((tours as Partial<TourEvent>[]) || []).map((t) => ({
             ...t,
             status: t.status || "confirmed",
             country: t.country || "PH",

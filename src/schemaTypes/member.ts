@@ -64,10 +64,21 @@ export const memberType = {
       type: 'string',
     },
     {
-      name: 'bio',
-      title: 'Biography',
-      type: 'text',
-      rows: 4,
+      name: 'socials',
+      title: 'Social Links',
+      type: 'object',
+      fields: [
+        {
+          name: 'instagram',
+          title: 'Instagram URL',
+          type: 'url',
+        },
+        {
+          name: 'tiktok',
+          title: 'TikTok URL',
+          type: 'url',
+        },
+      ],
     },
   ],
 }

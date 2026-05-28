@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
-import ImageLightbox from "./ImageLightbox";
+import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
 const BLOB_STYLES = `
 @keyframes blobDrift1{
@@ -52,7 +52,15 @@ interface CoachellaSectionProps {
 export default function CoachellaSection({
   images,
 }: CoachellaSectionProps) {
-  const photos = images.slice(0, 4);
+  const photos = useMemo(() => images.slice(0, 4), [images]);
+  const lightboxImages: LightboxImage[] = useMemo(
+    () =>
+      photos.map((photo) => ({
+        src: photo.imageUrl,
+        alt: photo.title || "BINICHELLA",
+      })),
+    [photos]
+  );
 
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -314,8 +322,9 @@ export default function CoachellaSection({
 
       <ImageLightbox
         open={lightboxOpen}
-        image={current.imageUrl}
-        alt={current.title}
+        images={lightboxImages}
+        index={index}
+        onIndexChange={setIndex}
         onClose={() => setLightboxOpen(false)}
       />
     </section>

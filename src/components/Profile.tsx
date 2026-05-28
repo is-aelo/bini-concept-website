@@ -16,6 +16,10 @@ interface Member {
   signatureColor?: string;
   profileImage?: string | null;
   galleryImage?: string | null;
+  socials?: {
+    instagram?: string;
+    tiktok?: string;
+  };
 }
 
 interface ProfileProps {
@@ -222,34 +226,32 @@ function CardBack({
             background: `linear-gradient(to top, rgba(${r},${g},${b},0.75) 0%, rgba(12,12,10,0.1) 52%, transparent 80%)`,
           }}
         />
-        <div className="absolute bottom-0 inset-x-0 z-2 px-3 pb-2">
-          <div
-            className="text-base font-normal tracking-wide"
-            style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#fff" }}
-          >
-            {member.stageName}
-          </div>
-          <div
-            className="text-[6px] tracking-widest uppercase opacity-80 mt-0.5"
-            style={{ fontFamily: "var(--f-mono)", color: "#fff" }}
-          >
-            {member.fullName}
-          </div>
-        </div>
       </div>
 
       <div className="px-3 py-3 flex flex-col grow justify-between bg-[#F5F3EE]">
         <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
-            <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.65)" }}>Zodiac</span>
-            <span className="inline-flex items-center gap-1 uppercase font-medium" style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A", fontSize: 12 }}>
-              <ZodiacSymbol sign={member.zodiac} color="#0C0C0A" />
-              {member.zodiac || "—"}
-            </span>
+          <div className="flex flex-col gap-0.5">
+            <div
+              className="text-base font-normal tracking-wide"
+              style={{ fontFamily: "var(--f-display)", lineHeight: 0.9, color: "#0C0C0A" }}
+            >
+              {member.stageName}
+            </div>
+            <div
+              className="text-[6px] tracking-widest uppercase opacity-60"
+              style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}
+            >
+              {member.fullName}
+            </div>
           </div>
           <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
             <span className="opacity-40 uppercase" style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.65)" }}>Birthday</span>
-            <span className="font-medium" style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}>{formatBirthday(member.birthday)}</span>
+            <span className="inline-flex items-center gap-1 font-medium" style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}>
+              {formatBirthday(member.birthday)}
+              <span className="opacity-40">/</span>
+              <ZodiacSymbol sign={member.zodiac} color="#0C0C0A" />
+              <span className="uppercase">{member.zodiac || "—"}</span>
+            </span>
           </div>
           {member.roles?.length ? (
             <div className="flex flex-col gap-0.5 text-[8px] tracking-wide">
@@ -269,10 +271,50 @@ function CardBack({
           ) : null}
         </div>
         <div
-          className="pt-2 border-t border-black/5 text-[7px] tracking-widest uppercase"
+          className="pt-2 border-t border-black/5 flex items-center justify-between"
           style={{ fontFamily: "var(--f-mono)", color: "rgba(12,12,10,0.55)" }}
         >
-          BINI · {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+          <div className="text-[7px] tracking-widest uppercase">
+            BINI · {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+          </div>
+          {(member.socials?.instagram || member.socials?.tiktok) && (
+            <div 
+              className="flex gap-1.5 items-center"
+              onPointerDown={(e) => e.stopPropagation()}
+              onPointerUp={(e) => e.stopPropagation()}
+              onPointerLeave={(e) => e.stopPropagation()}
+              onMouseMove={(e) => e.stopPropagation()}
+              onMouseEnter={(e) => e.stopPropagation()}
+              onMouseLeave={(e) => e.stopPropagation()}
+            >
+              {member.socials?.instagram && (
+                <a
+                  href={member.socials.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center transition-colors hover:text-teal-600"
+                  style={{ width: 12, height: 12, color: "inherit" }}
+                  aria-label="Instagram"
+                >
+                  <Icon icon="mingcute:instagram-line" className="w-full h-full" />
+                </a>
+              )}
+              {member.socials?.tiktok && (
+                <a
+                  href={member.socials.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center transition-colors hover:text-teal-600"
+                  style={{ width: 12, height: 12, color: "inherit" }}
+                  aria-label="TikTok"
+                >
+                  <Icon icon="mingcute:tiktok-line" className="w-full h-full" />
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
