@@ -135,16 +135,6 @@ export default function CoachellaSection({
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-        <div className="flex flex-col items-center text-center mb-10 md:mb-14">
-          <h2
-            className="leading-[.85] tracking-tighter"
-            style={{ fontSize: "clamp(4rem, 12vw, 10rem)" }}
-          >
-            <span style={{ color: "var(--c-teal)" }}>#BINI</span>
-            <span style={{ color: "var(--c-aiah)" }}>CHELLA</span>
-          </h2>
-        </div>
-
         {/* image frame */}
         <div
           className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-video w-full z-10"
@@ -174,10 +164,10 @@ export default function CoachellaSection({
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={current._id}
-              initial={{ opacity: 0, scale: 1.05 }}
+              initial={{ opacity: 0, scale: 1.01 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
+              exit={{ opacity: 0, scale: 1.01 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
               className="absolute inset-0"
             >
               <Image
@@ -196,6 +186,20 @@ export default function CoachellaSection({
                     "linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.2) 40%, transparent)",
                 }}
               />
+
+              <div
+                className="absolute bottom-4 right-4 z-20"
+                style={{
+                  color: "var(--c-surface)",
+                  fontFamily: "var(--f-mono)",
+                  fontSize: "clamp(0.55rem, 1.2vw, 0.72rem)",
+                  letterSpacing: ".18em",
+                  textTransform: "uppercase",
+                  textShadow: "0 2px 12px rgba(0,0,0,.4)",
+                }}
+              >
+                #BINICHELLA
+              </div>
             </motion.div>
           </AnimatePresence>
 

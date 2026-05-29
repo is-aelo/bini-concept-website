@@ -74,6 +74,19 @@ export const COACHELLA_GALLERY_QUERY = groq`
   }
 `;
 
+export const ALL_TEASERS_QUERY = groq`
+  *[_type == "teaser" && featured == true] | order(_createdAt desc) {
+    _id,
+    title,
+    main,
+    subtext,
+    featured,
+    "videoUrl": video.asset->url,
+    "mimeType": video.mimeType,
+    "lqip": video.asset->metadata.lqip
+  }
+`;
+
 export const ALL_ALBUMS_QUERY = groq`
   *[_type == "album"] | order(releaseDate desc) {
     _id,

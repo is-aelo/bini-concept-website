@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
 import IridescentMesh from "@/components/TourBackground";
 import Profile from "@/components/Profile";
+import Concept from "@/components/Concept";
 import { Discography } from "@/components/discography/Discography";
 import Tour from "@/components/Tour";
 import { Gallery } from "@/components/Gallery";
@@ -14,6 +15,7 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   COACHELLA_GALLERY_QUERY,
   ALL_MEMBERS_QUERY,
+  ALL_TEASERS_QUERY,
   ALL_TOURS_QUERY,
   NON_FEATURED_GALLERY_QUERY,
 } from "@/sanity/lib/queries";
@@ -57,10 +59,20 @@ interface GalleryItem {
   lqip?: string;
 }
 
+interface TeaserItem {
+  _id: string;
+  title?: string;
+  featured?: boolean;
+  videoUrl: string;
+  mimeType?: string;
+  lqip?: string;
+}
+
 export default async function BiniPage() {
   const [
     coachellaImages,
     sanityMembersData,
+    featuredTeasers,
     tours,
     galleryItems,
   ] = await Promise.all([
@@ -70,6 +82,10 @@ export default async function BiniPage() {
 
     sanityFetch({
       query: ALL_MEMBERS_QUERY,
+    }),
+
+    sanityFetch({
+      query: ALL_TEASERS_QUERY,
     }),
 
     sanityFetch({
@@ -110,10 +126,13 @@ export default async function BiniPage() {
     };
   });
 
+  const featuredTeaser = ((featuredTeasers as TeaserItem[]) || [])[0];
+
   return (
     <div className="relative">
       <Header />
       <Hero />
+      <Concept teaser={featuredTeaser} />
       <IridescentMesh />
       <CoachellaSection
         images={(coachellaImages as CoachellaImage[]) || []}
@@ -134,3 +153,4 @@ export default async function BiniPage() {
     </div>
   );
 }
+

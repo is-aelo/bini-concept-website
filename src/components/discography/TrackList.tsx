@@ -95,7 +95,7 @@ export const TrackList: React.FC<TrackListProps> = ({
                       backgroundColor:
                         isActive
                           ? `${accentColor}10`
-                          : "transparent",
+                          : "rgba(0, 0, 0, 0)",
                     }}
                     transition={{
                       duration: .18,

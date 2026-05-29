@@ -506,9 +506,9 @@ function FilterPill({
       onClick={onClick}
       aria-pressed={active}
       animate={{
-        background: active
+        backgroundColor: active
           ? "var(--c-teal-dark)"
-          : "transparent",
+          : "rgba(0, 0, 0, 0)",
         color: active
           ? "#fff"
           : "var(--c-ink)",

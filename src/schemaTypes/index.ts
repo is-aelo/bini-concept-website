@@ -4,6 +4,7 @@ import { albumType } from './album'
 import { tourType } from './tour'
 import { siteSettingsType } from './siteSettings'
 import galleryType from './gallery'
+import teaserType from './teaser'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -11,6 +12,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     memberType, 
     albumType, 
     tourType,
-    galleryType
+    galleryType,
+    teaserType
   ],
 }
