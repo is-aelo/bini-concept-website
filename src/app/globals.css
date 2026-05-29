@@ -72,7 +72,7 @@
   h1, h2, h3 {
     font-family: var(--f-display);
     text-transform: uppercase;
-    letter-spacing: -0.05em;
+    letter-spacing: 0.02em;
   }
 }
 

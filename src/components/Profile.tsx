@@ -98,10 +98,11 @@ function CardFront({
         backfaceVisibility: "hidden",
         WebkitBackfaceVisibility: "hidden",
         borderRadius: 16,
+        pointerEvents: "none",
       }}
     >
       <div
-        className="absolute inset-0 z-3 pointer-events-none"
+        className="absolute inset-0 z-3"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px)",
@@ -128,14 +129,14 @@ function CardFront({
       )}
 
       <div
-        className="absolute inset-0 z-1 pointer-events-none"
+        className="absolute inset-0 z-1"
         style={{
           background: `linear-gradient(to top, rgba(${r},${g},${b},0.85) 0%, rgba(12,12,10,0.2) 48%, transparent 72%)`,
         }}
       />
 
       <div
-        className="absolute inset-0 z-4 pointer-events-none"
+        className="absolute inset-0 z-4"
         style={{
           borderRadius: 16,
           border: `1px solid rgba(${r},${g},${b},0.45)`,
@@ -203,6 +204,7 @@ function CardBack({
         background: "var(--c-surface, #F5F3EE)",
         display: "flex",
         flexDirection: "column",
+        pointerEvents: "none",
       }}
     >
       <div className="relative w-full h-[52%] shrink-0 overflow-hidden bg-zinc-200">
@@ -221,7 +223,7 @@ function CardBack({
           />
         )}
         <div
-          className="absolute inset-0 z-1 pointer-events-none"
+          className="absolute inset-0 z-1"
           style={{
             background: `linear-gradient(to top, rgba(${r},${g},${b},0.75) 0%, rgba(12,12,10,0.1) 52%, transparent 80%)`,
           }}
@@ -278,26 +280,22 @@ function CardBack({
             BINI · {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </div>
           {(member.socials?.instagram || member.socials?.tiktok) && (
-            <div 
+            <div
               className="flex gap-1.5 items-center"
+              style={{ pointerEvents: "auto", position: "relative", zIndex: 20 }}
               onPointerDown={(e) => e.stopPropagation()}
-              onPointerUp={(e) => e.stopPropagation()}
-              onPointerLeave={(e) => e.stopPropagation()}
-              onMouseMove={(e) => e.stopPropagation()}
-              onMouseEnter={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               {member.socials?.instagram && (
                 <a
                   href={member.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center justify-center transition-colors hover:text-teal-600"
-                  style={{ width: 12, height: 12, color: "inherit" }}
+                  style={{ width: 20, height: 20, color: "inherit" }}
                   aria-label="Instagram"
                 >
-                  <Icon icon="mingcute:instagram-line" className="w-full h-full" />
+                  <Icon icon="mingcute:instagram-line" style={{ width: 12, height: 12 }} />
                 </a>
               )}
               {member.socials?.tiktok && (
@@ -305,12 +303,11 @@ function CardBack({
                   href={member.socials.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center justify-center transition-colors hover:text-teal-600"
-                  style={{ width: 12, height: 12, color: "inherit" }}
+                  style={{ width: 20, height: 20, color: "inherit" }}
                   aria-label="TikTok"
                 >
-                  <Icon icon="mingcute:tiktok-line" className="w-full h-full" />
+                  <Icon icon="mingcute:tiktok-line" style={{ width: 12, height: 12 }} />
                 </a>
               )}
             </div>
@@ -319,11 +316,12 @@ function CardBack({
       </div>
 
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0"
         style={{
           borderRadius: 16,
           border: `1px solid rgba(${r},${g},${b},0.18)`,
           boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35)`,
+          pointerEvents: "none",
         }}
       />
     </div>
@@ -341,7 +339,7 @@ function DesktopPhotoCard({
   total: number;
   isDeckHovered: boolean;
 }) {
-  const [isPressed, setIsPressed] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -355,14 +353,6 @@ function DesktopPhotoCard({
   const fannedX = distanceFromCenter * 140;
   const fannedRotate = distanceFromCenter * 5;
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    e.preventDefault();
-    setIsPressed(true);
-  };
-  const handlePointerUpOrLeave = () => {
-    setIsPressed(false);
-    setTilt({ x: 0, y: 0 });
-  };
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = cardRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -370,33 +360,31 @@ function DesktopPhotoCard({
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
-    if (isPressed) {
-      setTilt({ x: dy * 4, y: -dx * 4 });
-    } else {
-      setTilt({ x: -dy * 2, y: dx * 2 });
-    }
+    setTilt({ x: -dy * 2, y: dx * 2 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
   };
 
   return (
     <motion.div
       ref={cardRef}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUpOrLeave}
-      onPointerLeave={handlePointerUpOrLeave}
       onMouseMove={handleMouseMove}
-      className="absolute cursor-grab active:cursor-grabbing select-none touch-none origin-bottom"
+      onMouseLeave={handleMouseLeave}
+      className="absolute select-none touch-none origin-bottom"
       style={{
         perspective: "1500px",
         width: "210px",
         height: "315px",
         bottom: "10%",
         left: "calc(50% - 105px)",
-        zIndex: isPressed ? 50 : 10 + index,
+        zIndex: isFlipped ? 50 : 10 + index,
       }}
       animate={{
-        x: isPressed ? 0 : isDeckHovered ? fannedX : stackedX,
-        rotate: isPressed ? 0 : isDeckHovered ? fannedRotate : stackedRotate,
-        y: isPressed ? -40 : isDeckHovered ? -15 : 0,
+        x: isFlipped ? 0 : isDeckHovered ? fannedX : stackedX,
+        rotate: isFlipped ? 0 : isDeckHovered ? fannedRotate : stackedRotate,
+        y: isFlipped ? -40 : isDeckHovered ? -15 : 0,
       }}
       transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
     >
@@ -412,25 +400,25 @@ function DesktopPhotoCard({
           transformOrigin: "bottom center",
         }}
         animate={{
-          y: isPressed ? 36 : isDeckHovered ? 14 : 6,
-          scaleX: isPressed ? 0.86 : isDeckHovered ? 0.92 : 0.95,
-          scaleY: isPressed ? 0.80 : isDeckHovered ? 0.88 : 0.92,
-          filter: isPressed 
-            ? `blur(12px) drop-shadow(0 6px 12px rgba(${r}, ${g}, ${b}, 0.12))` 
-            : isDeckHovered 
-            ? `blur(6px) drop-shadow(0 3px 6px rgba(${r}, ${g}, ${b}, 0.06))` 
+          y: isFlipped ? 36 : isDeckHovered ? 14 : 6,
+          scaleX: isFlipped ? 0.86 : isDeckHovered ? 0.92 : 0.95,
+          scaleY: isFlipped ? 0.80 : isDeckHovered ? 0.88 : 0.92,
+          filter: isFlipped
+            ? `blur(12px) drop-shadow(0 6px 12px rgba(${r}, ${g}, ${b}, 0.12))`
+            : isDeckHovered
+            ? `blur(6px) drop-shadow(0 3px 6px rgba(${r}, ${g}, ${b}, 0.06))`
             : "blur(2.5px)",
-          opacity: isPressed ? 0.12 : isDeckHovered ? 0.22 : 0.65,
+          opacity: isFlipped ? 0.12 : isDeckHovered ? 0.22 : 0.65,
         }}
         transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
       />
 
       <motion.div
         animate={{
-          rotateY: isPressed ? 180 : 0,
+          rotateY: isFlipped ? 180 : 0,
           rotateX: tilt.x,
-          rotateZ: isPressed ? 0 : tilt.y * 0.2,
-          scale: isPressed ? 1.15 : 1,
+          rotateZ: tilt.y * 0.2,
+          scale: isFlipped ? 1.15 : 1,
         }}
         transition={{
           rotateY: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
@@ -440,6 +428,7 @@ function DesktopPhotoCard({
         }}
         className="w-full h-full relative"
         style={{ transformStyle: "preserve-3d" }}
+        onClick={() => setIsFlipped((f) => !f)}
       >
         <CardFront member={member} index={index} r={r} g={g} b={b} />
         <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
@@ -480,15 +469,14 @@ function MobileDeckCard({
   const opacity = useTransform(x, [-200, -140, 0, 140, 200], [0, 1, 1, 1, 0]);
 
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isHolding, setIsHolding] = useState(false);
-  
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const isTopCard = stackPosition === 0;
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
   const offset = STACK_OFFSETS[Math.min(stackPosition, STACK_OFFSETS.length - 1)];
 
   const handleDragEnd = async (_event: any, info: any) => {
     if (!isTopCard) return;
-
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       const direction = info.offset.x > 0 ? 1 : -1;
       await animate(x, direction * 420, { duration: 0.22, ease: [0.16, 1, 0.3, 1] });
@@ -500,11 +488,12 @@ function MobileDeckCard({
     }
   };
 
-  const handleTap = () => {
+  const handleFlip = () => {
     if (!isTopCard) return;
+    if (Math.abs(x.get()) > 10) return;
+    setIsAnimating(true);
     setIsFlipped((f) => !f);
-    setIsHolding(true);
-    setTimeout(() => setIsHolding(false), 250);
+    setTimeout(() => setIsAnimating(false), 250);
   };
 
   if (stackPosition >= MAX_VISIBLE_STACK) return null;
@@ -519,7 +508,6 @@ function MobileDeckCard({
       dragElastic={0.45}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
-      onTap={handleTap}
       style={{
         x: isTopCard ? x : 0,
         rotate: isTopCard ? rotate : stackTilt + offset.x * 0.3,
@@ -535,7 +523,7 @@ function MobileDeckCard({
         transformOrigin: "bottom center",
         perspective: "1200px",
       }}
-      className="cursor-grab active:cursor-grabbing select-none"
+      className="select-none"
       transition={{ type: "spring", stiffness: 220, damping: 24, mass: 0.6 }}
     >
       <motion.div
@@ -548,12 +536,12 @@ function MobileDeckCard({
           borderRadius: 20,
           backgroundColor: "rgba(12, 12, 10, 0.9)",
           transformOrigin: "bottom center",
-         }}
+        }}
         animate={{
           y: isTopCard ? 8 : 4,
           scaleX: isTopCard ? 0.92 : 0.95,
-          filter: isTopCard 
-            ? `blur(5px) drop-shadow(0 2px 4px rgba(${r}, ${g}, ${b}, 0.08))` 
+          filter: isTopCard
+            ? `blur(5px) drop-shadow(0 2px 4px rgba(${r}, ${g}, ${b}, 0.08))`
             : "blur(2px)",
           opacity: isTopCard ? 0.25 : 0.65,
         }}
@@ -561,19 +549,20 @@ function MobileDeckCard({
 
       <motion.div
         className="w-full h-full relative"
-        style={{ 
+        style={{
           transformStyle: "preserve-3d",
-          willChange: "transform"
+          willChange: "transform",
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        onClick={handleFlip}
       >
         <CardFront member={member} index={index} r={r} g={g} b={b} />
         <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
       </motion.div>
 
       <AnimatePresence>
-        {isHolding && (
+        {isAnimating && (
           <motion.div
             initial={{ opacity: 0.6, scale: 0.95 }}
             animate={{ opacity: 0, scale: 1.05 }}
@@ -685,7 +674,7 @@ export default function Profile({ members }: ProfileProps) {
             >
               MEET THE 8
             </h3>
-            
+
             <p
               className="hidden lg:block mt-3"
               style={{
@@ -697,7 +686,7 @@ export default function Profile({ members }: ProfileProps) {
                 color: "var(--c-ink)",
               }}
             >
-              Hover to expand deck · Hold card to flip
+              Hover to expand deck · Click card to flip
             </p>
 
             <p
@@ -711,12 +700,11 @@ export default function Profile({ members }: ProfileProps) {
                 color: "var(--c-ink)",
               }}
             >
-              Swipe for more · Tap to flip
+              Tap to flip · Swipe for next
             </p>
           </div>
         </div>
 
-        {/* Desktop Viewport: Visible ONLY on large viewports (1024px+) */}
         <div
           className="hidden lg:flex relative w-full items-center justify-center select-none mt-6"
           style={{ height: "460px" }}
@@ -736,7 +724,6 @@ export default function Profile({ members }: ProfileProps) {
           </div>
         </div>
 
-        {/* Tablet & Mobile Viewport: Strict block up to 1023px */}
         <div className="block lg:hidden mt-4">
           <MobileDeckViewer members={sorted} />
         </div>
