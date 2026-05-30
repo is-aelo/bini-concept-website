@@ -137,7 +137,7 @@ export default function CoachellaSection({
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
         {/* image frame */}
         <div
-          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-video w-full z-10"
+          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-[4/3] md:aspect-video w-full z-10"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;

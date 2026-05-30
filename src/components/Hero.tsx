@@ -1,11 +1,9 @@
-import Image from "next/image";
-import Link from "next/link";
-import { SpotifyLogo, Asterisk } from "@phosphor-icons/react/dist/ssr";
+import { Asterisk } from "@phosphor-icons/react/dist/ssr";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { HERO_GALLERY_QUERY, ALL_ALBUMS_QUERY } from "@/sanity/lib/queries";
-import StreamCounter from "./StreamCounter";
+import { HERO_GALLERY_QUERY } from "@/sanity/lib/queries";
 import AuroraShader from "./AuroraShader";
 import HeroCarousel from "./HeroCarousel";
+import LatestReleaseBar from "./LatestReleaseBar";
 
 interface HeroImage {
   _id: string;
@@ -23,30 +21,17 @@ interface Album {
   spotifyLink?: string;
 }
 
-const MEMBER_COLORS = [
-  "var(--c-aiah)",
-  "var(--c-jhoanna)",
-  "var(--c-maloi)",
-  "var(--c-colet)",
-  "var(--c-gwen)",
-  "var(--c-stacey)",
-  "var(--c-mikha)",
-  "var(--c-sheena)",
-];
-
-export default async function Hero() {
-  const [heroImages, albums] = await Promise.all([
-    sanityFetch<HeroImage[]>({ query: HERO_GALLERY_QUERY, tags: ["gallery"] }),
-    sanityFetch<Album[]>({ query: ALL_ALBUMS_QUERY, tags: ["albums"] }),
-  ]);
-
-  const latestAlbum = albums?.[0];
+export default async function Hero({ latestAlbum }: { latestAlbum?: Album | null }) {
+  const heroImages = await sanityFetch<HeroImage[]>({
+    query: HERO_GALLERY_QUERY,
+    tags: ["gallery"],
+  });
   const validImages = heroImages?.filter(img => img.imageUrl) || [];
   const displayData = validImages.slice(0, 8);
 
   if (displayData.length === 0) {
     return (
-      <section className="min-h-screen flex items-center justify-center bg-[var(--c-surface)]">
+      <section className="min-h-screen flex items-center justify-center bg-(--c-surface)">
         <h1 style={{ fontFamily: "var(--f-display)", fontSize: "clamp(80px,14vw,200px)", lineHeight: 0.85, color: "#3AAAB6" }}>
           BINI
         </h1>
@@ -55,10 +40,12 @@ export default async function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen bg-[var(--c-surface)] overflow-hidden flex flex-col border-b border-[var(--c-border)]">
+    <section className="relative min-h-screen bg-(--c-surface) overflow-hidden flex flex-col border-b border-(--c-border)">
       <AuroraShader />
 
-      <div className="relative z-10 flex flex-col flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 pt-24 sm:pt-28 md:pt-24 pb-0">
+      <LatestReleaseBar album={latestAlbum} streamCount={20000000} />
+
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-350 mx-auto px-4 sm:px-8 md:px-16 pt-24 sm:pt-28 md:pt-24 pb-0">
         <div className="flex-1 flex items-center justify-center w-full">
           <HeroCarousel images={displayData} />
         </div>
@@ -67,12 +54,12 @@ export default async function Hero() {
           <div className="flex items-center gap-2">
             <Asterisk
               size={11}
-              className="animate-spin text-[var(--c-bloom,#f4a7c3)]"
+              className="animate-spin text-(--c-bloom,#f4a7c3)"
               style={{ animationDuration: "12s" }}
             />
             <span
               style={{ fontFamily: "var(--f-mono)" }}
-              className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 text-[var(--c-ink)]"
+              className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 text-(--c-ink)"
             >
               Mabuhay! we are
             </span>
@@ -91,7 +78,7 @@ export default async function Hero() {
           </h1>
 
           <p
-            className="text-[var(--c-ink)] opacity-70 max-w-[320px] sm:max-w-[420px] leading-relaxed font-regular"
+            className="text-(--c-ink) opacity-70 max-w-[320px] sm:max-w-105 leading-relaxed font-regular"
             style={{
               fontFamily: "var(--f-body)",
               fontSize: "clamp(0.8rem, 2.5vw, 0.95rem)",
@@ -103,96 +90,6 @@ export default async function Hero() {
         </div>
       </div>
 
-      <div
-        className="relative z-20 w-full flex items-center gap-2 sm:gap-4 md:gap-5 px-3 sm:px-6 md:px-16"
-        style={{
-          minHeight: 64,
-          height: "auto",
-          paddingTop: 10,
-          paddingBottom: 10,
-          background: "rgba(245, 243, 238, 0.8)",
-          backdropFilter: "blur(20px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-          borderTop: "1px solid rgba(12,12,10,0.07)",
-        }}
-      >
-        {latestAlbum?.coverUrl && (
-          <div
-            className="relative flex-shrink-0 rounded-lg overflow-hidden"
-            style={{ width: 38, height: 38, boxShadow: "0 4px 12px rgba(0,0,0,0.10)" }}
-          >
-            <Image
-              src={latestAlbum.coverUrl}
-              alt={latestAlbum.title || "Latest Album"}
-              fill
-              sizes="38px"
-              className="object-cover"
-              priority
-              unoptimized
-            />
-          </div>
-        )}
-
-        <div className="flex flex-col gap-0.5 flex-shrink-0 min-w-0">
-          <span
-            style={{ fontFamily: "var(--f-mono)" }}
-            className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.14em] opacity-40 text-[var(--c-ink)]"
-          >
-            Latest Release
-          </span>
-          <span
-            className="font-black leading-none tracking-wide"
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "clamp(14px, 4vw, 21px)",
-            }}
-          >
-            {(latestAlbum?.title || "SIGNALS").split("").map((letter, i) => (
-              <span key={i} style={{ color: MEMBER_COLORS[i % MEMBER_COLORS.length] }}>
-                {letter}
-              </span>
-            ))}
-          </span>
-        </div>
-
-        <div
-          className="flex-shrink-0 hidden xs:block"
-          style={{ width: 1, height: 28, background: "rgba(12,12,10,0.10)" }}
-        />
-
-        <div className="hidden md:flex flex-col gap-0.5 flex-shrink-0">
-          <StreamCounter value={20000000} className="text-[16px] sm:text-[18px] font-bold tracking-tight text-[var(--c-ink)]" />
-          <span
-            style={{ fontFamily: "var(--f-mono)" }}
-            className="text-[8px] font-bold uppercase tracking-[0.12em] opacity-40 text-[var(--c-ink)]"
-          >
-            Spotify Streams
-          </span>
-        </div>
-
-        <div className="flex-1" />
-
-        {latestAlbum?.spotifyLink && (
-          <Link
-            href={latestAlbum.spotifyLink}
-            target="_blank"
-            className="flex-shrink-0 inline-flex items-center gap-1.5 sm:gap-2 font-bold text-black transition-all duration-200 hover:-translate-y-px active:scale-[0.98] whitespace-nowrap"
-            style={{
-              height: 36,
-              padding: "0 12px",
-              borderRadius: 9999,
-              background: "var(--c-teal)",
-              fontSize: "clamp(11px, 2.5vw, 13px)",
-              letterSpacing: "0.02em",
-              boxShadow: "0 4px 16px rgba(30,215,96,0.22)",
-              fontFamily: "var(--f-body)",
-            }}
-          >
-            <SpotifyLogo size={14} weight="fill" className="flex-shrink-0" />
-            Stream Now
-          </Link>
-        )}
-      </div>
     </section>
   );
 }

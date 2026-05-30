@@ -1,6 +1,6 @@
-// src/components/Concept.tsx
 "use client";
 
+import type { ReactNode } from "react";
 import ConceptText from "./ConceptText";
 
 interface TeaserVideo {
@@ -14,11 +14,18 @@ interface TeaserVideo {
   lqip?: string;
 }
 
-export default function Concept({ teaser }: { teaser?: TeaserVideo }) {
+export default function Concept({
+  teaser,
+  children,
+}: {
+  teaser?: TeaserVideo;
+  children?: ReactNode;
+}) {
   if (!teaser?.videoUrl) return null;
 
   return (
     <section
+      id="concept-section"
       className="relative w-screen h-screen overflow-hidden"
       style={{ background: "#000" }}
     >
@@ -29,7 +36,6 @@ export default function Concept({ teaser }: { teaser?: TeaserVideo }) {
         muted
         playsInline
         disablePictureInPicture
-        // @ts-expect-error — non-standard but widely supported
         disableRemotePlayback
         preload="auto"
         poster={teaser.lqip || undefined}
@@ -45,20 +51,24 @@ export default function Concept({ teaser }: { teaser?: TeaserVideo }) {
         }}
       />
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.38) 100%)",
-          zIndex: 1,
-        }}
-      />
-
       <ConceptText
         mainTitle={teaser.main || teaser.title || "UNTITLED"}
         subtext={teaser.subtext || ""}
       />
+
+      {children && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 3,
+          }}
+        >
+          {children}
+        </div>
+      )}
     </section>
   );
 }

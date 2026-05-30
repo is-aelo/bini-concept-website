@@ -1,21 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { List, Infinity } from '@phosphor-icons/react';
 import MobileMenu from './MobileMenu';
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
 
+interface SiteSettings {
+  logoUrl?: string;
+  title?: string;
+}
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [conceptVisible, setConceptVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const data = await sanityFetch<any>({
+        const data = await sanityFetch<SiteSettings>({
           query: SITE_SETTINGS_QUERY,
         });
         setSettings(data);
@@ -28,32 +35,51 @@ const Header = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
+
+    const conceptSection = document.getElementById("concept-section");
+    const observer = conceptSection
+      ? new IntersectionObserver(([entry]) => {
+          setConceptVisible(entry.isIntersecting);
+        })
+      : null;
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (conceptSection && observer) {
+      observer.observe(conceptSection);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer?.disconnect();
+    };
   }, []);
 
   const navLinks = [
     { name: 'Profile', href: '#profile' },
-    { name: 'Gallery', href: '#gallery' },
     { name: 'Discography', href: '#disco' },
     { name: 'Tour', href: '#tour' },
+    { name: 'Gallery', href: '#gallery' },
   ];
 
   return (
     <>
       <header 
         className={`fixed top-0 w-full z-[60] transition-all duration-500 px-6 md:px-10 ${
-          scrolled 
-            ? 'py-4 bg-[var(--c-surface)]/80 backdrop-blur-lg border-b border-[var(--c-surface-3)]' 
-            : 'py-8 bg-transparent'
+          !conceptVisible
+            ? scrolled 
+              ? 'py-4 bg-[var(--c-surface)]/80 backdrop-blur-lg border-b border-[var(--c-surface-3)] opacity-100 translate-y-0'
+              : 'py-8 bg-transparent opacity-100 translate-y-0'
+            : 'py-8 bg-transparent opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
         <div className="max-w-[1800px] mx-auto flex justify-between items-center">
           <a href="#" className="group relative flex items-center">
             {settings?.logoUrl ? (
-              <img 
+              <Image
                 src={settings.logoUrl} 
                 alt={settings?.title || "Logo"} 
+                width={180}
+                height={40}
                 className="h-8 w-auto md:h-10 object-contain"
               />
             ) : (
@@ -77,10 +103,15 @@ const Header = () => {
                 </li>
               ))}
             </ul>
-            <button className="btn-community text-[10px] whitespace-nowrap gap-2">
+            <a
+              href="https://shop.weverse.io/en/shop/USD/artists/285/sales/55705"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-community text-[10px] whitespace-nowrap gap-2 inline-flex items-center"
+            >
               <Infinity size={20} weight="bold" />
               COMMUNITY
-            </button>
+            </a>
           </nav>
 
           <button 

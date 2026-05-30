@@ -15,6 +15,7 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   COACHELLA_GALLERY_QUERY,
   ALL_MEMBERS_QUERY,
+  ALL_ALBUMS_QUERY,
   ALL_TEASERS_QUERY,
   ALL_TOURS_QUERY,
   NON_FEATURED_GALLERY_QUERY,
@@ -68,11 +69,22 @@ interface TeaserItem {
   lqip?: string;
 }
 
+interface Album {
+  _id: string;
+  title: string;
+  type?: string;
+  releaseDate?: string;
+  coverUrl: string | null;
+  tracklist?: string[];
+  spotifyLink?: string;
+}
+
 export default async function BiniPage() {
   const [
     coachellaImages,
     sanityMembersData,
     featuredTeasers,
+    albums,
     tours,
     galleryItems,
   ] = await Promise.all([
@@ -86,6 +98,10 @@ export default async function BiniPage() {
 
     sanityFetch({
       query: ALL_TEASERS_QUERY,
+    }),
+
+    sanityFetch({
+      query: ALL_ALBUMS_QUERY,
     }),
 
     sanityFetch({
@@ -127,28 +143,39 @@ export default async function BiniPage() {
   });
 
   const featuredTeaser = ((featuredTeasers as TeaserItem[]) || [])[0];
+  const latestAlbum = ((albums as Album[]) || [])[0];
 
   return (
-    <div className="relative">
+      <div className="relative">
       <Header />
-      <Hero />
-      <Concept teaser={featuredTeaser} />
+      <div id="concept-section" className="scroll-mt-24">
+        <Concept teaser={featuredTeaser} />
+      </div>
+      <Hero latestAlbum={latestAlbum} />
       <IridescentMesh />
+      <div id="profile" className="scroll-mt-24">
+        <Profile members={members} />
+      </div>
       <CoachellaSection
         images={(coachellaImages as CoachellaImage[]) || []}
       />
-      <Profile members={members} />
-      <Discography />
-      <Tour
-        tours={
-          ((tours as Partial<TourEvent>[]) || []).map((t) => ({
-            ...t,
-            status: t.status || "confirmed",
-            country: t.country || "PH",
-          })) as TourEvent[]
-        }
-      />
-      <Gallery items={(galleryItems as GalleryItem[]) || []} />
+      <div id="disco" className="scroll-mt-24">
+        <Discography />
+      </div>
+      <div id="tour" className="scroll-mt-24">
+        <Tour
+          tours={
+            ((tours as Partial<TourEvent>[]) || []).map((t) => ({
+              ...t,
+              status: t.status || "confirmed",
+              country: t.country || "PH",
+            })) as TourEvent[]
+          }
+        />
+      </div>
+      <div id="gallery" className="scroll-mt-24">
+        <Gallery items={(galleryItems as GalleryItem[]) || []} />
+      </div>
       <Membership />
     </div>
   );

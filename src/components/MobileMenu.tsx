@@ -55,10 +55,15 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
       </nav>
 
       <div className="mt-auto pt-10 border-t border-[var(--c-surface-3)]">
-        <button className="btn-community w-full justify-center py-5 text-sm gap-3">
+        <a
+          href="https://shop.weverse.io/en/shop/USD/artists/285/sales/55705"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-community w-full justify-center py-5 text-sm gap-3 inline-flex items-center"
+        >
           <Infinity size={24} weight="bold" />
           JOIN COMMUNITY
-        </button>
+        </a>
         <div className="mt-10 flex justify-between text-label-mono opacity-50">
           <span>BINI CORE CONCEPT</span>
           <span>© 2026</span>
