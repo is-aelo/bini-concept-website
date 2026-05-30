@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Track {
@@ -31,6 +31,12 @@ interface AlbumDisplayProps {
 
 // How many neighbours to show on each side
 const SIDE_COUNT = 2;
+
+function getReleaseBadge(album: Album) {
+  if (album.total_tracks <= 2) return "Single";
+  if (album.total_tracks <= 6) return "EP";
+  return "Album";
+}
 
 function getTransform(offset: number): {
   rotateY: number;
@@ -90,7 +96,8 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     if (Math.abs(dx) > 40) {
-      dx < 0 ? handleNext() : handlePrev();
+      if (dx < 0) handleNext();
+      else handlePrev();
     }
     touchStartX.current = null;
   };
@@ -290,7 +297,7 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
                 border: `1px solid ${accentColor}30`,
               }}
             >
-              {selected.type} · {selected.year}
+              {getReleaseBadge(selected)} · {selected.year}
             </span>
 
             {/* Album title */}

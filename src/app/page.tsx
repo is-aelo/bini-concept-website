@@ -9,6 +9,7 @@ import { Discography } from "@/components/discography/Discography";
 import Tour from "@/components/Tour";
 import { Gallery } from "@/components/Gallery";
 import Membership from "@/components/Membership";
+import Footer from "@/components/Footer";
 
 import { sanityFetch } from "@/sanity/lib/fetch";
 
@@ -177,6 +178,7 @@ export default async function BiniPage() {
         <Gallery items={(galleryItems as GalleryItem[]) || []} />
       </div>
       <Membership />
+      <Footer />
     </div>
   );
 }
