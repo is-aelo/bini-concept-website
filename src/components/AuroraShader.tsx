@@ -22,25 +22,15 @@ const fragmentShader = `
   vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
 
   float snoise(vec2 v) {
-    const vec4 C = vec4(
-      0.211324865405187,
-      0.366025403784439,
-      -0.577350269189626,
-      0.024390243902439
-    );
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
     vec2 i = floor(v + dot(v, C.yy));
     vec2 x0 = v - i + dot(i, C.xx);
     vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
     vec4 x12 = x0.xyxy + C.xxzz;
     x12.xy -= i1;
     i = mod289(i);
-    vec3 p = permute(
-      permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0)
-    );
-    vec3 m = max(
-      0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)),
-      0.0
-    );
+    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+    vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
     m = m * m;
     m = m * m;
     vec3 x = 2.0 * fract(p * C.www) - 1.0;
@@ -56,34 +46,24 @@ const fragmentShader = `
 
   void main() {
     vec2 uv = vUv;
-    
     float t1 = uTime * 0.05;
     float t2 = uTime * 0.03;
-
     float n1 = snoise(uv * 1.2 + vec2(t1, t2));
     float n2 = snoise(uv * 1.6 - vec2(t2 * 1.2, t1));
-    
     vec2 distortedUv = uv + vec2(n1, n2) * 0.35;
-
     float field1 = snoise(distortedUv * 1.0 + vec2(t1 * 0.5, -t1 * 0.3));
     float field2 = snoise(distortedUv * 1.4 - vec2(-t2, t1 * 0.7));
-
-    vec3 baseColor   = vec3(0.961, 0.953, 0.933); 
-    vec3 colorTeal   = vec3(0.388, 0.796, 0.839); 
-    vec3 colorDeepPink = vec3(1.000, 0.000, 0.431); 
-    vec3 colorAmber  = vec3(1.000, 0.745, 0.043); 
-    vec3 colorPurple = vec3(0.514, 0.220, 0.925); 
-
+    vec3 baseColor = vec3(0.961, 0.953, 0.933);
+    vec3 colorTeal = vec3(0.388, 0.796, 0.839);
+    vec3 colorDeepPink = vec3(1.000, 0.000, 0.431);
+    vec3 colorAmber = vec3(1.000, 0.745, 0.043);
+    vec3 colorPurple = vec3(0.514, 0.220, 0.925);
     vec3 gradientA = mix(colorTeal, colorDeepPink, smoothstep(-0.4, 0.4, field1));
     vec3 gradientB = mix(colorAmber, colorPurple, smoothstep(-0.5, 0.5, field2));
-    
     vec3 activeAurora = mix(gradientA, gradientB, smoothstep(-0.2, 0.2, field1 + field2));
-
     float patternIntensity = smoothstep(-0.5, 0.5, field1 * 0.5 + field2 * 0.5);
-    
     vec3 finalColor = mix(baseColor, activeAurora, 0.18 + 0.15 * patternIntensity);
     float finalAlpha = clamp(0.45 + 0.25 * patternIntensity, 0.35, 0.75);
-
     gl_FragColor = vec4(finalColor, finalAlpha);
   }
 `;
@@ -92,17 +72,14 @@ function Scene() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const { viewport } = useThree();
   const mouse = useMemo(() => new THREE.Vector2(0, 0), []);
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-    }),
-    []
-  );
+
+  const uniforms = useMemo(() => ({
+    uTime: { value: 0 },
+    uMouse: { value: new THREE.Vector2(0, 0) },
+  }), []);
 
   useFrame((state) => {
     if (!materialRef.current) return;
-
     materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
     mouse.set(state.mouse.x, state.mouse.y);
     materialRef.current.uniforms.uMouse.value.lerp(mouse, 0.03);
@@ -110,7 +87,7 @@ function Scene() {
 
   return (
     <mesh scale={[viewport.width, viewport.height, 1]}>
-      <planeGeometry args={[1, 1, 1, 1]} />
+      <planeGeometry args={[1, 1]} />
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
@@ -130,13 +107,9 @@ export default function AuroraShader() {
       className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
       style={{ background: "var(--c-surface)" }}
     >
-      <Canvas 
+      <Canvas
         camera={{ position: [0, 0, 1] }}
-        gl={{ 
-          antialias: true, 
-          alpha: true,
-          powerPreference: "high-performance" 
-        }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Scene />
       </Canvas>

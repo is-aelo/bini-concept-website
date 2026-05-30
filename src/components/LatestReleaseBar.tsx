@@ -18,17 +18,6 @@ interface LatestReleaseBarProps {
   streamCount: number;
 }
 
-const MEMBER_COLORS = [
-  "var(--c-aiah)",
-  "var(--c-jhoanna)",
-  "var(--c-maloi)",
-  "var(--c-colet)",
-  "var(--c-gwen)",
-  "var(--c-stacey)",
-  "var(--c-mikha)",
-  "var(--c-sheena)",
-];
-
 export default function LatestReleaseBar({ album, streamCount }: LatestReleaseBarProps) {
   return (
     <div
@@ -73,13 +62,10 @@ export default function LatestReleaseBar({ album, streamCount }: LatestReleaseBa
           style={{
             fontFamily: "var(--f-display)",
             fontSize: "clamp(14px, 4vw, 21px)",
+            color: "var(--c-teal-dark)",
           }}
         >
-          {(album?.title || "SIGNALS").split("").map((letter, i) => (
-            <span key={`${letter}-${i}`} style={{ color: MEMBER_COLORS[i % MEMBER_COLORS.length] }}>
-              {letter}
-            </span>
-          ))}
+          {album?.title || "SIGNALS"}
         </span>
       </div>
 

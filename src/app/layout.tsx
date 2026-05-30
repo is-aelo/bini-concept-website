@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Playfair_Display, Space_Mono, DM_Sans } from "next/font/google";
 import "./globals.css";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const displayFont = Bebas_Neue({
   weight: "400",
@@ -57,6 +58,8 @@ export default function RootLayout({
             />
           </filter>
         </svg>
+
+        <LoadingScreen />
 
         <main className="relative min-h-screen">
           {children}

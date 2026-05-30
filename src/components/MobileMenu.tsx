@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Infinity, ArrowUpRight } from '@phosphor-icons/react';
+import { X, ArrowUpRight } from '@phosphor-icons/react';
+import { Icon } from '@iconify/react';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
     <motion.div 
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
-      exit={{ x: '100%' }}
+      exit={{ x: '100%', transition: { duration: 0.15, ease: 'easeInOut' } }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className="fixed inset-0 z-[100] bg-[var(--c-surface)] flex flex-col p-10"
     >
@@ -61,8 +62,8 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
           rel="noopener noreferrer"
           className="btn-community w-full justify-center py-5 text-sm gap-3 inline-flex items-center"
         >
-          <Infinity size={24} weight="bold" />
-          JOIN COMMUNITY
+          <Icon icon="mingcute:diamond-2-line" width="24" height="24" />
+          EXCLUSIVE ACCESS
         </a>
         <div className="mt-10 flex justify-between text-label-mono opacity-50">
           <span>BINI CORE CONCEPT</span>

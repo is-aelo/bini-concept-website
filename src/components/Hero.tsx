@@ -40,7 +40,7 @@ export default async function Hero({ latestAlbum }: { latestAlbum?: Album | null
   }
 
   return (
-    <section className="relative min-h-screen bg-(--c-surface) overflow-hidden flex flex-col border-b border-(--c-border)">
+    <section id="hero" className="relative min-h-screen bg-(--c-surface) overflow-hidden flex flex-col border-b border-(--c-border)">
       <AuroraShader />
 
       <LatestReleaseBar album={latestAlbum} streamCount={20000000} />

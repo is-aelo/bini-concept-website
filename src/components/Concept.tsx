@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import ConceptText from "./ConceptText";
 
 interface TeaserVideo {
   _id: string;
@@ -51,10 +50,31 @@ export default function Concept({
         }}
       />
 
-      <ConceptText
-        mainTitle={teaser.main || teaser.title || "UNTITLED"}
-        subtext={teaser.subtext || ""}
-      />
+      <a
+        href="#hero"
+        aria-label="Scroll to hero"
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: "clamp(24px, 5vw, 32px)",
+          transform: "translateX(-50%)",
+          zIndex: 2,
+          width: "40px",
+          height: "40px",
+          borderRadius: "9999px",
+          background: "rgba(0, 0, 0, 0.35)",
+          border: "1px solid var(--c-teal)",
+          color: "var(--c-teal)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textDecoration: "none",
+          fontSize: "1.25rem",
+          lineHeight: 1,
+        }}
+      >
+        ↓
+      </a>
 
       {children && (
         <div

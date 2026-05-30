@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { List, Infinity } from '@phosphor-icons/react';
+import { List } from '@phosphor-icons/react';
+import { Icon } from '@iconify/react';
 import MobileMenu from './MobileMenu';
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
@@ -52,6 +53,22 @@ const Header = () => {
       window.removeEventListener('scroll', handleScroll);
       observer?.disconnect();
     };
+  }, []);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
+    const handleDesktopResize = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (desktopQuery.matches) {
+      setIsMobileMenuOpen(false);
+    }
+
+    desktopQuery.addEventListener('change', handleDesktopResize);
+    return () => desktopQuery.removeEventListener('change', handleDesktopResize);
   }, []);
 
   const navLinks = [
@@ -109,8 +126,8 @@ const Header = () => {
               rel="noopener noreferrer"
               className="btn-community text-[10px] whitespace-nowrap gap-2 inline-flex items-center"
             >
-              <Infinity size={20} weight="bold" />
-              COMMUNITY
+              <Icon icon="mingcute:diamond-2-line" width="20" height="20" />
+              EXCLUSIVE ACCESS
             </a>
           </nav>
 
