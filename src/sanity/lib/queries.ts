@@ -81,6 +81,7 @@ export const ALL_TEASERS_QUERY = groq`
     main,
     subtext,
     featured,
+    youtubeLink,
     "videoUrl": video.asset->url,
     "mimeType": video.mimeType,
     "lqip": video.asset->metadata.lqip

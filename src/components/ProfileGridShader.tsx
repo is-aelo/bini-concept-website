@@ -117,7 +117,10 @@ function Scene() {
 
 export default function ProfileGridShader() {
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" style={{ background: "var(--c-surface)" }}>
+    <div
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
+      style={{ background: "var(--c-surface)" }}
+    >
       <Canvas camera={{ position: [0, 0, 1] }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
         <Scene />
       </Canvas>

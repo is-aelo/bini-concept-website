@@ -9,6 +9,7 @@ interface TeaserVideo {
   subtext?: string;
   featured?: boolean;
   videoUrl: string;
+  youtubeLink?: string;
   mimeType?: string;
   lqip?: string;
 }
@@ -45,36 +46,39 @@ export default function Concept({
           width: "100%",
           height: "100%",
           objectFit: "cover",
+          filter: "contrast(1.08) saturate(1.1) brightness(1.01)",
           zIndex: 0,
           pointerEvents: "none",
         }}
       />
 
-      <a
-        href="#hero"
-        aria-label="Scroll to hero"
-        style={{
-          position: "absolute",
-          left: "50%",
-          bottom: "clamp(24px, 5vw, 32px)",
-          transform: "translateX(-50%)",
-          zIndex: 2,
-          width: "40px",
-          height: "40px",
-          borderRadius: "9999px",
-          background: "rgba(0, 0, 0, 0.35)",
-          border: "1px solid var(--c-teal)",
-          color: "var(--c-teal)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textDecoration: "none",
-          fontSize: "1.25rem",
-          lineHeight: 1,
-        }}
-      >
-        ↓
-      </a>
+      {teaser.youtubeLink && (
+        <a
+          href={teaser.youtubeLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="concept-link"
+          style={{
+            position: "absolute",
+            zIndex: 2,
+            color: "var(--c-surface)",
+            textDecoration: "none",
+            fontSize: "1rem",
+            fontWeight: 400,
+            fontFamily: "var(--f-mono)",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            whiteSpace: "nowrap",
+            padding: "8px 16px",
+            // Desktop: Right side centered vertically
+            right: "48px",
+            top: "50%",
+            transform: "translateY(-50%)",
+          }}
+        >
+          [ WATCH FULL CONCEPT FILM ]
+        </a>
+      )}
 
       {children && (
         <div
@@ -89,6 +93,17 @@ export default function Concept({
           {children}
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .concept-link {
+            top: auto !important;
+            right: 50% !important;
+            bottom: 2em !important;
+            transform: translateX(50%) !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

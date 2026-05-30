@@ -17,6 +17,11 @@ const teaserType = {
       },
     },
     {
+      name: 'youtubeLink',
+      title: 'YouTube Link',
+      type: 'url',
+    },
+    {
       name: 'main',
       title: 'Main',
       type: 'text',

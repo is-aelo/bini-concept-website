@@ -259,7 +259,7 @@ export default function Membership() {
               className="bloom-cta w-full"
               aria-label="Join BLOOM on Weverse"
             >
-              Join BLOOM
+              Be An Exclusive Member
               <ArrowIcon />
             </a>
           </div>
@@ -310,7 +310,7 @@ export default function Membership() {
             className="bloom-cta w-full"
             aria-label="Join BLOOM on Weverse"
           >
-            Join BLOOM
+            Be An Exclusive Member
             <ArrowIcon />
           </a>
         </div>
