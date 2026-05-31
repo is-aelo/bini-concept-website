@@ -46,8 +46,19 @@ export default function Concept({
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          filter: "contrast(1.08) saturate(1.1) brightness(1.01)",
+          filter: "contrast(1.2) saturate(1.3) brightness(1.05) sepia(0.1)",
           zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Subtle Film Overlay / Vignette */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background: "radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%)",
           pointerEvents: "none",
         }}
       />
@@ -70,7 +81,6 @@ export default function Concept({
             letterSpacing: "0.1em",
             whiteSpace: "nowrap",
             padding: "8px 16px",
-            // Desktop: Right side centered vertically
             right: "48px",
             top: "50%",
             transform: "translateY(-50%)",
@@ -99,7 +109,7 @@ export default function Concept({
           .concept-link {
             top: auto !important;
             right: 50% !important;
-            bottom: 2em !important;
+            bottom: 5em !important;
             transform: translateX(50%) !important;
           }
         }
