@@ -147,11 +147,9 @@ export default async function BiniPage() {
   const latestAlbum = ((albums as Album[]) || [])[0];
 
   return (
-      <div className="relative">
+    <div className="relative">
       <Header />
-      <div id="concept-section" className="scroll-mt-24">
-        <Concept teaser={featuredTeaser} />
-      </div>
+      <Concept teaser={featuredTeaser} />
       <Hero latestAlbum={latestAlbum} />
       <IridescentMesh />
       <div id="profile" className="scroll-mt-24">

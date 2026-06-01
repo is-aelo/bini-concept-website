@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 interface TeaserVideo {
   _id: string;
@@ -21,47 +21,181 @@ export default function Concept({
   teaser?: TeaserVideo;
   children?: ReactNode;
 }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const mediaRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadVideo(true);
+        }
+      },
+      {
+        rootMargin: "400px 0px",
+      }
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldLoadVideo || !videoRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+
+    video.load();
+    video.play().catch(() => {
+      // Autoplay can still be blocked by some browsers; the poster remains visible.
+    });
+  }, [shouldLoadVideo]);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const frame = frameRef.current;
+    const media = mediaRef.current;
+
+    if (!section || !frame || !media) {
+      return;
+    }
+
+    const reduceMotion =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let rafId = 0;
+
+    const applyTransform = () => {
+      rafId = 0;
+
+      if (reduceMotion) {
+        frame.style.transform = "translate3d(0, 0, 0)";
+        media.style.transform = "translate3d(0, 0, 0) scale3d(1, 1, 1)";
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+
+      const rawProgress =
+        (viewportHeight - rect.top) / (viewportHeight + rect.height);
+      const progress = Math.min(1, Math.max(0, rawProgress));
+      const pressure = Math.sin(progress * Math.PI);
+      const easedPressure = pressure * pressure;
+
+      const frameLift = (0.5 - progress) * 18;
+      const frameDrift = (progress - 0.5) * 8;
+
+      const mediaScaleX = 1 + easedPressure * 0.018;
+      const mediaScaleY = 1 + easedPressure * 0.05;
+
+      frame.style.transform = "translate3d(0, 0, 0)";
+      media.style.transform = `translate3d(${frameDrift}px, ${frameLift}px, 0) scale3d(${mediaScaleX}, ${mediaScaleY}, 1)`;
+    };
+
+    const scheduleTransform = () => {
+      if (rafId) {
+        return;
+      }
+
+      rafId = window.requestAnimationFrame(applyTransform);
+    };
+
+    scheduleTransform();
+
+    window.addEventListener("scroll", scheduleTransform, { passive: true });
+    window.addEventListener("resize", scheduleTransform);
+
+    return () => {
+      window.removeEventListener("scroll", scheduleTransform);
+      window.removeEventListener("resize", scheduleTransform);
+
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, []);
+
   if (!teaser?.videoUrl) return null;
 
   return (
     <section
+      ref={sectionRef}
       id="concept-section"
-      className="relative w-screen h-screen overflow-hidden"
+      className="relative w-screen h-screen overflow-hidden scroll-mt-24"
       style={{ background: "#000" }}
     >
-      <video
-        src={teaser.videoUrl}
-        autoPlay
-        loop
-        muted
-        playsInline
-        disablePictureInPicture
-        disableRemotePlayback
-        preload="auto"
-        poster={teaser.lqip || undefined}
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "contrast(1.2) saturate(1.3) brightness(1.05) sepia(0.1)",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Subtle Film Overlay / Vignette */}
       <div
+        ref={frameRef}
         style={{
           position: "absolute",
           inset: 0,
-          zIndex: 1,
-          background: "radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%)",
-          pointerEvents: "none",
+          overflow: "hidden",
+          transformOrigin: "center center",
+          willChange: "transform",
+          background: "#000",
         }}
-      />
+      >
+        <div
+          ref={mediaRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            transformOrigin: "center center",
+            willChange: "transform",
+            transform: "translate3d(0, 0, 0)",
+          }}
+        >
+          <video
+            ref={videoRef}
+            src={shouldLoadVideo ? teaser.videoUrl : undefined}
+            autoPlay={shouldLoadVideo}
+            loop={shouldLoadVideo}
+            muted
+            playsInline
+            disablePictureInPicture
+            disableRemotePlayback
+            preload={shouldLoadVideo ? "auto" : "none"}
+            poster={teaser.lqip || undefined}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: shouldLoadVideo ? 1 : 0.92,
+              transform: "scale(1.03)",
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          />
+
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
+              background:
+                "radial-gradient(circle at center, rgba(0,0,0,0) 42%, rgba(0,0,0,0.32) 100%), linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.18) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+      </div>
 
       {teaser.youtubeLink && (
         <a

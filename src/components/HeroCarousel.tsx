@@ -76,15 +76,34 @@ interface CardSlot {
 export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   const safeImages = useMemo(() => images.filter(i => i.imageUrl).slice(0, 8), [images]);
 
-  const [cardDims, setCardDims] = useState({ w: 220, h: 320 });
+  const [cardDims, setCardDims] = useState(() => getCardDimensions());
+  const resizeFrame = useRef<number | null>(null);
 
   useEffect(() => {
     function update() {
-      setCardDims(getCardDimensions());
+      const next = getCardDimensions();
+      setCardDims((prev) => (prev.w === next.w && prev.h === next.h ? prev : next));
     }
+
+    const scheduleUpdate = () => {
+      if (resizeFrame.current !== null) return;
+      resizeFrame.current = window.requestAnimationFrame(() => {
+        resizeFrame.current = null;
+        update();
+      });
+    };
+
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener("orientationchange", scheduleUpdate);
+
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", scheduleUpdate);
+      if (resizeFrame.current !== null) {
+        window.cancelAnimationFrame(resizeFrame.current);
+      }
+    };
   }, []);
 
   const [slots, setSlots] = useState<CardSlot[]>(() => {
@@ -96,7 +115,6 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
     ];
   });
 
-  const [deck, setDeck] = useState<string[]>(() => safeImages.map(i => i._id));
   const [isInitial, setIsInitial] = useState(true);
 
   const imageMap = useMemo(
@@ -106,18 +124,6 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
 
   const handleSwiped = useCallback((direction: "left" | "right") => {
     if (isInitial) setIsInitial(false);
-
-    setDeck(prev => {
-      const next = [...prev];
-      if (direction === "left") {
-        const first = next.shift()!;
-        next.push(first);
-      } else {
-        const last = next.pop()!;
-        next.unshift(last);
-      }
-      return next;
-    });
 
     setSlots(prevSlots => {
       return prevSlots.map(s => {

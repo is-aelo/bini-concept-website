@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -340,8 +340,11 @@ function DesktopPhotoCard({
   isDeckHovered: boolean;
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
+  const tiltX = useMotionValue(0);
+  const tiltZ = useMotionValue(0);
+  const rafRef = useRef<number | null>(null);
+  const pendingTilt = useRef({ x: 0, z: 0 });
 
   const accent = member.signatureColor || "#63CBD6";
   const { r, g, b } = hexToRgb(accent);
@@ -360,12 +363,33 @@ function DesktopPhotoCard({
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
-    setTilt({ x: -dy * 2, y: dx * 2 });
+    pendingTilt.current = { x: -dy * 2, z: dx * 0.4 };
+
+    if (rafRef.current !== null) return;
+
+    rafRef.current = window.requestAnimationFrame(() => {
+      tiltX.set(pendingTilt.current.x);
+      tiltZ.set(pendingTilt.current.z);
+      rafRef.current = null;
+    });
   };
 
   const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
+    if (rafRef.current !== null) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    tiltX.set(0);
+    tiltZ.set(0);
   };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   return (
     <motion.div
@@ -416,18 +440,18 @@ function DesktopPhotoCard({
       <motion.div
         animate={{
           rotateY: isFlipped ? 180 : 0,
-          rotateX: tilt.x,
-          rotateZ: tilt.y * 0.2,
           scale: isFlipped ? 1.15 : 1,
         }}
         transition={{
           rotateY: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
-          rotateX: { duration: 0.12, ease: "linear" },
-          rotateZ: { duration: 0.12, ease: "linear" },
           scale: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
         }}
+        style={{
+          transformStyle: "preserve-3d",
+          rotateX: tiltX,
+          rotateZ: tiltZ,
+        }}
         className="w-full h-full relative"
-        style={{ transformStyle: "preserve-3d" }}
         onClick={() => setIsFlipped((f) => !f)}
       >
         <CardFront member={member} index={index} r={r} g={g} b={b} />

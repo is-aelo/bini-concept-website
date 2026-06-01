@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useMemo, useRef, useSyncExternalStore } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -14,7 +14,6 @@ const vertexShader = `
 
 const fragmentShader = `
   uniform float uTime;
-  uniform vec2 uMouse;
   varying vec2 vUv;
 
   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -71,18 +70,14 @@ const fragmentShader = `
 function Scene() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const { viewport } = useThree();
-  const mouse = useMemo(() => new THREE.Vector2(0, 0), []);
 
   const uniforms = useMemo(() => ({
     uTime: { value: 0 },
-    uMouse: { value: new THREE.Vector2(0, 0) },
   }), []);
 
   useFrame((state) => {
     if (!materialRef.current) return;
     materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-    mouse.set(state.mouse.x, state.mouse.y);
-    materialRef.current.uniforms.uMouse.value.lerp(mouse, 0.03);
   });
 
   return (
@@ -102,6 +97,44 @@ function Scene() {
 }
 
 export default function AuroraShader() {
+  const enableCanvas = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") return () => undefined;
+
+      const mediaQueries = [
+        window.matchMedia("(prefers-reduced-motion: reduce)"),
+        window.matchMedia("(pointer: coarse)"),
+      ];
+
+      const handleChange = () => onStoreChange();
+
+      mediaQueries.forEach((query) => query.addEventListener("change", handleChange));
+
+      return () => {
+        mediaQueries.forEach((query) => query.removeEventListener("change", handleChange));
+      };
+    },
+    () => {
+      if (typeof window === "undefined") return false;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      return !reduceMotion && !coarsePointer;
+    },
+    () => false
+  );
+
+  if (!enableCanvas) {
+    return (
+      <div
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(circle at 18% 22%, rgba(99, 203, 214, 0.18), transparent 30%), radial-gradient(circle at 76% 30%, rgba(255, 196, 12, 0.14), transparent 26%), radial-gradient(circle at 58% 78%, rgba(255, 105, 180, 0.12), transparent 24%), var(--c-surface)",
+        }}
+      />
+    );
+  }
+
   return (
     <div
       className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
@@ -109,7 +142,8 @@ export default function AuroraShader() {
     >
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       >
         <Scene />
       </Canvas>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect } from "react";
+import React, { useRef, useMemo, useEffect, useSyncExternalStore } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -116,12 +116,54 @@ function Scene() {
 }
 
 export default function ProfileGridShader() {
+  const enableCanvas = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") return () => undefined;
+
+      const mediaQueries = [
+        window.matchMedia("(prefers-reduced-motion: reduce)"),
+        window.matchMedia("(pointer: coarse)"),
+      ];
+
+      const handleChange = () => onStoreChange();
+
+      mediaQueries.forEach((query) => query.addEventListener("change", handleChange));
+
+      return () => {
+        mediaQueries.forEach((query) => query.removeEventListener("change", handleChange));
+      };
+    },
+    () => {
+      if (typeof window === "undefined") return false;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      return !reduceMotion && !coarsePointer;
+    },
+    () => false
+  );
+
+  if (!enableCanvas) {
+    return (
+      <div
+        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 12%, rgba(99, 203, 214, 0.18), transparent 34%), radial-gradient(circle at 78% 78%, rgba(58, 170, 182, 0.12), transparent 28%), var(--c-surface)",
+        }}
+      />
+    );
+  }
+
   return (
     <div
       className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
       style={{ background: "var(--c-surface)" }}
     >
-      <Canvas camera={{ position: [0, 0, 1] }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+      >
         <Scene />
       </Canvas>
     </div>

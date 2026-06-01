@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import GalleryBackground from "./GalleryBackground";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
 type GalleryItem = {
@@ -292,6 +293,8 @@ export function Gallery({ items }: GalleryProps) {
 
   return (
     <section className="gallery-section" aria-label="Gallery">
+      <GalleryBackground />
+
       <div className="gallery-container">
         <header className="gallery-header">
           <span className="gallery-label text-label-mono">Photo Archive</span>
@@ -329,10 +332,14 @@ export function Gallery({ items }: GalleryProps) {
 
       <style>{`
         .gallery-section {
+          position: relative;
+          overflow: hidden;
           background-color: var(--c-surface);
           padding: 6rem 0 8rem;
         }
         .gallery-container {
+          position: relative;
+          z-index: 1;
           max-width: 1280px;
           margin: 0 auto;
           padding: 0 2rem;

@@ -33,8 +33,17 @@ const Header = () => {
     };
     fetchSettings();
 
+    let rafId: number | null = null;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      if (rafId !== null) {
+        return;
+      }
+
+      rafId = window.requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 50);
+        rafId = null;
+      });
     };
 
     const conceptSection = document.getElementById("concept-section");
@@ -52,6 +61,10 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       observer?.disconnect();
+
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
@@ -62,10 +75,6 @@ const Header = () => {
         setIsMobileMenuOpen(false);
       }
     };
-
-    if (desktopQuery.matches) {
-      setIsMobileMenuOpen(false);
-    }
 
     desktopQuery.addEventListener('change', handleDesktopResize);
     return () => desktopQuery.removeEventListener('change', handleDesktopResize);
