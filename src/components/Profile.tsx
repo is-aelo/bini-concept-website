@@ -83,20 +83,22 @@ function CardFront({
   r,
   g,
   b,
+  liteMode = false,
 }: {
   member: Member;
   index: number;
   r: number;
   g: number;
   b: number;
+  liteMode?: boolean;
 }) {
   const hasProfileImg = !!member.profileImage?.startsWith("http");
   return (
     <div
       className="absolute inset-0 overflow-hidden bg-zinc-900"
       style={{
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: liteMode ? "visible" : "hidden",
+        WebkitBackfaceVisibility: liteMode ? "visible" : "hidden",
         borderRadius: 16,
         pointerEvents: "none",
       }}
@@ -183,6 +185,7 @@ function CardBack({
   g,
   b,
   total,
+  liteMode = false,
 }: {
   member: Member;
   index: number;
@@ -191,15 +194,16 @@ function CardBack({
   g: number;
   b: number;
   total: number;
+  liteMode?: boolean;
 }) {
   const hasGalleryImg = !!member.galleryImage?.startsWith("http");
   return (
     <div
       className="absolute inset-0 overflow-hidden"
       style={{
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        transform: "rotateY(180deg)",
+        backfaceVisibility: liteMode ? "visible" : "hidden",
+        WebkitBackfaceVisibility: liteMode ? "visible" : "hidden",
+        transform: liteMode ? "none" : "rotateY(180deg)",
         borderRadius: 16,
         background: "var(--c-surface, #F5F3EE)",
         display: "flex",
@@ -494,6 +498,7 @@ function MobileDeckCard({
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const liteFlip = true;
 
   const isTopCard = stackPosition === 0;
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
@@ -517,7 +522,7 @@ function MobileDeckCard({
     if (Math.abs(x.get()) > 10) return;
     setIsAnimating(true);
     setIsFlipped((f) => !f);
-    setTimeout(() => setIsAnimating(false), 250);
+    setTimeout(() => setIsAnimating(false), liteFlip ? 120 : 250);
   };
 
   if (stackPosition >= MAX_VISIBLE_STACK) return null;
@@ -564,29 +569,62 @@ function MobileDeckCard({
         animate={{
           y: isTopCard ? 8 : 4,
           scaleX: isTopCard ? 0.92 : 0.95,
-          filter: isTopCard
+          scaleY: isTopCard ? 0.97 : 0.98,
+          filter: liteFlip
+            ? "none"
+            : isTopCard
             ? `blur(5px) drop-shadow(0 2px 4px rgba(${r}, ${g}, ${b}, 0.08))`
             : "blur(2px)",
           opacity: isTopCard ? 0.25 : 0.65,
         }}
       />
 
-      <motion.div
+      <div
         className="w-full h-full relative"
         style={{
-          transformStyle: "preserve-3d",
+          transformStyle: liteFlip ? "flat" : "preserve-3d",
           willChange: "transform",
         }}
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
         onClick={handleFlip}
       >
-        <CardFront member={member} index={index} r={r} g={g} b={b} />
-        <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
-      </motion.div>
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            opacity: isFlipped ? 0 : 1,
+            y: isFlipped ? -4 : 0,
+            scale: isFlipped ? 0.985 : 1,
+          }}
+          transition={{ duration: liteFlip ? 0.16 : 0.28, ease: [0.22, 1, 0.36, 1] }}
+          style={{ pointerEvents: isFlipped ? "none" : "auto" }}
+        >
+          <CardFront member={member} index={index} r={r} g={g} b={b} liteMode={liteFlip} />
+        </motion.div>
+
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            opacity: isFlipped ? 1 : 0,
+            y: isFlipped ? 0 : 4,
+            scale: isFlipped ? 1 : 0.985,
+          }}
+          transition={{ duration: liteFlip ? 0.16 : 0.28, ease: [0.22, 1, 0.36, 1] }}
+          style={{ pointerEvents: isFlipped ? "auto" : "none" }}
+        >
+          <CardBack
+            member={member}
+            index={index}
+            accent={accent}
+            r={r}
+            g={g}
+            b={b}
+            total={total}
+            liteMode={liteFlip}
+          />
+        </motion.div>
+      </div>
 
       <AnimatePresence>
-        {isAnimating && (
+        {!liteFlip && isAnimating && (
           <motion.div
             initial={{ opacity: 0.6, scale: 0.95 }}
             animate={{ opacity: 0, scale: 1.05 }}
