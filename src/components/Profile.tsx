@@ -494,7 +494,6 @@ function MobileDeckCard({
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const isLowPowerMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
 
   const isTopCard = stackPosition === 0;
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
@@ -518,7 +517,7 @@ function MobileDeckCard({
     if (Math.abs(x.get()) > 10) return;
     setIsAnimating(true);
     setIsFlipped((f) => !f);
-    setTimeout(() => setIsAnimating(false), isLowPowerMobile ? 150 : 250);
+    setTimeout(() => setIsAnimating(false), 250);
   };
 
   if (stackPosition >= MAX_VISIBLE_STACK) return null;
@@ -565,10 +564,7 @@ function MobileDeckCard({
         animate={{
           y: isTopCard ? 8 : 4,
           scaleX: isTopCard ? 0.92 : 0.95,
-          scaleY: isTopCard ? 0.96 : 0.98,
-          filter: isLowPowerMobile
-            ? "none"
-            : isTopCard
+          filter: isTopCard
             ? `blur(5px) drop-shadow(0 2px 4px rgba(${r}, ${g}, ${b}, 0.08))`
             : "blur(2px)",
           opacity: isTopCard ? 0.25 : 0.65,
@@ -580,13 +576,9 @@ function MobileDeckCard({
         style={{
           transformStyle: "preserve-3d",
           willChange: "transform",
-          perspective: isLowPowerMobile ? "900px" : "1200px",
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{
-          duration: isLowPowerMobile ? 0.28 : 0.38,
-          ease: [0.22, 1, 0.36, 1],
-        }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
         onClick={handleFlip}
       >
         <CardFront member={member} index={index} r={r} g={g} b={b} />
@@ -594,7 +586,7 @@ function MobileDeckCard({
       </motion.div>
 
       <AnimatePresence>
-        {isAnimating && !isLowPowerMobile && (
+        {isAnimating && (
           <motion.div
             initial={{ opacity: 0.6, scale: 0.95 }}
             animate={{ opacity: 0, scale: 1.05 }}
