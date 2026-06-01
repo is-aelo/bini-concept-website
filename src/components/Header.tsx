@@ -14,6 +14,8 @@ interface SiteSettings {
   title?: string;
 }
 
+const headerLogoSrc = "/BINI-logo.png";
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [conceptVisible, setConceptVisible] = useState(true);
@@ -100,19 +102,14 @@ const Header = () => {
       >
         <div className="max-w-[1800px] mx-auto flex justify-between items-center">
           <a href="#" className="group relative flex items-center">
-            {settings?.logoUrl ? (
-              <Image
-                src={settings.logoUrl} 
-                alt={settings?.title || "Logo"} 
-                width={180}
-                height={40}
-                className="h-8 w-auto md:h-10 object-contain"
-              />
-            ) : (
-              <span className="text-2xl font-bold tracking-tighter uppercase text-[var(--c-ink)]">
-                {settings?.title || "BINI"}
-              </span>
-            )}
+            <Image
+              src={headerLogoSrc}
+              alt={settings?.title || "BINI"}
+              width={180}
+              height={40}
+              className="h-8 w-auto md:h-10 object-contain"
+              priority
+            />
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[var(--c-teal)] transition-all duration-300 group-hover:w-full"></span>
           </a>
 
@@ -156,7 +153,7 @@ const Header = () => {
             isOpen={isMobileMenuOpen} 
             onClose={() => setIsMobileMenuOpen(false)} 
             navLinks={navLinks} 
-            logoUrl={settings?.logoUrl}
+            logoUrl={headerLogoSrc}
             siteTitle={settings?.title}
           />
         )}
