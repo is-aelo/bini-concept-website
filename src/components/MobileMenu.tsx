@@ -65,8 +65,8 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
           <Icon icon="mingcute:diamond-2-line" width="24" height="24" />
           EXCLUSIVE ACCESS
         </a>
-        <div className="mt-10 flex justify-between text-label-mono opacity-50">
-          <span>BINI CORE CONCEPT</span>
+        <div className="mt-10 flex flex-col text-label-mono opacity-50 gap-1">
+          <span>WEBSITE CONCEPT BY ELOISA JANE TALINGTING</span>
           <span>© 2026</span>
         </div>
       </div>

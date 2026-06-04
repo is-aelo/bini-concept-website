@@ -114,12 +114,12 @@ const Header = () => {
           </a>
 
           <nav className="hidden md:flex items-center gap-10">
-            <ul className="flex gap-10">
+            <ul className="flex gap-10 items-center">
               {navLinks.map((link) => (
                 <li key={link.name}>
                   <a 
                     href={link.href}
-                    className="text-label-mono text-[var(--c-ink)] hover:text-[var(--c-teal)] transition-colors relative group"
+                    className="text-label-mono text-[var(--c-ink)] hover:text-[var(--c-teal)] transition-colors relative group inline-flex items-center h-8 md:h-10 leading-none"
                   >
                     {link.name}
                   </a>
@@ -130,7 +130,7 @@ const Header = () => {
               href="https://shop.weverse.io/en/shop/USD/artists/285/sales/55705"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-community text-[10px] whitespace-nowrap gap-2 inline-flex items-center"
+              className="btn-community text-[10px] whitespace-nowrap gap-2 inline-flex items-center py-1.5 md:py-2.5"
             >
               <Icon icon="mingcute:diamond-2-line" width="20" height="20" />
               EXCLUSIVE ACCESS
