@@ -21,6 +21,7 @@ const Header = () => {
   const [conceptVisible, setConceptVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -49,20 +50,37 @@ const Header = () => {
     };
 
     const conceptSection = document.getElementById("concept-section");
-    const observer = conceptSection
+    const conceptObserver = conceptSection
       ? new IntersectionObserver(([entry]) => {
           setConceptVisible(entry.isIntersecting);
         })
       : null;
 
+    const sectionIds = ["profile", "disco", "tour", "gallery"];
+    const sectionObservers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id);
+        },
+        { rootMargin: "-40% 0px -55% 0px" }
+      );
+      observer.observe(el);
+      sectionObservers.push(observer);
+    });
+
     window.addEventListener('scroll', handleScroll);
-    if (conceptSection && observer) {
-      observer.observe(conceptSection);
+    if (conceptSection && conceptObserver) {
+      conceptObserver.observe(conceptSection);
     }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      observer?.disconnect();
+      conceptObserver?.disconnect();
+      sectionObservers.forEach((o) => o.disconnect());
 
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
@@ -115,16 +133,22 @@ const Header = () => {
 
           <nav className="hidden md:flex items-center gap-10">
             <ul className="flex gap-10 items-center">
-              {navLinks.map((link) => (
-                <li key={link.name}>
-                  <a 
-                    href={link.href}
-                    className="text-label-mono text-[var(--c-ink)] hover:text-[var(--c-teal)] transition-colors relative group inline-flex items-center h-8 md:h-10 leading-none"
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
+              {navLinks.map((link) => {
+                const sectionId = link.href.replace("#", "");
+                const isActive = activeSection === sectionId;
+                return (
+                  <li key={link.name}>
+                    <a 
+                      href={link.href}
+                      className={`text-label-mono transition-colors relative group inline-flex items-center h-8 md:h-10 leading-none ${
+                        isActive ? "text-[var(--c-teal)]" : "text-[var(--c-ink)] hover:text-[var(--c-teal)]"
+                      }`}
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
             <a
               href="https://shop.weverse.io/en/shop/USD/artists/285/sales/55705"
