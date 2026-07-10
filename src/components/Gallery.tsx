@@ -1,324 +1,337 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import GalleryBackground from "./GalleryBackground";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
-type GalleryItem = {
+type SignalsTourImage = {
   _id: string;
-  title?: string;
-  featured?: boolean;
+  caption: string;
   imageUrl: string;
   lqip?: string;
-  aspectRatio?: number;
 };
 
 type GalleryProps = {
-  items: GalleryItem[];
+  items: SignalsTourImage[];
 };
-
-const ROW_HEIGHT = 280;
-const INITIAL_ROWS = 3;
-const GAP = 10;
-
-function buildJustifiedRows(items: GalleryItem[], containerWidth: number) {
-  const rows: GalleryItem[][] = [];
-  let current: GalleryItem[] = [];
-  let currentWidth = 0;
-
-  for (const item of items) {
-    const ratio = item.aspectRatio ?? 16 / 9;
-    const w = ratio * ROW_HEIGHT;
-    currentWidth += w + (current.length > 0 ? GAP : 0);
-
-    current.push(item);
-
-    if (currentWidth >= containerWidth * 0.85) {
-      rows.push(current);
-      current = [];
-      currentWidth = 0;
-    }
-  }
-
-  if (current.length > 0) {
-    rows.push(current);
-  }
-
-  return rows;
-}
 
 function MobileSlider({
   items,
   onOpen,
 }: {
-  items: GalleryItem[];
+  items: SignalsTourImage[];
   onOpen: (index: number) => void;
 }) {
   const [active, setActive] = useState(0);
-  const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
-  const didSwipe = useRef(false);
+  const dragStartX = useRef(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  const prev = useCallback(() => setActive((a) => Math.max(0, a - 1)), []);
+  const prev = useCallback(() => setActive((value) => Math.max(0, value - 1)), []);
   const next = useCallback(
-    () => setActive((a) => Math.min(items.length - 1, a + 1)),
+    () => setActive((value) => Math.min(items.length - 1, value + 1)),
     [items.length]
   );
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [prev, next]);
-
   const item = items[active];
 
+  useEffect(() => {
+    const container = carouselRef.current;
+    const el = container?.children[active] as HTMLElement | undefined;
+    if (container && el) {
+      const scrollLeft =
+        el.offsetLeft + el.offsetWidth / 2 - container.offsetWidth / 2;
+      container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+    }
+  }, [active]);
+
   return (
-    <div className="ms-wrap">
+    <div className="signals-mobile">
       <div
-        className="ms-main"
-        onClick={() => {
-          if (!didSwipe.current) onOpen(active);
-          didSwipe.current = false;
+        className="relative overflow-hidden rounded-[24px] cursor-grab shadow-[0_18px_40px_rgba(0,0,0,.10)] aspect-[4/3] w-full z-10 border border-[rgba(12,12,10,.08)] bg-[rgba(255,255,255,.18)]"
+        onMouseDown={(e) => {
+          dragStartX.current = e.clientX;
+        }}
+        onMouseUp={(e) => {
+          const delta = e.clientX - dragStartX.current;
+
+          if (Math.abs(delta) < 5) onOpen(active);
+          else {
+            if (delta < -40) next();
+            if (delta > 40) prev();
+          }
         }}
         onTouchStart={(e) => {
-          didSwipe.current = false;
-          touchStartX.current = e.changedTouches[0].clientX;
+          dragStartX.current = e.touches[0].clientX;
         }}
         onTouchEnd={(e) => {
-          touchEndX.current = e.changedTouches[0].clientX;
-          const diff = touchStartX.current - touchEndX.current;
-          didSwipe.current = Math.abs(diff) > 40;
-          if (diff > 40) next();
-          if (diff < -40) prev();
+          const delta = e.changedTouches[0].clientX - dragStartX.current;
+
+          if (Math.abs(delta) < 5) onOpen(active);
+          else {
+            if (delta < -40) next();
+            if (delta > 40) prev();
+          }
         }}
       >
-        <div className="ms-img-frame" key={item._id}>
+        <div className="absolute inset-0" key={item._id}>
           <Image
             src={item.imageUrl}
-            alt={item.title || "BINI"}
+            alt={item.caption}
             fill
-            className="ms-img"
+            draggable={false}
+            className="object-cover select-none"
             sizes="100vw"
             placeholder={item.lqip ? "blur" : "empty"}
             blurDataURL={item.lqip}
             priority={active === 0}
           />
+
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.18) 42%, transparent)",
+            }}
+          />
+
+          <div
+            className="absolute bottom-4 right-4 z-20"
+            style={{
+              color: "var(--c-surface)",
+              fontFamily: "var(--f-mono)",
+              fontSize: "clamp(0.55rem, 1.2vw, 0.72rem)",
+              letterSpacing: ".18em",
+              textTransform: "uppercase",
+              textShadow: "0 2px 12px rgba(0,0,0,.4)",
+            }}
+          >
+            {item.caption}
+          </div>
         </div>
 
-        <button
-          className="ms-arrow ms-arrow-left"
-          onClick={(e) => {
-            e.stopPropagation();
-            prev();
+        <div
+          className="absolute top-4 right-4 z-20 px-3 py-2 rounded-full"
+          style={{
+            background: "rgba(255,255,255,.12)",
+            backdropFilter: "blur(14px)",
           }}
-          disabled={active === 0}
-          aria-label="Previous photo"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <path d="M11 3L5 9L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <button
-          className="ms-arrow ms-arrow-right"
-          onClick={(e) => {
-            e.stopPropagation();
-            next();
-          }}
-          disabled={active === items.length - 1}
-          aria-label="Next photo"
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <path d="M7 3L13 9L7 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        <div className="ms-counter" aria-live="polite">
-          {active + 1} <span>/</span> {items.length}
+          <span
+            style={{
+              color: "white",
+              fontSize: 11,
+              fontFamily: "var(--f-mono)",
+            }}
+            aria-live="polite"
+          >
+            {String(active + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+          </span>
         </div>
       </div>
 
-      <div className="ms-thumbs" role="list" aria-label="Photo thumbnails">
-        {items.map((img, i) => (
-          <button
-            key={img._id}
-            className={`ms-thumb ${i === active ? "ms-thumb-active" : ""}`}
+      <div className="signals-carousel" ref={carouselRef}>
+        {items.map((thumb, i) => (
+          <div
+            key={thumb._id}
             onClick={() => setActive(i)}
-            aria-label={`Go to photo ${i + 1}`}
-            aria-current={i === active}
-            role="listitem"
+            className={`signals-thumb${i === active ? " signals-thumb--active" : ""}`}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter") setActive(i); }}
+            aria-label={`View image ${i + 1}`}
           >
-            <div className="ms-thumb-img-wrap">
-              <Image
-                src={img.imageUrl}
-                alt=""
-                fill
-                className="ms-thumb-img"
-                sizes="80px"
-                placeholder={img.lqip ? "blur" : "empty"}
-                blurDataURL={img.lqip}
-              />
-            </div>
-          </button>
+            <Image
+              src={thumb.imageUrl}
+              alt={thumb.caption}
+              fill
+              className="signals-thumb-image"
+              sizes="120px"
+              draggable={false}
+            />
+          </div>
         ))}
+      </div>
+
+      <div className="mt-4 sm:mt-5 flex items-center justify-between gap-4 flex-wrap">
+        <div
+          className="flex items-center gap-3"
+          style={{
+            fontFamily: "var(--f-mono)",
+            fontSize: 10,
+            letterSpacing: ".12em",
+            color: "var(--c-ink)",
+            opacity: 0.55,
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Swipe through moments</span>
+          <span>&bull;</span>
+          <span>Tap to open</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <motion.button
+            onClick={prev}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.92 }}
+            className="h-11 w-11 rounded-full flex items-center justify-center border border-[rgba(12,12,10,.08)]"
+            style={{
+              background: "rgba(255,255,255,.82)",
+              backdropFilter: "blur(14px)",
+            }}
+          >
+            <CaretLeft size={18} weight="bold" />
+          </motion.button>
+
+          <motion.button
+            onClick={next}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.92 }}
+            className="h-11 w-11 rounded-full flex items-center justify-center border border-[rgba(12,12,10,.08)]"
+            style={{
+              background: "linear-gradient(135deg,var(--c-teal),var(--c-teal-dark))",
+            }}
+          >
+            <CaretRight size={18} weight="bold" />
+          </motion.button>
+        </div>
       </div>
     </div>
   );
 }
 
-function JustifiedFilmstrip({
-  items,
+function EditorialImage({
+  item,
+  index,
+  className,
   onOpen,
 }: {
-  items: GalleryItem[];
-  onOpen: (index: number) => void;
+  item: SignalsTourImage;
+  index: number;
+  className: string;
+  onOpen: () => void;
 }) {
-  const [showAll, setShowAll] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(1280);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const indexById = useMemo(
-    () => new Map(items.map((item, index) => [item._id, index])),
-    [items]
-  );
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setContainerWidth(entry.contentRect.width);
-    });
-    ro.observe(el);
-    setContainerWidth(el.getBoundingClientRect().width);
-    return () => ro.disconnect();
-  }, []);
-
-  const allRows = buildJustifiedRows(items, containerWidth);
-  const visibleRows = showAll ? allRows : allRows.slice(0, INITIAL_ROWS);
-  const hasMore = allRows.length > INITIAL_ROWS;
-  const hiddenCount = items.length - visibleRows.flat().length;
-
   return (
-    <div className="jf-wrap" ref={wrapRef}>
-      <div className="jf-rows">
-        {visibleRows.map((row, ri) => {
-          const isLastVisible = ri === visibleRows.length - 1;
-          const isLastRow = isLastVisible && !showAll && hasMore;
-          const isOrphanRow = isLastVisible && row.length < 3;
-          return (
-            <div
-              key={ri}
-              className={`jf-row${isLastRow ? " jf-row-fade" : ""}${isOrphanRow ? " jf-row-orphan" : ""}`}
-              style={{ animationDelay: `${ri * 50}ms` }}
-            >
-              {row.map((item) => {
-                const ratio = item.aspectRatio ?? 16 / 9;
-                return (
-                  <div
-                    key={item._id}
-                    className="jf-cell"
-                    style={
-                      isOrphanRow
-                        ? { flexGrow: 0, flexShrink: 0, flexBasis: `${ratio * ROW_HEIGHT}px` }
-                        : { flexGrow: ratio, flexBasis: `${ratio * ROW_HEIGHT}px` }
-                    }
-                  >
-                    <button
-                      className="jf-frame"
-                      onClick={() => onOpen(indexById.get(item._id) ?? 0)}
-                      aria-label={`Open ${item.title || "BINI photo"} in lightbox`}
-                    >
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.title || "BINI"}
-                        fill
-                        className="jf-img"
-                        sizes="(max-width:768px) 50vw, 33vw"
-                        placeholder={item.lqip ? "blur" : "empty"}
-                        blurDataURL={item.lqip}
-                      />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      className={className}
+      aria-label={`Open ${item.caption} in lightbox`}
+    >
+      <div className="signals-frame">
+        <Image
+          src={item.imageUrl}
+          alt={item.caption}
+          fill
+          className="signals-image"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          placeholder={item.lqip ? "blur" : "empty"}
+          blurDataURL={item.lqip}
+        />
 
-      {hasMore && (
-        <div className="jf-cta-row">
-          <div className="jf-line" aria-hidden="true" />
-          <button className="jf-cta" onClick={() => setShowAll((s) => !s)}>
-            {showAll ? (
-              <>
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                  <path d="M2 9L6.5 4L11 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                Show less
-              </>
-            ) : (
-              <>
-                View all
-                <span className="jf-cta-pill">+{hiddenCount}</span>
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                  <path d="M2 4L6.5 9L11 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </>
-            )}
-          </button>
-          <div className="jf-line" aria-hidden="true" />
+        <div className="signals-overlay" />
+
+        <div className="signals-counter">
+          {String(index + 1).padStart(2, "0")}
         </div>
-      )}
-    </div>
+
+        <div className="signals-caption signals-caption--overlay">
+          {item.caption}
+        </div>
+      </div>
+    </motion.button>
   );
 }
 
 export function Gallery({ items }: GalleryProps) {
   const galleryItems = useMemo(() => items || [], [items]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   const lightboxImages: LightboxImage[] = useMemo(
     () =>
       galleryItems.map((item) => ({
         src: item.imageUrl,
-        alt: item.title || "BINI",
+        alt: item.caption,
       })),
     [galleryItems]
   );
 
   if (galleryItems.length === 0) return null;
 
+  const lead = galleryItems[0];
+  const stack = galleryItems.slice(1, 3);
+  const secondary = galleryItems.slice(3, 6);
+
   return (
-    <section className="gallery-section" aria-label="Gallery">
+    <section className="gallery-section" aria-label="Signals World Tour">
       <GalleryBackground />
 
       <div className="gallery-container">
         <header className="gallery-header">
-          <span className="gallery-label text-label-mono">Photo Archive</span>
+          <span className="gallery-label text-label-mono">Signals World Tour</span>
 
           <div className="gallery-heading-row">
             <h2 className="gallery-title">
-              In<br />Frame
+              Signals<br />World Tour
             </h2>
 
-            <div className="gallery-note" aria-label="BINI and Blooms gallery note">
-              <span className="gallery-note-kicker">BINI x Blooms</span>
-              <p className="gallery-note-copy">A shared journey of music, memories, and moments made brighter together.</p>
+            <div className="gallery-note" aria-label="Signals World Tour editorial note">
+              <span className="gallery-note-kicker">Editorial dispatch</span>
+              <p className="gallery-note-copy">
+                A visual chronicle of the tour, captured in frames, captions, and
+                quiet moments between the noise.
+              </p>
             </div>
           </div>
         </header>
 
         <div className="gallery-divider" role="separator" />
 
-        <div className="show-desktop">
-          <JustifiedFilmstrip items={galleryItems} onOpen={setLightboxIndex} />
-        </div>
+        <div className="signals-grid">
+          <div className="signals-show-desktop">
+            <EditorialImage
+              item={lead}
+              index={0}
+              className="signals-card signals-card--lead"
+              onOpen={() => setLightboxIndex(0)}
+            />
 
-        <div className="show-mobile">
-          <MobileSlider items={galleryItems} onOpen={setLightboxIndex} />
+            <div className="signals-stack">
+              {stack.map((item, i) => (
+                <EditorialImage
+                  key={item._id}
+                  item={item}
+                  index={i + 1}
+                  className="signals-card signals-card--stack"
+                  onOpen={() => setLightboxIndex(i + 1)}
+                />
+              ))}
+            </div>
+
+            {secondary.length > 0 && (
+              <div className="signals-secondary">
+                {secondary.map((item, i) => {
+                  const actualIndex = i + 3;
+                  return (
+                    <EditorialImage
+                      key={item._id}
+                      item={item}
+                      index={actualIndex}
+                      className="signals-card signals-card--secondary"
+                      onOpen={() => setLightboxIndex(actualIndex)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="signals-show-mobile">
+            <MobileSlider items={galleryItems} onOpen={setLightboxIndex} />
+          </div>
         </div>
       </div>
 
@@ -337,10 +350,11 @@ export function Gallery({ items }: GalleryProps) {
           background-color: var(--c-surface);
           padding: 6rem 0 8rem;
         }
+
         .gallery-container {
           position: relative;
           z-index: 1;
-          max-width: 1280px;
+          max-width: 1320px;
           margin: 0 auto;
           padding: 0 2rem;
         }
@@ -349,8 +363,9 @@ export function Gallery({ items }: GalleryProps) {
           margin-bottom: 1.5rem;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          gap: 0.4rem;
         }
+
         .gallery-label {
           display: inline-block;
           align-self: flex-start;
@@ -359,6 +374,7 @@ export function Gallery({ items }: GalleryProps) {
           padding: 3px 10px;
           border-radius: 2px;
         }
+
         .gallery-heading-row {
           display: flex;
           align-items: flex-end;
@@ -366,6 +382,7 @@ export function Gallery({ items }: GalleryProps) {
           gap: 2rem;
           flex-wrap: wrap;
         }
+
         .gallery-title {
           font-family: var(--f-display);
           font-size: clamp(56px, 9vw, 120px);
@@ -375,14 +392,16 @@ export function Gallery({ items }: GalleryProps) {
           color: var(--c-teal-dark);
           margin: 0;
         }
+
         .gallery-note {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
           gap: 0.7rem;
-          max-width: 340px;
-          padding-bottom: 0.5rem;
+          max-width: 360px;
+          padding-bottom: 0.35rem;
         }
+
         .gallery-note-kicker {
           font-family: var(--f-mono);
           font-size: 10px;
@@ -391,243 +410,259 @@ export function Gallery({ items }: GalleryProps) {
           color: var(--c-ink);
           opacity: 0.45;
         }
+
         .gallery-note-copy {
           margin: 0;
           font-family: var(--f-body);
           font-size: clamp(14px, 1.6vw, 18px);
-          line-height: 1.35;
+          line-height: 1.45;
           color: var(--c-ink);
           opacity: 0.68;
         }
+
         .gallery-divider {
           height: 1.5px;
           background: var(--c-ink);
           margin-bottom: 24px;
         }
 
-        .show-desktop { display: block; }
-        .show-mobile  { display: none; }
+        .signals-grid {
+          display: grid;
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .signals-show-desktop {
+          display: contents;
+        }
+
+          .signals-show-mobile {
+            display: none;
+          }
+
+        .signals-stack {
+          grid-column: span 5;
+          display: grid;
+          gap: 16px;
+        }
+
+        .signals-secondary {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .signals-card {
+          position: relative;
+          width: 100%;
+          padding: 0;
+          border: 0;
+          border-radius: 0;
+          overflow: hidden;
+          background: var(--c-surface-2);
+          cursor: zoom-in;
+          box-shadow: var(--shadow-tactile);
+          text-align: left;
+        }
+
+        .signals-card--lead {
+          grid-column: span 7;
+          min-height: 620px;
+        }
+
+        .signals-card--stack {
+          min-height: 302px;
+        }
+
+        .signals-card--secondary {
+          min-height: 240px;
+        }
+
+        .signals-frame {
+          position: absolute;
+          inset: 0;
+        }
+
+        .signals-image {
+          object-fit: cover;
+          transition: opacity 260ms ease, filter 260ms ease;
+        }
+
+        .signals-card:hover .signals-image {
+          opacity: 0.96;
+          filter: saturate(0.96) contrast(1.01);
+        }
+
+        .signals-overlay {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, rgba(12,12,10,0.02) 0%, transparent 42%, rgba(12,12,10,0.24) 100%),
+            linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 28%, transparent 72%, rgba(255,255,255,0.08) 100%);
+          opacity: 0.88;
+          transition: opacity 260ms ease;
+          pointer-events: none;
+        }
+
+        .signals-card:hover .signals-overlay {
+          opacity: 0.98;
+        }
+
+        .signals-counter {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          z-index: 2;
+          font-family: var(--f-mono);
+          font-size: 10px;
+          letter-spacing: 0.12em;
+          color: var(--c-surface);
+          opacity: 0.72;
+          text-transform: uppercase;
+          background: rgba(12,12,10,0.35);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: var(--r-full);
+          padding: 5px 8px;
+          backdrop-filter: blur(8px);
+        }
+
+        .signals-caption {
+          font-family: var(--f-mono);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--c-ink);
+        }
+
+        .signals-caption--overlay {
+          position: absolute;
+          left: 16px;
+          right: 16px;
+          bottom: 16px;
+          z-index: 2;
+          font-size: 10px;
+          line-height: 1.5;
+          color: rgba(245,243,238,0.92);
+          text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+        }
+
+        .signals-stack .signals-caption--overlay,
+        .signals-secondary .signals-caption--overlay {
+          font-size: 9px;
+        }
+
+        @media (max-width: 1024px) {
+          .signals-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .signals-stack,
+          .signals-secondary,
+          .signals-card--lead {
+            grid-column: auto;
+          }
+
+          .signals-stack {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .signals-secondary {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .signals-card--lead {
+            min-height: 520px;
+          }
+
+          .signals-card--stack,
+          .signals-card--secondary {
+            min-height: 280px;
+          }
+        }
 
         @media (max-width: 640px) {
-          .show-desktop { display: none; }
-          .show-mobile  { display: block; }
-          .gallery-section { padding: 3.5rem 0 5rem; }
-          .gallery-container { padding: 0 1rem; }
-          .gallery-header { margin-bottom: 1.25rem; }
-          .gallery-heading-row { gap: 1rem; }
+          .gallery-section {
+            padding: 3.5rem 0 5rem;
+          }
+
+          .gallery-container {
+            padding: 0 1rem;
+          }
+
+          .gallery-header {
+            margin-bottom: 1.25rem;
+          }
+
+          .gallery-heading-row {
+            gap: 1rem;
+          }
+
           .gallery-note {
             max-width: 100%;
             padding-bottom: 0;
           }
-          .gallery-note-copy { font-size: 13px; }
+
+          .gallery-note-copy {
+            font-size: 13px;
+          }
+
+          .signals-show-desktop {
+            display: none;
+          }
+
+          .signals-show-mobile {
+            display: block;
+          }
+
+          .signals-mobile {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+          }
         }
 
-        /* ── Justified Filmstrip ── */
-        .jf-wrap {}
-
-        .jf-rows {
+        .signals-carousel {
           display: flex;
-          flex-direction: column;
-          gap: ${GAP}px;
-        }
-
-        .jf-row {
-          display: flex;
-          gap: ${GAP}px;
-          height: ${ROW_HEIGHT}px;
-          animation: jfRowIn 0.4s ease both;
-        }
-
-        .jf-row-orphan {
-          justify-content: flex-start;
-        }
-
-        .jf-row-fade {
-          mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
-        }
-
-        @keyframes jfRowIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .jf-cell {
-          min-width: 0;
-          flex-shrink: 1;
-          position: relative;
-        }
-
-        .jf-frame {
-          position: relative;
-          display: block;
-          width: 100%;
-          height: 100%;
-          padding: 0;
-          border: 0;
-          border-radius: var(--r-md, 6px);
-          background: var(--c-surface-2);
-          cursor: zoom-in;
-          overflow: hidden;
-        }
-
-        .jf-img {
-          object-fit: cover;
-          border-radius: inherit;
-          transition: filter 350ms ease;
-        }
-
-        .jf-frame:hover .jf-img {
-          filter: brightness(0.88);
-        }
-
-        /* CTA row */
-        .jf-cta-row {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          margin-top: 2rem;
-        }
-        .jf-line {
-          flex: 1;
-          height: 0.5px;
-          background: var(--c-surface-3);
-        }
-        .jf-cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.45rem;
-          font-family: var(--f-mono);
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          color: var(--c-ink);
-          background: transparent;
-          border: 1px solid var(--c-surface-3);
-          border-radius: var(--r-full);
-          padding: 0.5rem 1.1rem;
-          cursor: pointer;
-          white-space: nowrap;
-          transition: border-color 220ms ease, transform 220ms ease;
-        }
-        .jf-cta:hover {
-          border-color: var(--c-teal);
-          transform: translateY(-2px);
-        }
-        .jf-cta-pill {
-          background: var(--c-teal-pale);
-          color: var(--c-teal-dark);
-          border-radius: var(--r-full);
-          font-size: 10px;
-          padding: 1px 7px;
-          font-family: var(--f-mono);
-        }
-
-        /* ── Mobile Slider ── */
-        .ms-wrap { display: flex; flex-direction: column; gap: 10px; }
-
-        .ms-main {
-          position: relative;
-          width: 100%;
-          background: var(--c-surface-2);
-          border-radius: var(--r-md);
-          overflow: hidden;
-        }
-
-        .ms-img-frame {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 16 / 9;
-        }
-
-        .ms-img {
-          object-fit: cover;
-        }
-
-        .ms-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(12,12,10,0.40);
-          border: 1px solid rgba(255,255,255,0.18);
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: background 200ms ease, transform 200ms ease;
-          z-index: 2;
-        }
-        .ms-arrow:hover:not(:disabled) {
-          background: rgba(12,12,10,0.65);
-          transform: translateY(-50%) scale(1.08);
-        }
-        .ms-arrow:disabled { opacity: 0.25; cursor: default; }
-        .ms-arrow-left  { left: 10px; }
-        .ms-arrow-right { right: 10px; }
-
-        .ms-counter {
-          position: absolute;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-family: var(--f-mono);
-          font-size: 11px;
-          color: rgba(255,255,255,0.7);
-          letter-spacing: 0.1em;
-          background: rgba(12,12,10,0.35);
-          backdrop-filter: blur(4px);
-          padding: 3px 10px;
-          border-radius: var(--r-full);
-          white-space: nowrap;
-        }
-        .ms-counter span { opacity: 0.5; margin: 0 3px; }
-
-        .ms-thumbs {
-          display: flex;
-          gap: 6px;
-          overflow-x: auto;
+          gap: 8px;
+          overflow-x: scroll;
+          margin-top: 12px;
           padding-bottom: 4px;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
+          touch-action: pan-x;
+          scrollbar-width: none;
         }
-        .ms-thumbs::-webkit-scrollbar { height: 3px; }
-        .ms-thumbs::-webkit-scrollbar-track { background: var(--c-surface-2); border-radius: 2px; }
-        .ms-thumbs::-webkit-scrollbar-thumb { background: var(--c-surface-3); border-radius: 2px; }
 
-        .ms-thumb {
-          flex: 0 0 72px;
-          scroll-snap-align: start;
-          background: transparent;
-          border: 1.5px solid transparent;
-          border-radius: 6px;
+        .signals-carousel::-webkit-scrollbar {
+          display: none;
+        }
+
+        .signals-thumb {
+          position: relative;
+          flex-shrink: 0;
+          width: 72px;
+          height: 72px;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 2px solid transparent;
+          outline: none;
           padding: 0;
           cursor: pointer;
-          transition: border-color 200ms ease, transform 200ms ease;
-          overflow: hidden;
-        }
-        .ms-thumb-active {
-          border-color: var(--c-teal);
-          transform: scale(1.05);
+          transition: border-color 200ms ease, opacity 200ms ease;
+          opacity: 0.55;
+          scroll-snap-align: center;
         }
 
-        .ms-thumb-img-wrap {
-          position: relative;
-          width: 72px;
-          height: 46px;
-          border-radius: 4px;
-          overflow: hidden;
-          background: var(--c-surface-2);
+        .signals-thumb--active {
+          border-color: var(--c-teal);
+          opacity: 1;
         }
-        .ms-thumb-img {
+
+        .signals-thumb-image {
           object-fit: cover;
+          pointer-events: none;
         }
       `}</style>
     </section>
   );
 }
-
-export default Gallery;

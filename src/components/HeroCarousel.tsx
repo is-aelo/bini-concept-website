@@ -11,9 +11,10 @@ interface HeroImage {
 
 const SWIPE_THRESHOLD = 80;
 const VELOCITY_THRESHOLD = 400;
+const DEFAULT_CARD_DIMENSIONS = { w: 220, h: 320 };
 
 function getCardDimensions() {
-  if (typeof window === "undefined") return { w: 220, h: 320 };
+  if (typeof window === "undefined") return DEFAULT_CARD_DIMENSIONS;
   const vw = window.innerWidth;
   if (vw < 400) return { w: 160, h: 240 };
   if (vw < 640) return { w: 190, h: 280 };
@@ -76,7 +77,7 @@ interface CardSlot {
 export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   const safeImages = useMemo(() => images.filter(i => i.imageUrl).slice(0, 8), [images]);
 
-  const [cardDims, setCardDims] = useState(() => getCardDimensions());
+  const [cardDims, setCardDims] = useState(DEFAULT_CARD_DIMENSIONS);
   const resizeFrame = useRef<number | null>(null);
 
   useEffect(() => {

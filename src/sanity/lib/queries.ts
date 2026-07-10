@@ -74,6 +74,15 @@ export const COACHELLA_GALLERY_QUERY = groq`
   }
 `;
 
+export const ALL_SIGNALS_TOUR_IMAGES_QUERY = groq`
+  *[_type == "signalsTourImage"] | order(_createdAt asc) {
+    _id,
+    caption,
+    "imageUrl": image.asset->url,
+    "lqip": image.asset->metadata.lqip
+  }
+`;
+
 export const ALL_TEASERS_QUERY = groq`
   *[_type == "teaser" && featured == true] | order(_createdAt desc) {
     _id,

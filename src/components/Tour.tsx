@@ -144,7 +144,8 @@ const STYLES = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 9px 20px;
+    min-height: 34px;
+    padding: 8px 18px;
     border-radius: 999px;
     font-size: 10px;
     font-family: var(--f-mono);
@@ -152,7 +153,9 @@ const STYLES = `
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
-    border: none;
+    border: 1.5px solid transparent;
+    box-sizing: border-box;
+    line-height: 1;
     transition: background 0.2s ease, color 0.2s ease;
     align-self: flex-start;
     white-space: normal;
@@ -166,23 +169,30 @@ const STYLES = `
   .ticket-cta--buy {
     background: var(--c-ink);
     color: #fff;
+    border-color: var(--c-ink);
   }
   .ticket-cta--buy:hover {
     background: var(--c-teal-dark);
+    border-color: var(--c-teal-dark);
   }
   .ticket-cta--sold {
     background: transparent;
     color: var(--c-mikha);
-    border: 1px solid var(--c-mikha);
+    border-color: var(--c-mikha);
     cursor: default;
     opacity: 0.8;
   }
   .ticket-cta--past {
     background: transparent;
     color: var(--c-ink);
-    border: 1px solid var(--c-surface-3);
+    border-color: var(--c-surface-3);
     cursor: default;
     opacity: 0.4;
+  }
+  .ticket-cta--free {
+    background: transparent;
+    color: var(--c-teal-dark);
+    border-color: var(--c-teal-dark);
   }
 
   .tour-page-btn:focus-visible {
@@ -207,11 +217,11 @@ const cardVariants: Variants = {
   hidden: { opacity: 0, y: 16, scale: 0.98 },
   show:   {
     opacity: 1, y: 0, scale: 1,
-    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as any },
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const },
   },
   exit:   {
     opacity: 0, y: -8, scale: 0.97,
-    transition: { duration: 0.18, ease: [0.65, 0, 0.35, 1] as any },
+    transition: { duration: 0.18, ease: [0.65, 0, 0.35, 1] as const },
   },
 };
 
@@ -511,8 +521,12 @@ function TicketCard({ tour }: { tour: TourItem }) {
 
   const ctaClass = canBuy
     ? "ticket-cta ticket-cta--buy"
+    : isPast
+    ? "ticket-cta ticket-cta--past"
     : isSoldOut
     ? "ticket-cta ticket-cta--sold"
+    : isFree
+    ? "ticket-cta ticket-cta--free"
     : "ticket-cta ticket-cta--past";
 
   const badgeColor = local ? "var(--c-teal-dark)" : "var(--c-gwen)";

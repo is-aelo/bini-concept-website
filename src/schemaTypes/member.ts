@@ -1,4 +1,5 @@
 import { User } from "@phosphor-icons/react/dist/ssr";
+import type { Rule as SanityRule } from "@sanity/types";
 
 export const memberType = {
   name: 'member',
@@ -10,7 +11,7 @@ export const memberType = {
       name: 'stageName',
       title: 'Stage Name',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'fullName',
@@ -22,7 +23,7 @@ export const memberType = {
       title: 'Slug',
       type: 'slug',
       options: { source: 'stageName', maxLength: 96 },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'profileImage',

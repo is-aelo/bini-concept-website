@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
 import CoachellaSection from "@/components/CoachellaSection";
 import IridescentMesh from "@/components/TourBackground";
 import Profile from "@/components/Profile";
@@ -16,10 +15,9 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   COACHELLA_GALLERY_QUERY,
   ALL_MEMBERS_QUERY,
-  ALL_ALBUMS_QUERY,
   ALL_TEASERS_QUERY,
   ALL_TOURS_QUERY,
-  NON_FEATURED_GALLERY_QUERY,
+  ALL_SIGNALS_TOUR_IMAGES_QUERY,
 } from "@/sanity/lib/queries";
 
 interface CoachellaImage {
@@ -53,10 +51,9 @@ interface TourEvent {
   memberKey?: string;
 }
 
-interface GalleryItem {
+interface SignalsTourImageItem {
   _id: string;
-  title?: string;
-  featured?: boolean;
+  caption: string;
   imageUrl: string;
   lqip?: string;
 }
@@ -70,24 +67,13 @@ interface TeaserItem {
   lqip?: string;
 }
 
-interface Album {
-  _id: string;
-  title: string;
-  type?: string;
-  releaseDate?: string;
-  coverUrl: string | null;
-  tracklist?: string[];
-  spotifyLink?: string;
-}
-
 export default async function BiniPage() {
   const [
     coachellaImages,
     sanityMembersData,
     featuredTeasers,
-    albums,
     tours,
-    galleryItems,
+    signalsTourImages,
   ] = await Promise.all([
     sanityFetch({
       query: COACHELLA_GALLERY_QUERY,
@@ -102,15 +88,11 @@ export default async function BiniPage() {
     }),
 
     sanityFetch({
-      query: ALL_ALBUMS_QUERY,
-    }),
-
-    sanityFetch({
       query: ALL_TOURS_QUERY,
     }),
 
     sanityFetch({
-      query: NON_FEATURED_GALLERY_QUERY,
+      query: ALL_SIGNALS_TOUR_IMAGES_QUERY,
     }),
   ]);
 
@@ -144,13 +126,11 @@ export default async function BiniPage() {
   });
 
   const featuredTeaser = ((featuredTeasers as TeaserItem[]) || [])[0];
-  const latestAlbum = ((albums as Album[]) || [])[0];
 
   return (
     <div className="relative">
       <Header />
       <Concept teaser={featuredTeaser} />
-      <Hero latestAlbum={latestAlbum} />
       <IridescentMesh />
       <div id="profile" className="scroll-mt-24">
         <Profile members={members} />
@@ -173,7 +153,7 @@ export default async function BiniPage() {
         />
       </div>
       <div id="gallery" className="scroll-mt-24">
-        <Gallery items={(galleryItems as GalleryItem[]) || []} />
+        <Gallery items={(signalsTourImages as SignalsTourImageItem[]) || []} />
       </div>
       <Membership />
       <Footer />

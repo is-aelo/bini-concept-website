@@ -155,7 +155,7 @@ export default function LoadingScreen() {
             textTransform: "uppercase",
           }}
         >
-          Singles — EP
+          Signals — EP
         </span>
 
         <div

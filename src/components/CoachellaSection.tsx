@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
@@ -25,17 +25,9 @@ const BLOB_STYLES = `
 100%{transform:translate(0,0) scale(1)}
 }
 
-.coachella-blob1{
-animation:blobDrift1 18s ease-in-out infinite;
-}
-
-.coachella-blob2{
-animation:blobDrift2 22s ease-in-out infinite;
-}
-
-.coachella-blob3{
-animation:blobDrift3 26s ease-in-out infinite;
-}
+.coachella-blob1{animation:blobDrift1 18s ease-in-out infinite;}
+.coachella-blob2{animation:blobDrift2 22s ease-in-out infinite;}
+.coachella-blob3{animation:blobDrift3 26s ease-in-out infinite;}
 `;
 
 interface CoachellaImage {
@@ -84,60 +76,98 @@ export default function CoachellaSection({
 
   return (
     <section
-      className="relative overflow-hidden py-14 md:py-24"
+      className="relative overflow-hidden py-12 sm:py-16 lg:py-24"
       style={{ background: "var(--c-surface)" }}
     >
       <style>{BLOB_STYLES}</style>
 
-      {/* MESH LAYER */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-0 opacity-70">
         <div
           className="coachella-blob1 absolute"
           style={{
-            width: 650,
-            height: 650,
-            top: -180,
-            left: -140,
-            filter: "blur(90px)",
+            width: 520,
+            height: 520,
+            top: -170,
+            left: -160,
+            filter: "blur(110px)",
             background:
               "radial-gradient(circle, var(--c-teal) 0%, transparent 70%)",
-            opacity: 0.22,
+            opacity: 0.12,
           }}
         />
 
         <div
           className="coachella-blob2 absolute"
           style={{
-            width: 600,
-            height: 600,
+            width: 500,
+            height: 500,
             bottom: -180,
-            right: -160,
-            filter: "blur(90px)",
+            right: -170,
+            filter: "blur(110px)",
             background:
               "radial-gradient(circle, var(--c-aiah) 0%, transparent 70%)",
-            opacity: 0.22,
+            opacity: 0.12,
           }}
         />
 
         <div
           className="coachella-blob3 absolute"
           style={{
-            width: 520,
-            height: 520,
-            top: "35%",
-            left: "30%",
-            filter: "blur(110px)",
+            width: 420,
+            height: 420,
+            top: "28%",
+            left: "34%",
+            filter: "blur(120px)",
             background:
               "radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%)",
-            opacity: 0.18,
+            opacity: 0.08,
           }}
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-        {/* image frame */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 sm:mb-10 flex flex-col items-center lg:items-start text-center lg:text-left gap-2">
+          <span
+            className="text-label-mono"
+            style={{
+              display: "inline-block",
+              alignSelf: "flex-start",
+              color: "var(--c-surface)",
+              background: "var(--c-teal-dark)",
+              padding: "3px 10px",
+              borderRadius: "2px",
+            }}
+          >
+            MOJAVE STAGE &bull; COACHELLA 2026
+          </span>
+
+          <h3
+            style={{
+              fontFamily: "var(--f-display)",
+              fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
+              lineHeight: 0.95,
+              color: "var(--c-teal-dark)",
+            }}
+          >
+            A GLOBAL MILESTONE
+          </h3>
+
+          <p
+            className="max-w-[34rem]"
+            style={{
+              color: "var(--c-ink)",
+              opacity: 0.72,
+              lineHeight: 1.7,
+              fontSize: "clamp(0.82rem, 1.8vw, 0.98rem)",
+            }}
+          >
+            BINI became the first Filipino pop group to perform at Coachella,
+            opening a new chapter for P-pop on the world stage.
+          </p>
+        </div>
+
         <div
-          className="relative overflow-hidden rounded-[30px] cursor-grab shadow-[0_25px_60px_rgba(0,0,0,.14)] aspect-[4/3] md:aspect-video w-full z-10"
+          className="relative overflow-hidden rounded-[24px] cursor-grab shadow-[0_18px_40px_rgba(0,0,0,.10)] aspect-[4/3] md:aspect-video w-full z-10 border border-[rgba(12,12,10,.08)] bg-[rgba(255,255,255,.18)]"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;
@@ -161,47 +191,39 @@ export default function CoachellaSection({
             }
           }}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
+          <div className="absolute inset-0">
+            <Image
               key={current._id}
-              initial={{ opacity: 0, scale: 1.01 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.01 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
+              fill
+              priority
+              draggable={false}
+              src={current.imageUrl}
+              alt={current.title || "BINICHELLA"}
+              className="object-cover select-none"
+            />
+
+            <div
               className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.18) 42%, transparent)",
+              }}
+            />
+
+            <div
+              className="absolute bottom-4 right-4 z-20"
+              style={{
+                color: "var(--c-surface)",
+                fontFamily: "var(--f-mono)",
+                fontSize: "clamp(0.55rem, 1.2vw, 0.72rem)",
+                letterSpacing: ".18em",
+                textTransform: "uppercase",
+                textShadow: "0 2px 12px rgba(0,0,0,.4)",
+              }}
             >
-              <Image
-                fill
-                priority
-                draggable={false}
-                src={current.imageUrl}
-                alt={current.title || "BINICHELLA"}
-                className="object-cover select-none"
-              />
-
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.2) 40%, transparent)",
-                }}
-              />
-
-              <div
-                className="absolute bottom-4 right-4 z-20"
-                style={{
-                  color: "var(--c-surface)",
-                  fontFamily: "var(--f-mono)",
-                  fontSize: "clamp(0.55rem, 1.2vw, 0.72rem)",
-                  letterSpacing: ".18em",
-                  textTransform: "uppercase",
-                  textShadow: "0 2px 12px rgba(0,0,0,.4)",
-                }}
-              >
-                #BINICHELLA
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              #BINICHELLA
+            </div>
+          </div>
 
           <div
             className="absolute top-4 right-4 z-20 px-3 py-2 rounded-full"
@@ -242,80 +264,44 @@ export default function CoachellaSection({
           </div>
         </div>
 
-        {/* context description layer & controls */}
-        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row md:justify-between md:items-start gap-8">
-          <div>
-            <span
-              style={{
-                fontFamily: "var(--f-mono)",
-                fontSize: 10,
-                letterSpacing: ".12em",
-                color: "var(--c-ink)",
-                opacity: 0.75,
-              }}
-            >
-              MOJAVE STAGE &bull; COACHELLA 2026
-            </span>
-
-            <h3
-              style={{
-                fontFamily: "var(--f-display)",
-                fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
-                lineHeight: 0.95,
-                color: "var(--c-teal-dark)",
-                marginTop: 8,
-              }}
-            >
-              A GLOBAL MILESTONE
-            </h3>
-
-            <p
-              className="mt-4"
-              style={{
-                color: "var(--c-ink)",
-                opacity: 0.7,
-                lineHeight: 1.6,
-                fontSize: "clamp(.9rem, 1.2vw, 1.05rem)",
-                maxWidth: 520,
-              }}
-            >
-              BINI became the first Filipino pop group to perform at
-              Coachella, opening a new chapter for P-pop on the world stage.
-            </p>
+        <div className="mt-6 sm:mt-8 flex items-center justify-between gap-4 flex-wrap">
+          <div
+            className="flex items-center gap-3"
+            style={{
+              fontFamily: "var(--f-mono)",
+              fontSize: 10,
+              letterSpacing: ".12em",
+              color: "var(--c-ink)",
+              opacity: 0.55,
+              textTransform: "uppercase",
+            }}
+          >
+            <span>Swipe through moments</span>
+            <span>•</span>
+            <span>Tap to open</span>
           </div>
 
-          <div className="flex items-center justify-center md:justify-end gap-4 w-full md:w-auto md:mt-1">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={prev}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.92 }}
-              className="h-12 w-12 rounded-full flex items-center justify-center"
+              className="h-11 w-11 rounded-full flex items-center justify-center border border-[rgba(12,12,10,.08)]"
               style={{
-                background: "rgba(255,255,255,.75)",
+                background: "rgba(255,255,255,.82)",
                 backdropFilter: "blur(14px)",
               }}
             >
               <CaretLeft size={18} weight="bold" />
             </motion.button>
 
-            <div
-              style={{
-                fontFamily: "var(--f-mono)",
-                fontSize: 10,
-                opacity: 0.45,
-              }}
-            >
-              SWIPE
-            </div>
-
             <motion.button
               onClick={next}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.92 }}
-              className="h-12 w-12 rounded-full flex items-center justify-center"
+              className="h-11 w-11 rounded-full flex items-center justify-center border border-[rgba(12,12,10,.08)]"
               style={{
-                background:
-                  "linear-gradient(135deg,var(--c-teal),var(--c-teal-dark))",
+                background: "linear-gradient(135deg,var(--c-teal),var(--c-teal-dark))",
               }}
             >
               <CaretRight size={18} color="white" weight="bold" />

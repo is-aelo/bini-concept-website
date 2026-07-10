@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import ProfileGridShader from "./ProfileGridShader";
+import type { PanInfo } from "framer-motion";
 
 interface Member {
   _id: string;
@@ -499,7 +500,7 @@ function MobileDeckCard({
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
   const offset = STACK_OFFSETS[Math.min(stackPosition, STACK_OFFSETS.length - 1)];
 
-  const handleDragEnd = async (_event: any, info: any) => {
+  const handleDragEnd = async (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (!isTopCard) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
       const direction = info.offset.x > 0 ? 1 : -1;
@@ -684,7 +685,7 @@ export default function Profile({ members }: ProfileProps) {
                 opacity: 0.75,
               }}
             >
-              THE NATION'S GIRL GROUP
+              Mabuhay! we are
             </span>
 
             <h3
@@ -696,35 +697,20 @@ export default function Profile({ members }: ProfileProps) {
                 marginTop: 8,
               }}
             >
-              MEET THE 8
+              BINI
             </h3>
 
             <p
-              className="hidden lg:block mt-3"
+              className="mt-3 max-w-[34rem]"
               style={{
-                fontFamily: "var(--f-mono)",
-                fontSize: "0.68rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                opacity: 0.5,
+                fontFamily: "var(--f-body)",
+                fontSize: "clamp(0.82rem, 1.8vw, 0.98rem)",
+                lineHeight: 1.7,
+                opacity: 0.72,
                 color: "var(--c-ink)",
               }}
             >
-              Hover to expand deck · Click card to flip
-            </p>
-
-            <p
-              className="block lg:hidden mt-3"
-              style={{
-                fontFamily: "var(--f-mono)",
-                fontSize: "0.62rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                opacity: 0.5,
-                color: "var(--c-ink)",
-              }}
-            >
-              Tap to flip · Swipe for next
+              An 8-member Filipino girl group redefining P-pop and bringing modern Filipino talent to the global stage.
             </p>
           </div>
         </div>
