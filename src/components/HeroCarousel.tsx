@@ -77,13 +77,19 @@ interface CardSlot {
 export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   const safeImages = useMemo(() => images.filter(i => i.imageUrl).slice(0, 8), [images]);
 
-  const [cardDims, setCardDims] = useState(DEFAULT_CARD_DIMENSIONS);
+  const [cardDims, setCardDims] = useState(getCardDimensions());
   const resizeFrame = useRef<number | null>(null);
 
   useEffect(() => {
     function update() {
-      const next = getCardDimensions();
-      setCardDims((prev) => (prev.w === next.w && prev.h === next.h ? prev : next));
+      if (typeof window === "undefined") return;
+      const vw = window.innerWidth;
+      let w: number, h: number;
+      if (vw < 400)       { w = 160; h = 240; }
+      else if (vw < 640)  { w = 190; h = 280; }
+      else if (vw < 768)  { w = 220; h = 320; }
+      else                { w = 260; h = 380; }
+      setCardDims((prev) => (prev.w === w && prev.h === h ? prev : { w, h }));
     }
 
     const scheduleUpdate = () => {
