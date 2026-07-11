@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useCallback, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import Heading from "@/components/Heading";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
 const BLOB_STYLES = `
@@ -79,7 +80,14 @@ export default function CoachellaSection({
       className="relative overflow-hidden py-12 sm:py-16 lg:py-24"
       style={{ background: "var(--c-surface)" }}
     >
-      <style>{BLOB_STYLES}</style>
+      <style>{`
+        ${BLOB_STYLES}
+        @media (max-width: 640px) {
+          .coachella-card {
+            border-radius: 0 !important;
+          }
+        }
+      `}</style>
 
       <div className="absolute inset-0 pointer-events-none z-0 opacity-70">
         <div
@@ -126,7 +134,7 @@ export default function CoachellaSection({
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 sm:mb-10 flex flex-col items-center lg:items-start text-center lg:text-left gap-2">
+        <div className="mb-8 sm:mb-10 flex flex-col items-start text-left gap-2">
           <span
             className="text-label-mono"
             style={{
@@ -141,16 +149,9 @@ export default function CoachellaSection({
             MOJAVE STAGE &bull; COACHELLA 2026
           </span>
 
-          <h3
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
-              lineHeight: 0.95,
-              color: "var(--c-teal-dark)",
-            }}
-          >
+          <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
             A GLOBAL MILESTONE
-          </h3>
+          </Heading>
 
           <p
             className="max-w-[34rem]"
@@ -167,7 +168,7 @@ export default function CoachellaSection({
         </div>
 
         <div
-          className="relative overflow-hidden rounded-[24px] cursor-grab shadow-[0_18px_40px_rgba(0,0,0,.10)] aspect-[4/3] md:aspect-video w-full z-10 border border-[rgba(12,12,10,.08)] bg-[rgba(255,255,255,.18)]"
+          className="coachella-card relative overflow-hidden rounded-[24px] cursor-grab shadow-[0_18px_40px_rgba(0,0,0,.10)] aspect-[4/3] md:aspect-video w-full z-10 border border-[rgba(12,12,10,.08)] bg-[rgba(255,255,255,.18)]"
           onMouseDown={(e) => (dragStartX.current = e.clientX)}
           onMouseUp={(e) => {
             const delta = e.clientX - dragStartX.current;

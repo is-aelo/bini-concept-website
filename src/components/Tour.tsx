@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import Heading from "@/components/Heading";
 import TourBackground from "./TourBackground";
 
 interface TourItem {
@@ -284,18 +285,9 @@ export default function Tour({ tours = [] }: TourProps) {
           </p>
 
           <div className="flex items-end justify-between gap-6 flex-wrap">
-            <h2
-              style={{
-                fontFamily: "var(--f-display)",
-                fontSize: "clamp(56px, 9vw, 120px)",
-                letterSpacing: "-0.04em",
-                lineHeight: 0.88,
-                color: "var(--c-teal-dark)",
-                textTransform: "uppercase",
-              }}
-            >
-              Tour<br />Dates
-            </h2>
+            <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
+              Tour Dates
+            </Heading>
 
             <div
               className="hidden sm:flex items-center gap-2 pb-2 flex-wrap"

@@ -2,6 +2,7 @@ import { Asterisk } from "@phosphor-icons/react/dist/ssr";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { HERO_GALLERY_QUERY } from "@/sanity/lib/queries";
 import AuroraShader from "./AuroraShader";
+import Heading from "./Heading";
 import HeroCarousel from "./HeroCarousel";
 import LatestReleaseBar from "./LatestReleaseBar";
 
@@ -32,9 +33,9 @@ export default async function Hero({ latestAlbum }: { latestAlbum?: Album | null
   if (displayData.length === 0) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-(--c-surface)">
-        <h1 style={{ fontFamily: "var(--f-display)", fontSize: "clamp(80px,14vw,200px)", lineHeight: 0.85, color: "#3AAAB6" }}>
+        <Heading level="display" style={{ color: "var(--c-teal-dark)" }}>
           BINI
-        </h1>
+        </Heading>
       </section>
     );
   }
@@ -65,17 +66,9 @@ export default async function Hero({ latestAlbum }: { latestAlbum?: Album | null
             </span>
           </div>
 
-          <h1
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "clamp(56px, 10vw, 140px)",
-              lineHeight: 0.88,
-              letterSpacing: "-0.03em",
-              color: "var(--c-ink)",
-            }}
-          >
+          <Heading level="display" style={{ color: "var(--c-ink)" }}>
             BINI
-          </h1>
+          </Heading>
 
           <p
             className="text-(--c-ink) opacity-70 max-w-[320px] sm:max-w-105 leading-relaxed font-regular"

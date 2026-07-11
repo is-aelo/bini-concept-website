@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue, useAnimationFrame, useReducedMotion } from "framer-motion";
+import Heading from "@/components/Heading";
 
 const MEMBERS = [
   { name: "Aiah", color: "var(--c-aiah)" },
@@ -236,18 +237,9 @@ export default function Membership() {
             BINI On Weverse
           </p>
 
-          <h2
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "clamp(56px, 9vw, 120px)",
-              letterSpacing: "-0.04em",
-              lineHeight: 0.88,
-              color: "var(--c-teal-dark)",
-              textTransform: "uppercase",
-            }}
-          >
-            Exclusive<br />Membership
-          </h2>
+          <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
+            Exclusive Membership
+          </Heading>
         </div>
 
         <div className="grid gap-8 lg:gap-16 lg:grid-cols-2 lg:items-start">

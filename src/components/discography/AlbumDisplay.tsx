@@ -2,6 +2,7 @@
 
 import React, { useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Heading from "@/components/Heading";
 
 interface Track {
   id: string;
@@ -301,19 +302,9 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
             </span>
 
             {/* Album title */}
-            <h3
-              style={{
-                fontFamily: "var(--f-display)",
-                fontSize: "clamp(22px, 6vw, 32px)",
-                color: "var(--c-ink)",
-                margin: 0,
-                textTransform: "uppercase",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}
-            >
+            <Heading level="card" style={{ color: "var(--c-ink)" }}>
               {selected.name}
-            </h3>
+            </Heading>
 
             {/* ─── Nav row: prev arrow · dots · next arrow ─── */}
             <div

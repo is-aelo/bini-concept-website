@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
+import Heading from "@/components/Heading";
 import ProfileGridShader from "./ProfileGridShader";
 import type { PanInfo } from "framer-motion";
 
@@ -688,17 +689,9 @@ export default function Profile({ members }: ProfileProps) {
               Mabuhay! we are
             </span>
 
-            <h3
-              style={{
-                fontFamily: "var(--f-display)",
-                fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
-                lineHeight: 0.95,
-                color: "var(--c-teal-dark)",
-                marginTop: 8,
-              }}
-            >
+            <Heading level="section" style={{ color: "var(--c-teal-dark)", marginTop: 8 }}>
               BINI
-            </h3>
+            </Heading>
 
             <p
               className="mt-3 max-w-[34rem]"

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import Heading from "@/components/Heading";
 import GalleryBackground from "./GalleryBackground";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
@@ -271,20 +272,12 @@ export function Gallery({ items }: GalleryProps) {
 
       <div className="gallery-container">
         <header className="gallery-header">
-          <span className="gallery-label text-label-mono">Signals World Tour</span>
+          <span className="gallery-label text-label-mono">The Nation's Girl Group On Their</span>
 
           <div className="gallery-heading-row">
-            <h2 className="gallery-title">
-              Signals<br />World Tour
-            </h2>
-
-            <div className="gallery-note" aria-label="Signals World Tour editorial note">
-              <span className="gallery-note-kicker">Editorial dispatch</span>
-              <p className="gallery-note-copy">
-                A visual chronicle of the tour, captured in frames, captions, and
-                quiet moments between the noise.
-              </p>
-            </div>
+            <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
+              Signals World Tour
+            </Heading>
           </div>
         </header>
 
@@ -357,6 +350,7 @@ export function Gallery({ items }: GalleryProps) {
           max-width: 1320px;
           margin: 0 auto;
           padding: 0 2rem;
+          overflow: hidden;
         }
 
         .gallery-header {
@@ -381,16 +375,6 @@ export function Gallery({ items }: GalleryProps) {
           justify-content: space-between;
           gap: 2rem;
           flex-wrap: wrap;
-        }
-
-        .gallery-title {
-          font-family: var(--f-display);
-          font-size: clamp(56px, 9vw, 120px);
-          line-height: 0.88;
-          letter-spacing: -0.04em;
-          text-transform: uppercase;
-          color: var(--c-teal-dark);
-          margin: 0;
         }
 
         .gallery-note {
@@ -606,18 +590,36 @@ export function Gallery({ items }: GalleryProps) {
             font-size: 13px;
           }
 
+          .signals-grid {
+            grid-template-columns: 1fr;
+            overflow: hidden;
+          }
+
           .signals-show-desktop {
             display: none;
           }
 
           .signals-show-mobile {
             display: block;
+            overflow: hidden;
           }
 
           .signals-mobile {
             display: block;
             width: 100%;
             overflow: hidden;
+          }
+
+          .signals-mobile > div:first-child {
+            border-radius: 0 !important;
+          }
+
+          .signals-thumb {
+            border-radius: 0 !important;
+          }
+
+          .signals-card {
+            max-width: 100%;
           }
         }
 

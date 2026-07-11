@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Icon } from "@iconify/react";
+import Heading from "@/components/Heading";
 import TourBackground from "@/components/TourBackground";
 
 const BINI_LINKS = [
@@ -166,18 +167,9 @@ export default function Footer() {
         <div className="mb-4 sm:mb-5 flex flex-col gap-1">
           <p className="footer-pill text-label-mono">Connect</p>
 
-          <h2
-            style={{
-              fontFamily: "var(--f-display)",
-              fontSize: "clamp(28px, 4vw, 48px)",
-              letterSpacing: "-0.04em",
-              lineHeight: 0.88,
-              color: "var(--c-teal-dark)",
-              textTransform: "uppercase",
-            }}
-          >
+          <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
             Links & Contact
-          </h2>
+          </Heading>
         </div>
 
         <div className="grid gap-4 lg:gap-6 lg:grid-cols-2 lg:items-start">

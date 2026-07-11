@@ -107,8 +107,7 @@ export default function ConceptText({ mainTitle, subtext }: ConceptTextProps) {
           {/* Main Title on top line (H2 scale, tight spacing) */}
           <h2
             style={{
-              fontFamily: "var(--f-body)",
-              fontWeight: 700,
+              fontFamily: "var(--f-display)",
               fontSize: "clamp(1.2rem, 2.5vw, 2.5rem)",
               letterSpacing: "0.02em",
               textTransform: "uppercase",
@@ -125,7 +124,7 @@ export default function ConceptText({ mainTitle, subtext }: ConceptTextProps) {
           {/* Subtext on next line */}
           <p
             style={{
-              fontFamily: "'Geist Mono', 'Geist', monospace",
+              fontFamily: "var(--f-mono)",
               fontSize: "clamp(10px, 1.1vw, 12px)",
               letterSpacing: "0.15em",
               textTransform: "uppercase",

@@ -75,19 +75,13 @@
     }
   }
 
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     font-family: var(--f-display);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
   }
 }
 
 @layer utilities {
-  .text-display-xl {
-    font-size: clamp(80px, 14vw, 200px);
-    line-height: 0.85;
-  }
-
   .text-editorial-lg {
     font-family: var(--f-serif);
     font-style: italic;

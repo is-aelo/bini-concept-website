@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CaretDown } from "@phosphor-icons/react";
 import { Icon } from "@iconify/react";
+import Heading from "@/components/Heading";
 import { AlbumDisplay } from "./AlbumDisplay";
 import { TrackList } from "./TrackList";
 import discographyData from "@/app/data/bini_discography.json";
@@ -328,23 +329,9 @@ export const Discography: React.FC =
               </p>
 
               <div className="flex items-end justify-between gap-6 flex-wrap">
-                <h2
-                  style={{
-                    fontFamily:
-                      "var(--f-display)",
-                    fontSize:
-                      "clamp(56px,9vw,120px)",
-                    letterSpacing:
-                      "-0.04em",
-                    lineHeight:
-                      0.88,
-                    color:
-                      "var(--c-teal-dark)",
-                    margin: 0,
-                  }}
-                >
+                <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
                   Music
-                </h2>
+                </Heading>
 
                 <div className="hidden sm:flex items-center gap-2 pb-2">
                   {FILTERS.map(
