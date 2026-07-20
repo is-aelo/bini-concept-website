@@ -242,7 +242,7 @@ function CardBack({
               {member.stageName}
             </div>
             <div
-              className="text-[6px] tracking-widest uppercase opacity-60"
+              className="text-[10px] tracking-wide uppercase opacity-80"
               style={{ fontFamily: "var(--f-mono)", color: "#0C0C0A" }}
             >
               {member.fullName}
