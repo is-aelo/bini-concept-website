@@ -262,7 +262,7 @@ export default function Tour({ tours = [] }: TourProps) {
     <section
       className="w-full py-20 relative overflow-hidden"
       style={{ background: "var(--c-surface)" }}
-      aria-label="BINI Tour Dates"
+      aria-label="BINI SIGNALS World Tour"
     >
       <TourBackground />
       <style>{STYLES}</style>
@@ -281,12 +281,12 @@ export default function Tour({ tours = [] }: TourProps) {
               borderRadius: "2px",
             }}
           >
-            BINI Live
+            WORLD TOUR
           </p>
 
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <Heading level="section" style={{ color: "var(--c-teal-dark)" }}>
-              Tour Dates
+              SIGNALS
             </Heading>
 
             <div

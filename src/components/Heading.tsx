@@ -23,8 +23,6 @@ const HEADING_STYLES: Record<HeadingLevel, React.CSSProperties> = {
     lineHeight: 0.88,
     letterSpacing: "-0.04em",
     textTransform: "uppercase",
-    maxHeight: "2.15em",
-    overflow: "hidden",
     margin: 0,
   },
   subsection: {

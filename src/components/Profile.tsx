@@ -365,7 +365,7 @@ function DesktopPhotoCard({
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
-    pendingTilt.current = { x: -dy * 2, z: dx * 0.4 };
+    pendingTilt.current = { x: -dy * 0.8, z: dx * 0.12 };
 
     if (rafRef.current !== null) return;
 
@@ -447,6 +447,8 @@ function DesktopPhotoCard({
         transition={{
           rotateY: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
           scale: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+          rotateX: { type: "spring", stiffness: 200, damping: 28, mass: 0.4 },
+          rotateZ: { type: "spring", stiffness: 200, damping: 28, mass: 0.4 },
         }}
         style={{
           transformStyle: "preserve-3d",
@@ -534,6 +536,7 @@ function MobileDeckCard({
       dragElastic={0.45}
       dragMomentum={false}
       onDragEnd={handleDragEnd}
+      onTap={handleFlip}
       style={{
         x: isTopCard ? x : 0,
         rotate: isTopCard ? rotate : stackTilt + offset.x * 0.3,
@@ -581,7 +584,6 @@ function MobileDeckCard({
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-        onClick={handleFlip}
       >
         <CardFront member={member} index={index} r={r} g={g} b={b} />
         <CardBack member={member} index={index} accent={accent} r={r} g={g} b={b} total={total} />
