@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Heading from "@/components/Heading";
 
@@ -60,6 +60,73 @@ function getTransform(offset: number): {
   const opacity = abs > SIDE_COUNT ? 0 : Math.max(0, 1 - 0.32 * abs);
   const zIndex = 10 - abs;
   return { rotateY, translateX, translateZ, scale, opacity, zIndex };
+}
+
+function seededRand(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function SparkleParticles({ color, width }: { color: string; width: string }) {
+  const particles = useMemo(() => {
+    const rand = seededRand(42);
+    return Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      x: rand() * 100,
+      y: rand() * 100,
+      size: 2 + rand() * 3,
+      delay: rand() * 3,
+      duration: 2.5 + rand() * 2,
+      driftX: (rand() - 0.5) * 30,
+      driftY: -15 - rand() * 25,
+    }));
+  }, []);
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: "-15%",
+        pointerEvents: "none",
+        zIndex: 5,
+        overflow: "visible",
+      }}
+    >
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, 1, 1, 0],
+            x: [0, p.driftX],
+            y: [0, p.driftY],
+            scale: [0.5, 1, 0.8, 0.3],
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            repeat: Infinity,
+            repeatDelay: 1 + Math.random() * 2,
+            ease: "easeOut",
+          }}
+          style={{
+            position: "absolute",
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            borderRadius: "50%",
+            background: color,
+            boxShadow: `0 0 ${p.size * 2}px ${p.size}px ${color}80`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
@@ -124,23 +191,33 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
       aria-label="Album carousel"
       style={{ outline: "none", width: "100%" }}
     >
-      {/* Ambient glow behind the whole carousel */}
+      {/* Ambient glow behind the whole carousel — breathing pulse */}
       <AnimatePresence>
         <motion.div
           key={accentColor + "-glow"}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          animate={{ opacity: [0, 0.7, 0.4, 0.75, 0.35, 0.65, 0] }}
+          transition={{ duration: 4, ease: "easeInOut", times: [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1] }}
           style={{
             position: "absolute",
             inset: "-80px -40px",
-            background: `radial-gradient(ellipse 70% 55% at 50% 45%, ${accentColor}22 0%, transparent 68%)`,
+            background: `radial-gradient(ellipse 70% 55% at 50% 45%, ${accentColor}30 0%, transparent 68%)`,
             pointerEvents: "none",
             zIndex: 0,
           }}
         />
       </AnimatePresence>
+
+      {/* Secondary deeper glow layer */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "-120px -60px",
+          background: `radial-gradient(ellipse 50% 40% at 50% 50%, ${accentColor}12 0%, transparent 70%)`,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
 
       {/* ─── Coverflow stage ─────────────────────────────────── */}
       <div
@@ -157,6 +234,7 @@ export const AlbumDisplay: React.FC<AlbumDisplayProps> = ({
           zIndex: 1,
         }}
       >
+        <SparkleParticles color={accentColor} width={CARD_W} />
         {visibleAlbums.map((album) => {
           const globalIdx = albums.indexOf(album);
           const offset = globalIdx - activeIndex;

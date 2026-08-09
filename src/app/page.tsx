@@ -9,6 +9,7 @@ import Tour from "@/components/Tour";
 import { Gallery } from "@/components/Gallery";
 import Membership from "@/components/Membership";
 import Footer from "@/components/Footer";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 import { sanityFetch } from "@/sanity/lib/fetch";
 
@@ -132,16 +133,18 @@ export default async function BiniPage() {
       <Header />
       <Concept teaser={featuredTeaser} />
       <IridescentMesh />
-      <div id="profile" className="scroll-mt-24">
+      <ScrollReveal as="section" id="profile" className="scroll-mt-24" delay={0.02}>
         <Profile members={members} />
-      </div>
-      <CoachellaSection
-        images={(coachellaImages as CoachellaImage[]) || []}
-      />
-      <div id="disco" className="scroll-mt-24">
+      </ScrollReveal>
+      <ScrollReveal as="section" className="scroll-mt-24" delay={0.06}>
+        <CoachellaSection
+          images={(coachellaImages as CoachellaImage[]) || []}
+        />
+      </ScrollReveal>
+      <ScrollReveal as="section" id="disco" className="scroll-mt-24" delay={0.1}>
         <Discography />
-      </div>
-      <div id="tour" className="scroll-mt-24">
+      </ScrollReveal>
+      <ScrollReveal as="section" id="tour" className="scroll-mt-24" delay={0.14}>
         <Tour
           tours={
             ((tours as Partial<TourEvent>[]) || []).map((t) => ({
@@ -151,11 +154,13 @@ export default async function BiniPage() {
             })) as TourEvent[]
           }
         />
-      </div>
-      <div id="gallery" className="scroll-mt-24">
+      </ScrollReveal>
+      <ScrollReveal as="section" id="gallery" className="scroll-mt-24" delay={0.18}>
         <Gallery items={(signalsTourImages as SignalsTourImageItem[]) || []} />
-      </div>
-      <Membership />
+      </ScrollReveal>
+      <ScrollReveal as="section" className="scroll-mt-24" delay={0.22}>
+        <Membership />
+      </ScrollReveal>
       <Footer />
     </div>
   );

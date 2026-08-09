@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, AnimatePresence, useInView } from "framer-motion";
 import { Icon } from "@iconify/react";
 import Heading from "@/components/Heading";
 import ProfileGridShader from "./ProfileGridShader";
@@ -335,11 +335,13 @@ function DesktopPhotoCard({
   index,
   total,
   isDeckHovered,
+  hasAppeared,
 }: {
   member: Member;
   index: number;
   total: number;
   isDeckHovered: boolean;
+  hasAppeared: boolean;
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -357,6 +359,8 @@ function DesktopPhotoCard({
   const stackedRotate = distanceFromCenter * 3;
   const fannedX = distanceFromCenter * 140;
   const fannedRotate = distanceFromCenter * 5;
+
+  const entranceDelay = hasAppeared ? index * 0.12 : 0;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = cardRef.current?.getBoundingClientRect();
@@ -407,12 +411,25 @@ function DesktopPhotoCard({
         left: "calc(50% - 105px)",
         zIndex: isFlipped ? 50 : 10 + index,
       }}
-      animate={{
-        x: isFlipped ? 0 : isDeckHovered ? fannedX : stackedX,
-        rotate: isFlipped ? 0 : isDeckHovered ? fannedRotate : stackedRotate,
-        y: isFlipped ? -40 : isDeckHovered ? -15 : 0,
+      initial={{ x: 0, rotate: 0, y: 0, opacity: 0, scale: 0.9 }}
+      animate={
+        hasAppeared
+          ? {
+              x: isFlipped ? 0 : isDeckHovered ? fannedX : stackedX,
+              rotate: isFlipped ? 0 : isDeckHovered ? fannedRotate : stackedRotate,
+              y: isFlipped ? -40 : isDeckHovered ? -15 : 0,
+              opacity: 1,
+              scale: 1,
+            }
+          : { x: 0, rotate: 0, y: 0, opacity: 0, scale: 0.9 }
+      }
+      transition={{
+        x: { type: "spring", stiffness: 120, damping: 24, mass: 0.6, delay: entranceDelay },
+        rotate: { type: "spring", stiffness: 120, damping: 24, mass: 0.6, delay: entranceDelay },
+        y: { type: "spring", stiffness: 120, damping: 24, mass: 0.6, delay: entranceDelay },
+        opacity: { duration: 0.35, delay: entranceDelay },
+        scale: { type: "spring", stiffness: 180, damping: 20, mass: 0.5, delay: entranceDelay },
       }}
-      transition={{ type: "spring", stiffness: 120, damping: 24, mass: 0.6 }}
     >
       <motion.div
         className="absolute pointer-events-none"
@@ -503,6 +520,8 @@ function MobileDeckCard({
   const stackTilt = STACK_TILTS[index % STACK_TILTS.length];
   const offset = STACK_OFFSETS[Math.min(stackPosition, STACK_OFFSETS.length - 1)];
 
+
+
   const handleDragEnd = async (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (!isTopCard) return;
     if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
@@ -574,6 +593,7 @@ function MobileDeckCard({
             : "blur(2px)",
           opacity: isTopCard ? 0.25 : 0.65,
         }}
+        transition={{ type: "spring", stiffness: 220, damping: 24, mass: 0.6 }}
       />
 
       <motion.div
@@ -665,12 +685,15 @@ function MobileDeckViewer({ members }: { members: Member[] }) {
 
 export default function Profile({ members }: ProfileProps) {
   const [isDeckHovered, setIsDeckHovered] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
   if (!members?.length) return null;
 
   const sorted = sortByBirthdayEldestToYoungest(members);
 
   return (
     <section
+      ref={sectionRef}
       className="relative py-12 sm:py-16 lg:py-24 overflow-hidden w-full"
       style={{ background: "var(--c-surface, #F5F3EE)" }}
     >
@@ -724,6 +747,7 @@ export default function Profile({ members }: ProfileProps) {
                 index={i}
                 total={sorted.length}
                 isDeckHovered={isDeckHovered}
+                hasAppeared={isInView}
               />
             ))}
           </div>

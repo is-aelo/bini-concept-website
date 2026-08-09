@@ -120,14 +120,15 @@ const Header = () => {
       >
         <div className="max-w-[1800px] mx-auto flex justify-between items-center">
           <a href="#" className="group relative flex items-center">
-            <Image
-              src={headerLogoSrc}
-              alt={settings?.title || "BINI"}
-              width={180}
-              height={40}
-              className="h-8 w-auto md:h-10 object-contain"
-              priority
-            />
+            <div className="h-8 md:h-10 w-[130px] md:w-[160px] relative">
+              <Image
+                src={headerLogoSrc}
+                alt={settings?.title || "BINI"}
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[var(--c-teal)] transition-all duration-300 group-hover:w-full"></span>
           </a>
 
@@ -174,9 +175,9 @@ const Header = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <MobileMenu 
-            isOpen={isMobileMenuOpen} 
             onClose={() => setIsMobileMenuOpen(false)} 
             navLinks={navLinks} 
+            activeSection={activeSection}
             logoUrl={headerLogoSrc}
             siteTitle={settings?.title}
           />

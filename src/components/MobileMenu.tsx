@@ -1,19 +1,26 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { X, ArrowUpRight } from '@phosphor-icons/react';
 import { Icon } from '@iconify/react';
 
 interface MobileMenuProps {
-  isOpen: boolean;
   onClose: () => void;
   navLinks: { name: string; href: string }[];
+  activeSection?: string;
   logoUrl?: string;
   siteTitle?: string;
 }
 
-const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: MobileMenuProps) => {
+const MobileMenu = ({
+  onClose,
+  navLinks = [],
+  activeSection = "",
+  logoUrl,
+  siteTitle,
+}: MobileMenuProps) => {
   return (
     <motion.div 
       initial={{ x: '100%' }}
@@ -25,7 +32,14 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
       <div className="flex justify-between items-center mb-20">
         <div className="flex items-center">
           {logoUrl ? (
-            <img src={logoUrl} alt={siteTitle || "Logo"} className="h-8 w-auto object-contain" />
+            <div className="relative h-8 w-[120px]">
+              <Image
+                src={logoUrl}
+                alt={siteTitle || "Logo"}
+                fill
+                className="object-contain"
+              />
+            </div>
           ) : (
             <span className="text-xl font-bold tracking-tighter uppercase">{siteTitle || "BINI"}</span>
           )}
@@ -39,7 +53,11 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
       </div>
 
       <nav className="flex flex-col gap-6">
-        {navLinks.map((link, idx) => (
+        {navLinks.map((link, idx) => {
+          const sectionId = link.href.replace("#", "");
+          const isActive = activeSection === sectionId;
+
+          return (
           <motion.a
             key={link.name}
             initial={{ opacity: 0, x: 20 }}
@@ -47,12 +65,29 @@ const MobileMenu = ({ isOpen, onClose, navLinks = [], logoUrl, siteTitle }: Mobi
             transition={{ delay: 0.1 + idx * 0.1 }}
             href={link.href}
             onClick={onClose}
-            className="text-5xl font-display uppercase tracking-tighter flex items-center justify-between group hover:text-[var(--c-teal)] transition-colors"
-          >
-            {link.name}
-            <ArrowUpRight size={32} weight="light" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+            aria-current={isActive ? "page" : undefined}
+            className={`text-5xl font-display uppercase tracking-tighter flex items-center justify-between group transition-colors ${
+              isActive
+                ? "text-[var(--c-teal)]"
+                : "text-[var(--c-ink)] hover:text-[var(--c-teal)]"
+            }`}
+            >
+            <span className="relative inline-flex items-center">
+              {link.name}
+              {isActive && (
+                <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-[var(--c-teal)]" />
+              )}
+            </span>
+            <ArrowUpRight
+              size={32}
+              weight="light"
+              className={`transition-opacity ${
+                isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              }`}
+            />
           </motion.a>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="mt-auto pt-10 border-t border-[var(--c-surface-3)]">

@@ -8,6 +8,19 @@ import Heading from "@/components/Heading";
 import GalleryBackground from "./GalleryBackground";
 import ImageLightbox, { LightboxImage } from "./ImageLightbox";
 
+const GALLERY_POP_KEY = "bini-gallery-popped";
+
+function shouldPlayPop(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.sessionStorage.getItem(GALLERY_POP_KEY)) return false;
+    window.sessionStorage.setItem(GALLERY_POP_KEY, "1");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 type SignalsTourImage = {
   _id: string;
   caption: string;
@@ -84,7 +97,7 @@ function MobileSlider({
             fill
             draggable={false}
             className="object-cover select-none"
-            sizes="100vw"
+            sizes="(max-width: 640px) 100vw, 1320px"
             placeholder={item.lqip ? "blur" : "empty"}
             blurDataURL={item.lqip}
             priority={active === 0}
@@ -209,11 +222,15 @@ function EditorialImage({
   index,
   className,
   onOpen,
+  popDelay,
+  shouldPop,
 }: {
   item: SignalsTourImage;
   index: number;
   className: string;
   onOpen: () => void;
+  popDelay: number;
+  shouldPop: boolean;
 }) {
   return (
     <motion.button
@@ -221,6 +238,15 @@ function EditorialImage({
       onClick={onOpen}
       className={className}
       aria-label={`Open ${item.caption} in lightbox`}
+      initial={shouldPop ? { opacity: 0, scale: 0.3, rotate: (index % 2 === 0 ? 1 : -1) * (3 + ((((index * 1664525 + 1013904223) & 0xffffffff) >>> 0) / 0xffffffff) * 4) } : { opacity: 1, scale: 1, rotate: 0 }}
+      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 14,
+        mass: 0.8,
+        delay: shouldPop ? popDelay : 0,
+      }}
     >
       <div className="signals-frame">
         <Image
@@ -260,6 +286,22 @@ export function Gallery({ items }: GalleryProps) {
     [galleryItems]
   );
 
+  const shouldPop = useMemo(() => shouldPlayPop(), []);
+
+  const popDelays = useMemo(() => {
+    if (!shouldPop) return {};
+    const indices = galleryItems.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    const delays: Record<number, number> = {};
+    indices.forEach((cardIdx, order) => {
+      delays[cardIdx] = order * 0.12 + Math.random() * 0.08;
+    });
+    return delays;
+  }, [galleryItems.length, shouldPop]);
+
   if (galleryItems.length === 0) return null;
 
   const lead = galleryItems[0];
@@ -290,6 +332,8 @@ export function Gallery({ items }: GalleryProps) {
               index={0}
               className="signals-card signals-card--lead"
               onOpen={() => setLightboxIndex(0)}
+              popDelay={popDelays[0] ?? 0}
+              shouldPop={shouldPop}
             />
 
             <div className="signals-stack">
@@ -300,6 +344,8 @@ export function Gallery({ items }: GalleryProps) {
                   index={i + 1}
                   className="signals-card signals-card--stack"
                   onOpen={() => setLightboxIndex(i + 1)}
+                  popDelay={popDelays[i + 1] ?? 0}
+                  shouldPop={shouldPop}
                 />
               ))}
             </div>
@@ -315,6 +361,8 @@ export function Gallery({ items }: GalleryProps) {
                       index={actualIndex}
                       className="signals-card signals-card--secondary"
                       onOpen={() => setLightboxIndex(actualIndex)}
+                      popDelay={popDelays[actualIndex] ?? 0}
+                      shouldPop={shouldPop}
                     />
                   );
                 })}
