@@ -119,12 +119,13 @@ const Header = () => {
         }`}
       >
         <div className="max-w-[1800px] mx-auto flex justify-between items-center">
-          <a href="#" className="group relative flex items-center">
-            <div className="h-8 md:h-10 w-[130px] md:w-[160px] relative">
+          <a href="#" className="group relative flex items-center h-8 md:h-10">
+            <div className="h-full relative" style={{ width: "clamp(100px, 30vw, 140px)" }}>
               <Image
                 src={headerLogoSrc}
                 alt={settings?.title || "BINI"}
                 fill
+                style={{ objectPosition: "left center" }}
                 className="object-contain"
                 priority
               />
@@ -162,12 +163,12 @@ const Header = () => {
             </a>
           </nav>
 
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="md:hidden p-2 text-[var(--c-ink)]"
+            className="md:hidden h-8 w-8 flex items-center justify-center text-[var(--c-ink)]"
             aria-label="Open Menu"
           >
-            <List size={32} weight="light" />
+            <List size={26} weight="light" />
           </button>
         </div>
       </header>
